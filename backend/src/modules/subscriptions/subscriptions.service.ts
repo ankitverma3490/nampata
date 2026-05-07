@@ -314,8 +314,11 @@ export class SubscriptionsService implements OnModuleInit {
         
         try {
             const url = new URL(rawUrl);
-            return `${url.protocol}//${url.host}`;
+            const cleanUrl = `${url.protocol}//${url.host}`;
+            this.logger.log(`[getCleanBaseUrl] Raw: ${rawUrl}, Clean: ${cleanUrl}`);
+            return cleanUrl;
         } catch (e) {
+            this.logger.error(`[getCleanBaseUrl] Failed to parse URL: ${rawUrl}`);
             return 'http://localhost:3000';
         }
     }
@@ -474,7 +477,8 @@ export class SubscriptionsService implements OnModuleInit {
                         planName: existingTransaction.subscription?.plan?.name || 'Premium Plan',
                         planType: existingTransaction.subscription?.plan?.planType,
                         amount: existingTransaction.amount,
-                        endDate: existingTransaction.subscription?.endDate
+                        endDate: existingTransaction.subscription?.endDate,
+                        transactionId: existingTransaction.id
                     };
                 }
 
@@ -485,13 +489,19 @@ export class SubscriptionsService implements OnModuleInit {
                 });
 
                 if (existingActivePlan) {
+                    // Find the transaction record
+                    const transaction = await this.transactionRepository.findOne({
+                        where: { gatewayTransactionId: session.id }
+                    });
+                    
                     return {
                         success: true,
                         alreadyProcessed: true,
                         planName: existingActivePlan.plan?.name || 'Premium Plan',
                         type: existingActivePlan.plan?.type || 'plan',
                         amount: existingActivePlan.amountPaid,
-                        endDate: existingActivePlan.endDate
+                        endDate: existingActivePlan.endDate,
+                        transactionId: transaction?.id
                     };
                 }
 
@@ -504,12 +514,18 @@ export class SubscriptionsService implements OnModuleInit {
                         const plan = await this.planRepository.findOne({ where: { stripePriceId: priceId } });
                         if (plan) {
                             const sub = await this.processSubscriptionSuccess(vendorId, plan.id, session.id, 'Stripe');
+                            // Find the newly created transaction
+                            const transaction = await this.transactionRepository.findOne({
+                                where: { gatewayTransactionId: session.id }
+                            });
+                            
                             return {
                                 success: true,
                                 planName: plan.name,
                                 planType: plan.planType,
                                 amount: plan.price,
-                                endDate: sub.endDate
+                                endDate: sub.endDate,
+                                transactionId: transaction?.id
                             };
                         }
                     }
@@ -520,12 +536,18 @@ export class SubscriptionsService implements OnModuleInit {
                     const { planId, targetId } = session.metadata;
                     if (vendorId && planId) {
                         const activePlan = await this.processActivePlanSuccess(vendorId, planId, session.id, 'Stripe', targetId);
+                        // Find the newly created transaction
+                        const transaction = await this.transactionRepository.findOne({
+                            where: { gatewayTransactionId: session.id }
+                        });
+                        
                         return {
                             success: true,
                             type: activePlan.plan?.type || 'plan',
                             planName: activePlan.plan?.name || 'Active Plan',
                             endDate: activePlan.endDate,
-                            amount: activePlan.amountPaid
+                            amount: activePlan.amountPaid,
+                            transactionId: transaction?.id
                         };
                     }
                 }

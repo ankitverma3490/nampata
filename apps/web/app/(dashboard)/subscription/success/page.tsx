@@ -14,11 +14,170 @@ import {
     AlertCircle,
     PartyPopper,
     ShieldCheck,
-    Zap
+    Zap,
+    FileText,
+    Download,
+    X
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { useRef } from 'react';
+
+/* ─── Invoice Modal ─────────────────────────────────────────────────────── */
+function InvoiceModal({ invoiceId, onClose }: { invoiceId: string; onClose: () => void }) {
+    const [data, setData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const printRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        api.subscriptions.getInvoice(invoiceId).then(setData).catch(console.error).finally(() => setLoading(false));
+    }, [invoiceId]);
+
+    const handlePrint = () => {
+        if (!printRef.current) return;
+        const content = printRef.current.innerHTML;
+        const w = window.open('', '_blank');
+        if (!w) return;
+        w.document.write(`<html><head><title>Invoice</title>
+            <style>
+                body { font-family: system-ui, sans-serif; padding: 40px; color: #0f172a; }
+                .logo { font-size: 24px; font-weight: 900; color: #f97316; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { padding: 12px 16px; text-align: left; }
+                th { background: #f8fafc; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; }
+                .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #fff7ed; color: #f97316; }
+                .total-row { border-top: 2px solid #f1f5f9; font-weight: 900; }
+            </style>
+        </head><body>${content}</body></html>`);
+        w.document.close();
+        w.print();
+    };
+
+    const txn = data?.transaction;
+    const vendor = data?.vendor;
+    const userInfo = data?.user;
+    const plan = txn?.subscription?.plan || txn?.pricingPlan;
+    const invDate = txn?.paidAt ? new Date(txn.paidAt) : new Date(txn?.createdAt);
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ scale: 0.9, y: 20, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.9, y: 20, opacity: 0 }}
+                className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
+                onClick={e => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between px-8 py-5 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-orange-50 dark:bg-orange-900/10 flex items-center justify-center">
+                            <FileText className="w-5 h-5 text-orange-500" />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-black text-slate-900 dark:text-white">Invoice</h2>
+                            {txn && <p className="text-xs text-slate-400 font-bold">{txn.invoiceNumber || txn.id}</p>}
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {!loading && txn && (
+                            <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl text-xs font-black hover:opacity-90 transition-all">
+                                <Download className="w-3.5 h-3.5" /> Print / Save PDF
+                            </button>
+                        )}
+                        <button onClick={onClose} className="w-10 h-10 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 transition-colors">
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="overflow-y-auto max-h-[75vh]">
+                    {loading ? (
+                        <div className="flex items-center justify-center py-20">
+                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                        </div>
+                    ) : !txn ? (
+                        <div className="text-center py-16 text-slate-400 font-bold">Invoice not found</div>
+                    ) : (
+                        <div ref={printRef} className="p-8">
+                            {/* Invoice Header */}
+                            <div className="flex items-start justify-between mb-10 text-slate-900 dark:text-white">
+                                <div>
+                                    <div className="text-2xl font-black text-orange-500 mb-1">naampata</div>
+                                    <p className="text-xs text-slate-400 font-bold">Business Listings Platform</p>
+                                </div>
+                                <div className="text-right">
+                                <div className="inline-block px-4 py-1.5 bg-green-500/10 text-green-500 rounded-full text-xs font-black uppercase tracking-wider mb-2">
+                                    {txn.status === 'completed' ? '✓ Paid' : txn.status}
+                                </div>
+                                    <p className="text-sm font-black">{txn.invoiceNumber || `INV-${txn.id.slice(0, 8).toUpperCase()}`}</p>
+                                    <p className="text-xs text-slate-400 font-bold mt-0.5">
+                                        {invDate.toLocaleDateString('en-PK', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Billed To */}
+                            <div className="grid grid-cols-2 gap-8 mb-10 pb-8 border-b border-slate-100 dark:border-slate-800 text-slate-900 dark:text-white">
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-2">Billed To</p>
+                                    <p className="font-black">{vendor?.businessName || userInfo?.fullName}</p>
+                                    <p className="text-sm text-slate-500 font-bold mt-1">{userInfo?.email}</p>
+                                    {userInfo?.phone && <p className="text-sm text-slate-500 font-bold">{userInfo?.phone}</p>}
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-2">Payment Details</p>
+                                    <p className="text-sm font-black">Method: {txn.paymentGateway || 'Stripe'}</p>
+                                    <p className="text-sm text-slate-500 font-bold mt-1">
+                                        Ref: {txn.gatewayTransactionId?.slice(-12)}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Items Table */}
+                            <table className="w-full mb-6">
+                                <thead>
+                                    <tr className="bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                                        <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-400 rounded-l-xl">Description</th>
+                                        <th className="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-400 rounded-r-xl">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="border-b border-slate-50 dark:border-slate-800/50">
+                                        <td className="px-4 py-4">
+                                            <p className="font-black text-slate-900 dark:text-white">{plan?.name || 'Subscription Plan'}</p>
+                                            <p className="text-xs text-slate-400 font-bold mt-0.5">
+                                                Active Subscription Service
+                                            </p>
+                                        </td>
+                                        <td className="px-4 py-4 text-right font-black text-slate-900 dark:text-white">
+                                            PKR {Number(txn.amount).toLocaleString()}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td className="px-4 py-6 text-right text-sm font-black text-slate-500 uppercase tracking-wider">Total</td>
+                                        <td className="px-4 py-6 text-right text-2xl font-black text-slate-900 dark:text-white">
+                                            PKR {Number(txn.amount).toLocaleString()}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
 
 function SuccessContent() {
     const router = useRouter();
@@ -27,6 +186,7 @@ function SuccessContent() {
     const sessionId = searchParams.get('session_id');
     const [status, setStatus] = useState<'loading' | 'celebrating' | 'success' | 'error'>('loading');
     const [planDetails, setPlanDetails] = useState<any>(null);
+    const [showInvoice, setShowInvoice] = useState(false);
 
     useEffect(() => {
         if (sessionId) {
@@ -84,6 +244,12 @@ function SuccessContent() {
 
     return (
         <AnimatePresence mode="wait">
+            {showInvoice && planDetails?.transactionId && (
+                <InvoiceModal 
+                    invoiceId={planDetails.transactionId} 
+                    onClose={() => setShowInvoice(false)} 
+                />
+            )}
             {status === 'loading' && (
                 <motion.div
                     key="loading"
@@ -272,14 +438,23 @@ function SuccessContent() {
                             </div>
 
                             <div className="space-y-3">
-                                <Link href="/dashboard" className="flex items-center justify-between w-full p-5 bg-white/5 dark:bg-slate-50 hover:bg-white/10 dark:hover:bg-slate-100 rounded-2xl transition-all group/btn">
-                                    <span className="font-black text-sm">Open Dashboard</span>
-                                    <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                                </Link>
-                                <Link href="/listings" className="flex items-center justify-between w-full p-5 bg-white/5 dark:bg-slate-50 hover:bg-white/10 dark:hover:bg-slate-100 rounded-2xl transition-all group/btn">
-                                    <span className="font-black text-sm">Optimize Listings</span>
-                                    <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                                </Link>
+                            <Link href="/dashboard" className="flex items-center justify-between w-full p-5 bg-white/5 dark:bg-slate-50 hover:bg-white/10 dark:hover:bg-slate-100 rounded-2xl transition-all group/btn">
+                                <span className="font-black text-sm">Open Dashboard</span>
+                                <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                            </Link>
+                            {planDetails?.transactionId && (
+                                <button 
+                                    onClick={() => setShowInvoice(true)}
+                                    className="flex items-center justify-between w-full p-5 bg-white/5 dark:bg-slate-50 hover:bg-white/10 dark:hover:bg-slate-100 rounded-2xl transition-all group/btn"
+                                >
+                                    <span className="font-black text-sm text-left">Download Invoice</span>
+                                    <FileText className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                                </button>
+                            )}
+                            <Link href="/listings" className="flex items-center justify-between w-full p-5 bg-white/5 dark:bg-slate-50 hover:bg-white/10 dark:hover:bg-slate-100 rounded-2xl transition-all group/btn">
+                                <span className="font-black text-sm">Optimize Listings</span>
+                                <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                            </Link>
                             </div>
                         </div>
                     </div>
