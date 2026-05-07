@@ -823,19 +823,25 @@ export class SubscriptionsService implements OnModuleInit {
             });
 
             if (freePlan) {
-                // Create/Update absolute Free Plan in New System
-                const endDate = new Date(now.getTime() + 3650 * 24 * 60 * 60 * 1000);
-                const activePlan = this.activePlanRepository.create({
-                    vendorId: vendor.id,
-                    planId: freePlan.id,
-                    status: ActivePlanStatus.ACTIVE,
-                    startDate: now,
-                    endDate: endDate,
-                    amountPaid: 0,
-                });
-                result = await this.activePlanRepository.save(activePlan);
-                isNewSystem = true;
-            } else {
+                try {
+                    // Create/Update absolute Free Plan in New System
+                    const endDate = new Date(now.getTime() + 3650 * 24 * 60 * 60 * 1000);
+                    const activePlan = this.activePlanRepository.create({
+                        vendorId: vendor.id,
+                        planId: freePlan.id,
+                        status: ActivePlanStatus.ACTIVE,
+                        startDate: now,
+                        endDate: endDate,
+                        amountPaid: 0,
+                    });
+                    result = await this.activePlanRepository.save(activePlan);
+                    isNewSystem = true;
+                } catch (err) {
+                    this.logger.error(`Failed to auto-assign new system Free plan: ${err.message}`);
+                }
+            }
+            
+            if (!result) {
                 // Fallback to Old System Free Plan
                 const oldFreePlan = await this.planRepository.findOne({
                     where: { name: 'Free' }

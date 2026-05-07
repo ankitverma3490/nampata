@@ -310,7 +310,9 @@ export class BusinessesService implements OnModuleInit {
             queryBuilder.andWhere('listing.id IN (:...esIds)', { esIds });
             // If relevance sorting requested, use ES order
             if (sortBy === SearchSortBy.RELEVANCE) {
-                queryBuilder.orderBy(`array_position(ARRAY['${esIds.join("','")}']::uuid[], listing.id)`, 'ASC');
+                // Ensure IDs are properly quoted for the SQL array
+                const quotedIds = esIds.map(id => `'${id}'`).join(',');
+                queryBuilder.orderBy(`array_position(ARRAY[${quotedIds}]::uuid[], listing.id)`, 'ASC');
             }
         } else if (searchDto.query) {
             // Text search fallback — matches title, description and vendor/admin-added search keywords
