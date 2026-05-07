@@ -95,6 +95,7 @@ export class SearchBusinessDto extends PaginationDto {
     @IsBoolean()
     verifiedOnly?: boolean = false;
 
+    // Trigger redeploy to fix skipped status
     @ApiPropertyOptional({ example: 'new', description: 'Quick filter (new, featured)' })
     @IsOptional()
     @IsString()
