@@ -229,7 +229,7 @@ export default function BroadcastRequestForm({ onSuccess }: BroadcastRequestForm
                                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                         onKeyDown={(e) => e.key === 'Enter' && nextStep()}
                                     />
-                                    <Megaphone className="absolute right-8 top-1/2 -translate-y-1/2 w-8 h-8 text-slate-100 group-focus-within:text-blue-600/20 transition-colors" />
+                                    {/* <Megaphone className="absolute right-8 top-1/2 -translate-y-1/2 w-8 h-8 text-slate-100 group-focus-within:text-blue-600/20 transition-colors" /> */}
                                 </div>
                             </div>
                         )}

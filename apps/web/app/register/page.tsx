@@ -85,7 +85,7 @@ function RegisterForm() {
         <div className="min-h-screen bg-white flex flex-col">
             <Navbar />
 
-            <main className="flex-grow flex items-center justify-center px-4 py-20 relative overflow-hidden">
+            <main className="flex-grow flex items-center justify-center px-4 py-10 relative overflow-hidden">
                 {/* Background Accents */}
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[128px] pointer-events-none" />
                 <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/5 rounded-full blur-[128px] pointer-events-none" />
@@ -256,11 +256,7 @@ function RegisterForm() {
                             Sign up with Google
                         </button>
 
-                        <div className="mt-8 pt-8 border-t border-slate-100/50 text-center">
-                            <div className="flex items-center justify-center gap-2 text-slate-300 text-[10px] font-black uppercase tracking-widest">
-                                <ShieldCheck className="w-4 h-4 text-emerald-400" /> Secure Encryption
-                            </div>
-                        </div>
+                        
                     </div>
 
                     <p className="mt-8 text-center text-sm text-slate-500 font-bold">

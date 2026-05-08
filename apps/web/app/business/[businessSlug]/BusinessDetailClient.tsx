@@ -2173,7 +2173,7 @@ export default function BusinessDetailClient({
               </div>
 
               {/* Business Profile / Vendor Profile Card */}
-              <div className="bg-white rounded-[32px] p-10 border border-slate-100 shadow-premium transition-all hover:shadow-2xl hover:-translate-y-1 duration-500">
+              <div className="bg-light rounded-[30px] p-10 border border-slate-100 transition-all   duration-500">
                 <h4 className="text-xl font-black text-slate-900 mb-10 flex items-center gap-4">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                     <User className="w-5 h-5 text-primary" />
@@ -2216,17 +2216,15 @@ export default function BusinessDetailClient({
                       {business.vendor?.user?.fullName ||
                         "Verified Business Owner"}
                     </h5>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-8">
-                      Authorized Vendor
-                    </p>
+                   
                   </Link>
 
 
 
                   {/* Status & Followers Section */}
-                  <div className="w-full grid grid-cols-2 gap-3 mb-6">
+                  <div className="w-full grid grid-cols-2 gap-3 mb-6 mt-3">
                     <div className="">
-                      <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                      <div className="text-[9px] font-black mb-2 text-slate-400 uppercase tracking-widest">
                         Availability
                       </div>
                       <VendorOnlineBadge

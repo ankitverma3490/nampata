@@ -233,15 +233,7 @@ export default function Navbar() {
                                                         <span className="text-[10px] text-slate-400 font-medium italic">Post your requirement instantly</span>
                                                     </div>
                                                 </Link>
-                                                <Link href="/search" onClick={() => setActiveDropdown(null)} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-all group/item">
-                                                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
-                                                        <Filter className="w-4 h-4" />
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm font-bold text-slate-900">Advanced Search</span>
-                                                        <span className="text-[10px] text-slate-400 font-medium italic">Find exactly what you need</span>
-                                                    </div>
-                                                </Link>
+                                                
                                                 <Link href="/offers-events" onClick={() => setActiveDropdown(null)} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-all group/item">
                                                     <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500">
                                                         <Calendar className="w-4 h-4" />
@@ -480,12 +472,7 @@ export default function Navbar() {
                                                 </div>
                                                 <span className="text-sm font-semibold text-slate-700">Business Broadcast</span>
                                             </Link>
-                                            <Link href="/search" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white transition-all">
-                                                <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
-                                                    <Filter className="w-4 h-4" />
-                                                </div>
-                                                <span className="text-sm font-semibold text-slate-700">Advanced Search</span>
-                                            </Link>
+                                          
                                             <Link href="/offers-events" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white transition-all">
                                                 <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500">
                                                     <Calendar className="w-4 h-4" />

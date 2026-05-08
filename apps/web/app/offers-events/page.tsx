@@ -129,7 +129,7 @@ const OffersEventsContent = () => {
             <Navbar />
 
             {/* Premium Header */}
-            <div className="bg-white border-b border-slate-50 pt-24 pb-12 lg:pt-32 lg:pb-16">
+            <div className="bg-white border-b border-slate-50 pt-10 pb-12 lg:pt-10 lg:pb-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Breadcrumbs */}
                     <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300 mb-10">
@@ -173,7 +173,7 @@ const OffersEventsContent = () => {
 
             {/* Search Bar - Premium Sticky? No, just prominent */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
-                <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-3 p-3 bg-white rounded-[24px] shadow-2xl shadow-slate-200/50 border border-slate-100">
+                <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-3 p-3 bg-white rounded-[24px]  shadow-slate-200/50 border border-slate-100">
                     <div className="flex-1 relative group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-orange-500 transition-colors" />
                         <input 

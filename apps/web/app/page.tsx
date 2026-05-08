@@ -319,7 +319,7 @@ export default function HomePage() {
       {/* Google Maps Script is handled in layout.tsx */}
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-32 px-4 bg-[#FDFCFB]">
+      <section className="relative pt-20 pb-32 px-4 bg-[#FDFCFB]">
         {/* Subtle background patterns like in the image */}
         <div className="absolute top-10 left-10 opacity-20">
           <div className="grid grid-cols-4 gap-2">
@@ -338,9 +338,9 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-50 border border-orange-100 mb-8">
+            {/* <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-50 border border-orange-100 mb-8">
               <span className="text-[10px] font-black text-orange-500 uppercase tracking-[0.2em]">✨ Your Local. Your Choice.</span>
-            </div>
+            </div> */}
 
             <h1 className="text-5xl md:text-7xl font-black text-[#112D4E] mb-6 tracking-tight leading-[1.1]">
               Discover Trusted Local Businesses <br />
@@ -361,10 +361,10 @@ export default function HomePage() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="max-w-5xl mx-auto mb-12"
           >
-            <div className="bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 p-3 flex flex-col md:flex-row items-center gap-2">
+            <div className="bg-white rounded-[32px]  border border-gray-100 p-3 flex flex-col md:flex-row items-center gap-2">
               {/* City Selection */}
               <div className="flex-1 w-full flex items-center px-6 py-4 md:border-r border-gray-100 group">
-                <MapPin className="w-5 h-5 text-slate-300 mr-4 group-hover:text-orange-500 transition-colors" />
+                {/* <MapPin className="w-5 h-5 text-slate-300 mr-4 group-hover:text-orange-500 transition-colors" /> */}
                 <div className="flex flex-col items-start text-left flex-1">
                   <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1">Your Area</span>
                   <CitySearchSelect
@@ -395,7 +395,7 @@ export default function HomePage() {
 
               <button
                 onClick={handleSearch}
-                className="w-full md:w-auto bg-[#FF7A30] hover:bg-[#E86920] text-white px-10 py-5 rounded-[24px] font-black text-lg transition-all active:scale-95 shadow-xl shadow-orange-500/20 flex items-center justify-center gap-3"
+                className="w-full md:w-auto bg-[#FF7A30] hover:bg-[#E86920] text-white px-10 py-5 rounded-[24px] font-black text-lg transition-all active:scale-95  flex items-center justify-center gap-3"
               >
                 <Search className="w-5 h-5" />
                 Search

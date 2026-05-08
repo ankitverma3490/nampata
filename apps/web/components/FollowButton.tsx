@@ -90,35 +90,46 @@ export default function FollowButton({
         );
     }
 
-    return (
-        <div className={`flex flex-col gap-2.5 ${className}`}>
-            <button
-                onClick={handleToggle}
-                disabled={loading}
-                className={`group inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl font-black text-sm transition-all duration-500 shadow-xl w-full border-2 ${
-                    isFollowing
-                        ? 'bg-violet-600 text-white border-violet-500 hover:bg-violet-700 shadow-violet-500/20'
-                        : 'bg-white text-slate-900 border-white hover:border-violet-400 hover:text-violet-600 shadow-white/5'
-                } ${loading ? 'opacity-60 cursor-not-allowed' : 'active:scale-[0.97]'}`}
-            >
-                <div className={`transition-all duration-500 ${loading ? 'animate-pulse' : 'group-hover:scale-110'}`}>
-                    {isFollowing
-                        ? <BellOff className="w-4.5 h-4.5" />
-                        : <Bell className="w-4.5 h-4.5 group-hover:rotate-12 transition-transform" />
-                    }
+   return (
+    <div className={`flex items-center gap-3 ${className}`}>
+        <button
+            onClick={handleToggle}
+            disabled={loading}
+            className={`group inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-xs transition-all duration-300 border shadow-sm min-w-[190px] ${
+                isFollowing
+                    ? 'bg-violet-600 text-white border-violet-600 hover:bg-violet-700'
+                    : 'bg-white text-slate-800 border-slate-200 hover:border-violet-400 hover:text-violet-600'
+            } ${loading ? 'opacity-60 cursor-not-allowed' : 'active:scale-[0.98]'}`}
+        >
+            <div className={`${loading ? 'animate-pulse' : 'group-hover:scale-110'} transition-all duration-300`}>
+                {isFollowing ? (
+                    <BellOff className="w-4 h-4" />
+                ) : (
+                    <Bell className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+                )}
+            </div>
+
+            <span className="uppercase tracking-wide whitespace-nowrap">
+                {isFollowing ? 'Following' : 'Follow Business'}
+            </span>
+        </button>
+
+        {followersCount > 0 && (
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm min-w-fit">
+                <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center">
+                    <Users className="w-4 h-4 text-white" />
                 </div>
-                <span className="tracking-tight uppercase text-xs">{isFollowing ? 'Following' : 'Follow Business'}</span>
-            </button>
-            {followersCount > 0 && (
-                <div className="flex items-center gap-2 px-1">
-                    <div className="w-6 h-6 rounded-full border border-white/20 bg-black flex items-center justify-center">
-                        <Users className="w-3.5 h-3.5 text-white" />
+
+                <div className="leading-none">
+                    <div className="text-sm font-bold text-slate-800">
+                        {followersCount.toLocaleString()}
                     </div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">
-                        {followersCount.toLocaleString()} {followersCount === 1 ? 'follower' : 'followers'}
-                    </span>
+                    <div className="text-[10px] uppercase tracking-wide text-slate-400 font-semibold">
+                        {followersCount === 1 ? 'Follower' : 'Followers'}
+                    </div>
                 </div>
-            )}
-        </div>
-    );
+            </div>
+        )}
+    </div>
+);
 }
