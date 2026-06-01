@@ -6,7 +6,7 @@ import {
     BadgeCheck, Phone, Mail, Star, Building2,
     Facebook, Instagram, Twitter, Globe, Linkedin, Youtube,
 } from 'lucide-react';
-import VendorAvatar from './VendorAvatar';
+import BusinessAvatar from './BusinessAvatar';
 import { getImageUrl } from '../lib/api';
 import { getBusinessStatus } from '../lib/business-status';
 
@@ -84,7 +84,7 @@ export default function VendorProfileCard({ vendor, city }: Props) {
             {/* ── Profile photo ── */}
             <div className="flex flex-col items-center pt-8 pb-4 px-5">
                 <div className="relative mb-4">
-                    <VendorAvatar 
+                    <BusinessAvatar 
                         src={vendor.avatarUrl} 
                         alt={vendor.businessName} 
                         size="lg" 
@@ -199,3 +199,4 @@ export default function VendorProfileCard({ vendor, city }: Props) {
         </div>
     );
 }
+

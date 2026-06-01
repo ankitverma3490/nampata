@@ -34,7 +34,7 @@ import { api } from "../../../lib/api";
 import { useAuth } from "../../../context/AuthContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 import { usePlanFeature } from "../../../hooks/usePlanFeature";
 
 type OfferType = "offer" | "event";
@@ -1072,3 +1072,4 @@ export default function BusinessEventsPage() {
     </FeatureGate>
   );
 }
+

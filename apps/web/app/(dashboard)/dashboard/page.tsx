@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import StatsGrid from '../../../components/vendor/StatsGrid';
-import PerformanceChart from '../../../components/vendor/PerformanceChart';
-import RecentReviews from '../../../components/vendor/RecentReviews';
+import StatsGrid from '../../../components/business/StatsGrid';
+import PerformanceChart from '../../../components/business/PerformanceChart';
+import RecentReviews from '../../../components/business/RecentReviews';
 import { Star, ChevronRight, ListTree, Heart, MessageSquare, Plus, TrendingUp, Loader2, Bell, CheckCircle2, Zap, Share2, Copy, Gift, Mail, Clock, BadgeCheck } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import Link from 'next/link';
@@ -12,7 +12,7 @@ import { api, getImageUrl } from '../../../lib/api';
 import { ListingImage } from '../../../components/ListingImage';
 import { Business } from '../../../types/api';
 import { motion } from 'framer-motion';
-import VendorHotDemandWidget from '../../../components/vendor/VendorHotDemandWidget';
+import BusinessHotDemandWidget from '../../../components/business/BusinessHotDemandWidget';
 import BusinessLeadsInbox from '../../../components/leads/VendorLeadsInbox';
 import MyJobLeads from '../../../components/leads/MyJobLeads';
 import MyInquiries from '../../../components/leads/MyInquiries';
@@ -528,7 +528,7 @@ export default function GenericDashboard() {
                     />
 
                     {isVendor && hasFeature('showDemand') && (
-                        <VendorHotDemandWidget insights={demandInsights} loading={loading} />
+                        <BusinessHotDemandWidget insights={demandInsights} loading={loading} />
                     )}
 
                     {((isVendor || isAdmin) && hasFeature('showChat')) && (
@@ -674,4 +674,5 @@ export default function GenericDashboard() {
         </div>
     );
 }
+
 

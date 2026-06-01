@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Search, Filter, MoreVertical, Star, MapPin, Eye, MessageSquare, Loader2, ChevronLeft, ChevronRight, X, Lock, Hash, CheckCircle2, XCircle } from 'lucide-react';
 import Link from 'next/link';
-import AddBusinessModal from '../../../components/vendor/AddBusinessModal';
+import AddBusinessModal from '../../../components/business/AddBusinessModal';
 import { useAuth } from '../../../context/AuthContext';
 import { api, getImageUrl } from '../../../lib/api';
 import { ListingImage } from '../../../components/ListingImage';
 import { Business } from '../../../types/api';
 import { useRouter } from 'next/navigation';
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 import { usePlanFeature } from '../../../hooks/usePlanFeature';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -798,3 +798,4 @@ export default function BusinessListings() {
         </FeatureGate>
     );
 }
+

@@ -295,7 +295,7 @@ function SearchResults() {
                                     </label>
 
                                     <label className="flex items-center justify-between cursor-pointer group">
-                                        <span className="text-xs font-bold text-slate-400 group-hover:text-slate-900 transition-colors">Trusted Only</span>
+                                        <span className="text-xs font-bold text-slate-400 group-hover:text-slate-900 transition-colors">Recommended Only</span>
                                         <input 
                                             type="checkbox" 
                                             checked={verifiedOnly} 

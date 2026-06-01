@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { api, getImageUrl } from '../../../lib/api';
 import Navbar from '../../../components/Navbar';
-import VendorAvatar from '../../../components/VendorAvatar';
+import BusinessAvatar from '../../../components/BusinessAvatar';
 import ChatTrigger from '../../../components/chat/ChatTrigger';
 import Footer from '../../../components/Footer';
 
@@ -183,7 +183,7 @@ export default function VendorProfileClient({ slugOrId, initialData }: { slugOrI
                     <div className="flex flex-col md:flex-row items-center md:items-start gap-10">
                         {/* Avatar Section */}
                         <div className="relative group">
-                            <VendorAvatar 
+                            <BusinessAvatar 
                                 src={vendor.avatarUrl} 
                                 alt={vendor.vendorName} 
                                 size="lg" 
@@ -488,3 +488,4 @@ export default function VendorProfileClient({ slugOrId, initialData }: { slugOrI
         </div>
     );
 }
+

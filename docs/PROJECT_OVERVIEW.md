@@ -31,7 +31,7 @@ A production-ready hyperlocal business discovery platform (Yelp/Justdial-class) 
    - In-app chat (Firebase)
    - Lead tracking & analytics
 
-5. **Vendor Dashboard**
+5. **Business Dashboard**
    - Business profile management
    - Multiple listings support
    - Analytics (views, leads, reviews)
@@ -252,3 +252,4 @@ business-saas/
 **Status**: Ready for implementation
 **Version**: 1.0.0-MVP
 **Last Updated**: 2026-02-06
+

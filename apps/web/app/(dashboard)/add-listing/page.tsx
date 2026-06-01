@@ -170,7 +170,7 @@ export default function AddListingPage() {
         if (activeStep !== STEPS.length) return;
 
         if (!formData.agreed) {
-            setError('You must agree to the Terms & Conditions.');
+            setError('You must agree to the Terms & Conditions and Privacy Policy.');
             return;
         }
 
@@ -179,6 +179,8 @@ export default function AddListingPage() {
         const submissionData = {
             ...rawData,
             phone: `${rawData.phoneCode}${rawData.phoneNumber}`.replace(/\s+/g, ''),
+            legalConsentAccepted: true,
+            legalConsentAcceptedAt: new Date().toISOString(),
             status: 'pending_geocode', // Let BullMQ handle it
         };
 

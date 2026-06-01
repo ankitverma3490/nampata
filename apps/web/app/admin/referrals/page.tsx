@@ -17,7 +17,7 @@ import {
     ChevronRight
 } from 'lucide-react';
 import { api } from '../../../lib/api';
-import StatsGrid from '../../../components/vendor/StatsGrid';
+import StatsGrid from '../../../components/business/StatsGrid';
 
 export default function AdminReferralsPage() {
     const [referrals, setReferrals] = useState<any[]>([]);
@@ -248,3 +248,4 @@ export default function AdminReferralsPage() {
         </div>
     );
 }
+

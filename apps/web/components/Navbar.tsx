@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { api } from '../lib/api';
-import VendorAvatar from './VendorAvatar';
+import BusinessAvatar from './BusinessAvatar';
 import { Category, City } from '../types/api';
 import { usePushNotifications } from '../lib/usePushNotifications';
 
@@ -310,12 +310,12 @@ export default function Navbar() {
                         {user ? (
                             <div className="flex items-center gap-3">
                                 {user.role === 'user' && (
-                                    <Link href="/upgrade" className="hidden sm:inline-block px-4 py-2 rounded-xl bg-[#FF7A30] text-white font-bold text-xs hover:bg-[#E86920] transition-all whitespace-nowrap">
+                                    <Link href="/business-setup" className="hidden sm:inline-block px-4 py-2 rounded-xl bg-[#FF7A30] text-white font-bold text-xs hover:bg-[#E86920] transition-all whitespace-nowrap">
                                         List My Business
                                     </Link>
                                 )}
                                 <Link href={user.role === 'admin' || user.role === 'superadmin' ? '/admin' : '/dashboard'} className="hidden sm:flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full border border-gray-100 hover:bg-gray-100 transition-colors">
-                                    <VendorAvatar
+                                    <BusinessAvatar
                                         src={user.avatarUrl}
                                         alt={user.fullName || user.email}
                                         size="sm"
@@ -450,7 +450,7 @@ export default function Navbar() {
                         <div className="p-6 space-y-8 overflow-y-auto max-h-[calc(100vh-5rem)]">
                             {user && (
                                 <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                    <VendorAvatar src={user.avatarUrl} alt={user.fullName} size="md" />
+                                    <BusinessAvatar src={user.avatarUrl} alt={user.fullName} size="md" />
                                     <div className="flex flex-col">
                                         <span className="font-bold text-slate-900">{user.fullName || user.email}</span>
                                         <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold text-[#FF7A30] uppercase tracking-wider">View Dashboard</Link>
@@ -547,7 +547,7 @@ export default function Navbar() {
                             )}
 
                             {user && user.role === 'user' && (
-                                <Link href="/upgrade" onClick={() => setIsMobileMenuOpen(false)} className="block w-full py-4 text-center rounded-2xl font-bold bg-[#FF7A30] text-white mb-3">
+                                <Link href="/business-setup" onClick={() => setIsMobileMenuOpen(false)} className="block w-full py-4 text-center rounded-2xl font-bold bg-[#FF7A30] text-white mb-3">
                                     List My Business
                                 </Link>
                             )}
@@ -564,3 +564,4 @@ export default function Navbar() {
         </nav>
     );
 }
+

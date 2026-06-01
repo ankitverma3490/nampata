@@ -10,7 +10,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { api, getImageUrl } from '../../../lib/api';
 import { Review } from '../../../types/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 import { usePlanFeature } from '../../../hooks/usePlanFeature';
 import Link from 'next/link';
 import { Lock } from 'lucide-react';
@@ -497,3 +497,4 @@ export default function BusinessReviews() {
         </FeatureGate>
     );
 }
+

@@ -29,7 +29,7 @@ backend/src/
 backend/src/modules/
 ├── auth/                # Authentication & authorization
 ├── users/               # User management
-├── vendors/             # Vendor management
+├── vendors/             # Business management
 ├── categories/          # Category management
 ├── businesses/          # Business listings
 ├── reviews/             # Reviews & ratings
@@ -91,7 +91,7 @@ Focus on one complete feature end-to-end:
 
 1. **"Generate business listing feature"** - Backend + Frontend
 2. **"Generate search feature"** - Backend + Frontend
-3. **"Generate vendor dashboard"** - Backend + Frontend
+3. **"Generate business dashboard"** - Backend + Frontend
 
 ---
 
@@ -182,3 +182,4 @@ Based on your requirements, I recommend:
 **Waiting for your command to proceed!** 🚀
 
 Which option do you choose?
+

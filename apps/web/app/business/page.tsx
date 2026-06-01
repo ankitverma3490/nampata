@@ -75,7 +75,7 @@ export default function BusinessListingPage() {
                         Explore Local Businesses
                     </h1>
                     <p className="text-blue-100/80 text-lg max-w-2xl font-medium">
-                        Discover top-rated services and stores in your community. Trusted listings you can rely on.
+                        Discover top-rated services and stores in your community. Local listings you can explore with confidence.
                     </p>
                 </div>
             </div>

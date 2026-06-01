@@ -96,9 +96,15 @@ const VendorOnlineBadge = ({
 const TrustBadge = ({ badge, score }: { badge?: string; score?: number }) => {
   if (!badge) return null;
 
+  const normalizedBadge = (() => {
+    const lb = badge.toLowerCase();
+    if (lb.includes("trusted") || lb.includes("verified")) return "Recommended";
+    return badge;
+  })();
+
   const getBadgeStyles = (b: string) => {
     const lb = b.toLowerCase();
-    if (lb.includes("trusted")) return "bg-amber-50 text-amber-700 border-amber-200";
+    if (lb.includes("trusted") || lb.includes("verified") || lb.includes("recommended")) return "bg-amber-50 text-amber-700 border-amber-200";
     if (lb.includes("active")) return "bg-blue-50 text-blue-700 border-blue-200";
     return "bg-slate-50 text-slate-600 border-slate-200";
   };
@@ -106,11 +112,11 @@ const TrustBadge = ({ badge, score }: { badge?: string; score?: number }) => {
   return (
     <div
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border shadow-sm ${getBadgeStyles(
-        badge
+        normalizedBadge
       )}`}
     >
       <Award className="w-2.5 h-2.5" />
-      {badge}
+      {normalizedBadge}
       {score !== undefined && <span className="ml-1 opacity-60">Score: {score}</span>}
     </div>
   );
@@ -825,7 +831,7 @@ export default function BusinessDetailClient({
                 <div className="flex flex-wrap items-center gap-3 mb-6">
                   {business.isVerified && (
                     <div className="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-wider border border-emerald-500/20">
-                      <ShieldCheck className="w-3.5 h-3.5" /> Trusted
+                      <ShieldCheck className="w-3.5 h-3.5" /> Recommended
                     </div>
                   )}
                   <div className="flex items-center gap-2">

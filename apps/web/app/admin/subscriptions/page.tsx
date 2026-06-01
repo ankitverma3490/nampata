@@ -141,7 +141,7 @@ export default function SubscriptionsPage() {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50 border-b border-slate-100">
                             <tr>
-                                <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Vendor</th>
+                                <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Business</th>
                                 <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Plan</th>
                                 <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Status</th>
                                 <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Dates</th>
@@ -170,7 +170,7 @@ export default function SubscriptionsPage() {
                                     <tr key={sub.id} className="hover:bg-slate-50/50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div>
-                                                <p className="font-black text-slate-900">{sub.vendor?.user?.firstName || 'Unknown Vendor'}</p>
+                                                <p className="font-black text-slate-900">{sub.vendor?.user?.firstName || 'Unknown Business'}</p>
                                                 <p className="text-xs font-bold text-slate-500">{sub.vendor?.user?.email || 'N/A'}</p>
                                             </div>
                                         </td>
@@ -229,12 +229,12 @@ export default function SubscriptionsPage() {
                         >
                             <div className="p-6 border-b border-slate-100">
                                 <h2 className="text-2xl font-black text-slate-900">Assign Subscription</h2>
-                                <p className="text-sm font-bold text-slate-500 mt-1">Manually grant a plan to a vendor.</p>
+                                <p className="text-sm font-bold text-slate-500 mt-1">Manually grant a plan to a business account.</p>
                             </div>
 
                             <div className="p-6 space-y-5">
                                 <div>
-                                    <label className="block text-xs font-black text-slate-500 uppercase tracking-wider mb-2">Search Vendor</label>
+                                    <label className="block text-xs font-black text-slate-500 uppercase tracking-wider mb-2">Search Business</label>
                                     <div className="relative mb-3">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <input
@@ -250,7 +250,7 @@ export default function SubscriptionsPage() {
                                         onChange={e => setAssignForm({ ...assignForm, vendorId: e.target.value })}
                                         className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                                     >
-                                        <option value="" disabled>Select Vendor</option>
+                                        <option value="" disabled>Select Business</option>
                                         {filteredVendors.map(v => (
                                             <option key={v.id} value={v.id}>{v.user?.firstName || ''} ({v.user?.email || 'No email'})</option>
                                         ))}

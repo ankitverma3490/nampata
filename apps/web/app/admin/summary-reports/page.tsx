@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../../lib/api';
 import { IndianRupee, Users, Receipt, TrendingUp } from 'lucide-react';
-import StatsGrid from '../../../components/vendor/StatsGrid';
+import StatsGrid from '../../../components/business/StatsGrid';
 
 // Helper to get last 6 months
 const getLast6Months = () => {
@@ -210,3 +210,4 @@ export default function ReportsPage() {
         </div>
     );
 }
+

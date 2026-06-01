@@ -11,6 +11,8 @@
   --foreground: 17, 24, 39;
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(255, 255, 255, 0.5);
+  --font-roboto: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-outfit: "Trebuchet MS", "Segoe UI Semibold", "Avenir Next", "Segoe UI", sans-serif;
   font-family: var(--font-roboto), sans-serif;
 }
 

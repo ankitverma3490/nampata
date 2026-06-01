@@ -1,4 +1,4 @@
-import VendorProfileClient from '../../vendors/[vendorSlug]/VendorProfileClient';
+import BusinessProfileClient from './BusinessProfileClient';
 
 export const dynamic = 'force-static';
 export const dynamicParams = false;
@@ -36,5 +36,5 @@ export async function generateMetadata({ params }: { params: Promise<{ businessS
 /** Canonical public business profile route (alias of legacy /vendors/[slug]). */
 export default async function BusinessProfilePage({ params }: { params: Promise<{ businessSlug: string }> }) {
     const { businessSlug } = await params;
-    return <VendorProfileClient slugOrId={businessSlug} />;
+    return <BusinessProfileClient slugOrId={businessSlug} />;
 }

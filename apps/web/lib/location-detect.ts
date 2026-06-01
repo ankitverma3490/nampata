@@ -93,6 +93,74 @@ export function sortAndDedupeCities(cities: City[]): City[] {
     return unique.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 }
 
+function normalizeCountryToken(value?: string | null): string {
+    return (value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+const COUNTRY_ALIASES: Record<string, string[]> = {
+    pakistan: ['pk'],
+    india: ['in'],
+    'united arab emirates': ['uae', 'ae'],
+    'united states': ['us', 'usa', 'united states of america'],
+    'united kingdom': ['uk', 'gb', 'great britain'],
+    malaysia: ['my'],
+};
+
+export function getCanonicalCountryName(country?: string | null): string {
+    const normalized = normalizeCountryToken(country);
+    if (!normalized) return '';
+
+    for (const [canonical, aliases] of Object.entries(COUNTRY_ALIASES)) {
+        if (normalized === canonical || aliases.includes(normalized)) {
+            return canonical;
+        }
+    }
+
+    return normalized;
+}
+
+export function sortAndDedupeCountries(
+    countries: Array<string | { code?: string; name?: string }>,
+): { code: string; name: string }[] {
+    const unique = new Map<string, { code: string; name: string }>();
+
+    for (const item of countries) {
+        const rawName = typeof item === 'string' ? item : item?.name || item?.code || '';
+        const rawCode = typeof item === 'string' ? '' : item?.code || '';
+        const canonical = getCanonicalCountryName(rawName || rawCode);
+        if (!canonical) continue;
+
+        const displayName = canonical
+            .split(' ')
+            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(' ');
+
+        if (!unique.has(canonical)) {
+            unique.set(canonical, {
+                code: rawCode.trim().toUpperCase(),
+                name: displayName,
+            });
+        } else if (rawCode && !unique.get(canonical)?.code) {
+            unique.set(canonical, {
+                code: rawCode.trim().toUpperCase(),
+                name: unique.get(canonical)?.name || displayName,
+            });
+        }
+    }
+
+    return Array.from(unique.values()).sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }),
+    );
+}
+
+export function cityMatchesCountry(city: City, selectedCountry?: string | null): boolean {
+    const target = getCanonicalCountryName(selectedCountry);
+    if (!target) return true;
+
+    const cityCountry = getCanonicalCountryName(city.country);
+    return cityCountry === target;
+}
+
 export function findNearestCity(cities: City[], latitude: number, longitude: number): City | null {
     const withCoords = cities.filter(
         (c) => typeof c.latitude === 'number' && typeof c.longitude === 'number',

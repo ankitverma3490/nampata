@@ -10,7 +10,7 @@ import { useNotifications } from '../../../hooks/useNotifications';
 import { getImageUrl } from '../../../lib/api';
 import Link from 'next/link';
 import { usePlanFeature } from '../../../hooks/usePlanFeature';
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 
 import { useSocket } from '../../../context/SocketContext';
 
@@ -503,3 +503,4 @@ export default function ChatDashboard() {
         </FeatureGate>
     );
 }
+

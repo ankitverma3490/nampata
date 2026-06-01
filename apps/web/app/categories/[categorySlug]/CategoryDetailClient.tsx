@@ -159,7 +159,7 @@ export default function CategoryDetailClient({ slug }: CategoryDetailClientProps
                                 </div>
                                 {businesses.some(b => b.isVerified) && (
                                     <div className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100">
-                                        <ShieldCheck className="w-3.5 h-3.5" /> Trusted Providers
+                                        <ShieldCheck className="w-3.5 h-3.5" /> Recommended Businesses
                                     </div>
                                 )}
                             </div>
@@ -262,7 +262,7 @@ export default function CategoryDetailClient({ slug }: CategoryDetailClientProps
                                     {/* Availability Toggles */}
                                     <div className="space-y-6 pt-4">
                                         {[
-                                            { key: 'verifiedOnly', label: 'Trusted Only' },
+                                            { key: 'verifiedOnly', label: 'Recommended Only' },
                                             { key: 'featuredOnly', label: 'Recommended' },
                                             { key: 'openNow', label: 'Currently Open' }
                                         ].map(item => (

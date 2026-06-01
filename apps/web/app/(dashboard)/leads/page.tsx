@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../../context/AuthContext';
 import Link from 'next/link';
 import { usePlanFeature } from '../../../hooks/usePlanFeature';
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type LeadStatus = 'new' | 'contacted' | 'converted' | 'lost';
@@ -28,6 +28,17 @@ interface Lead {
     businessId: string;
     createdAt: string;
     notes?: string;
+}
+
+interface LeadNote {
+    id: string;
+    note: string;
+    createdAt: string;
+    createdBy?: {
+        id?: string;
+        fullName?: string;
+        email?: string;
+    } | null;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -111,11 +122,66 @@ function LeadDetailModal({ lead, onClose, onStatusChange }: {
     lead: Lead; onClose: () => void; onStatusChange: (id: string, status: LeadStatus) => void;
 }) {
     const [updating, setUpdating] = useState(false);
+    const [notes, setNotes] = useState<LeadNote[]>([]);
+    const [notesLoading, setNotesLoading] = useState(true);
+    const [noteDraft, setNoteDraft] = useState('');
+    const [noteError, setNoteError] = useState('');
+    const [savingNote, setSavingNote] = useState(false);
+
+    useEffect(() => {
+        let active = true;
+
+        const fetchNotes = async () => {
+            setNotesLoading(true);
+            setNoteError('');
+            try {
+                const response = await api.leads.getNotes(lead.id);
+                if (!active) return;
+                setNotes(Array.isArray(response) ? response : []);
+            } catch (error) {
+                if (!active) return;
+                console.error('Failed to load lead notes:', error);
+                setNoteError('Unable to load internal notes right now.');
+                setNotes([]);
+            } finally {
+                if (active) {
+                    setNotesLoading(false);
+                }
+            }
+        };
+
+        fetchNotes();
+
+        return () => {
+            active = false;
+        };
+    }, [lead.id]);
 
     const handleStatus = async (status: LeadStatus) => {
         setUpdating(true);
         await onStatusChange(lead.id, status);
         setUpdating(false);
+    };
+
+    const handleSaveNote = async () => {
+        const trimmed = noteDraft.trim();
+        if (!trimmed) {
+            setNoteError('Add a short internal note before saving.');
+            return;
+        }
+
+        setSavingNote(true);
+        setNoteError('');
+        try {
+            const savedNote = await api.leads.addNote(lead.id, trimmed);
+            setNotes((prev) => [savedNote, ...prev]);
+            setNoteDraft('');
+        } catch (error) {
+            console.error('Failed to save lead note:', error);
+            setNoteError('Unable to save this note right now. Please try again.');
+        } finally {
+            setSavingNote(false);
+        }
     };
 
     return (
@@ -183,6 +249,80 @@ function LeadDetailModal({ lead, onClose, onStatusChange }: {
 
                         <div className="flex items-center justify-between px-2">
                             <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Received on {new Date(lead.createdAt).toLocaleDateString()} at {new Date(lead.createdAt).toLocaleTimeString()}</p>
+                        </div>
+                    </div>
+
+                    <div className="mb-10 rounded-[32px] border border-slate-100 bg-slate-50 p-6">
+                        <div className="flex items-start justify-between gap-4 mb-4">
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Internal Notes</p>
+                                <p className="text-sm font-medium text-slate-500 mt-2">
+                                    Keep private follow-up notes for your team. Customers cannot see these notes.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-500 shadow-sm">
+                                <Lock className="w-3.5 h-3.5 text-slate-400" />
+                                Private
+                            </div>
+                        </div>
+
+                        <div className="space-y-3 mb-4 max-h-56 overflow-y-auto pr-1">
+                            {notesLoading ? (
+                                <div className="flex items-center gap-3 rounded-2xl bg-white px-4 py-5 text-sm font-medium text-slate-500 border border-slate-100">
+                                    <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                    Loading internal notes...
+                                </div>
+                            ) : notes.length > 0 ? (
+                                notes.map((note) => (
+                                    <div key={note.id} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+                                        <div className="flex items-center justify-between gap-3 mb-2">
+                                            <p className="text-xs font-black text-slate-700">
+                                                {note.createdBy?.fullName || note.createdBy?.email || 'Business Team'}
+                                            </p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                                                {new Date(note.createdAt).toLocaleDateString()} {new Date(note.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </p>
+                                        </div>
+                                        <p className="text-sm leading-relaxed text-slate-600">{note.note}</p>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-5 text-sm font-medium text-slate-400">
+                                    No internal notes yet. Add follow-up context here for your business team.
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-3">
+                            <textarea
+                                value={noteDraft}
+                                onChange={(e) => {
+                                    setNoteDraft(e.target.value);
+                                    if (noteError) setNoteError('');
+                                }}
+                                rows={4}
+                                maxLength={1000}
+                                placeholder="Add a private note about next steps, callbacks, pricing, or customer context..."
+                                className="w-full rounded-[24px] border border-slate-200 bg-white px-5 py-4 text-sm text-slate-700 outline-none transition-all focus:border-blue-400 focus:ring-4 focus:ring-blue-500/5 resize-none"
+                            />
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    {noteError ? (
+                                        <p className="text-sm font-bold text-red-500">{noteError}</p>
+                                    ) : (
+                                        <p className="text-xs font-medium text-slate-400">Notes are only visible inside your business dashboard.</p>
+                                    )}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleSaveNote}
+                                    disabled={savingNote}
+                                    className="inline-flex items-center justify-center gap-2 rounded-[18px] bg-blue-600 px-5 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-blue-600/15 transition-all hover:bg-slate-900 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+                                >
+                                    {savingNote ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                    Save Note
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -283,6 +423,10 @@ export default function VendorLeadsPage() {
     useEffect(() => {
         fetchLeads();
     }, [user, fetchLeads]);
+
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [page]);
 
     const handleStatusChange = async (id: string, status: LeadStatus) => {
         try {
@@ -522,3 +666,4 @@ export default function VendorLeadsPage() {
         </FeatureGate>
     );
 }
+

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../../lib/api';
 import { useAuth } from '../../../context/AuthContext';
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 import Link from 'next/link';
 
 interface CommentItem {
@@ -399,3 +399,4 @@ export default function BusinessCommentsPage() {
         </FeatureGate>
     );
 }
+

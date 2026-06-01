@@ -234,7 +234,7 @@ export default function AdminBusinessesPage() {
                                                         <Tag className="w-3 h-3" /> {b.category?.name || 'Uncategorized'}
                                                     </span>
                                                     {b.isVerified && (
-                                                        <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest pl-1">Trusted Member</span>
+                                                        <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest pl-1">Recommended Listing</span>
                                                     )}
                                                 </div>
                                             </td>
@@ -440,7 +440,7 @@ export default function AdminBusinessesPage() {
                                             <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">Operational Status</p>
                                             <div className="flex flex-wrap gap-2">
                                                 <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border ${selectedBusiness.isVerified ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>
-                                                    {selectedBusiness.isVerified ? 'Trusted' : 'Not Trusted'}
+                                                    {selectedBusiness.isVerified ? 'Recommended' : 'Standard'}
                                                 </span>
                                                 {selectedBusiness.isFeatured && (
                                                     <span className="px-4 py-2 bg-amber-50 text-amber-600 border border-amber-100 rounded-xl text-[10px] font-black uppercase tracking-wider">Featured Asset</span>

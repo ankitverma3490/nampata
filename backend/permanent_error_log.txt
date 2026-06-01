@@ -2525,3 +2525,6 @@ Details: {"query":"SELECT DISTINCT \"distinctAlias\".\"listing_id\" AS \"ids_lis
 [2026-06-01T10:17:28.373Z] findAllForUser FALLBACK for user 0cd1f347-ae7a-4c41-81fe-6baf7a94e1c8: column Notification.priority does not exist
 [2026-06-01T10:17:29.246Z] findAllForUser FALLBACK for user 0cd1f347-ae7a-4c41-81fe-6baf7a94e1c8: column Notification.priority does not exist
 [2026-06-01T10:22:46.286Z] NotificationsService Constructor Called
+[2026-06-01T11:58:54.013Z] NotificationsService Constructor Called
+[2026-06-01T11:59:02.020Z] NotificationsService Constructor Called
+[2026-06-01T11:59:19.803Z] NotificationsService Constructor Called

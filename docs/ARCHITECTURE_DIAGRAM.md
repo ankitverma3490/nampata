@@ -66,7 +66,7 @@ User Browser
 ### 🏢 VENDOR SIDE FLOW
 
 ```
-Vendor Dashboard
+Business Dashboard
     │
     ├─▶ View Stats ────────▶ api.vendor.getDashboardStats() ──▶ GET /vendors/dashboard-stats
     │                                                               │
@@ -240,7 +240,7 @@ business-saas/
 │   │   ├── modules/
 │   │   │   ├── auth/                ✅ Authentication
 │   │   │   ├── users/               ✅ User management
-│   │   │   ├── vendors/             ✅ Vendor management
+│   │   │   ├── vendors/             ✅ Business management
 │   │   │   ├── businesses/          ✅ Business CRUD
 │   │   │   ├── categories/          ✅ Categories
 │   │   │   ├── reviews/             ✅ Reviews & ratings
@@ -306,3 +306,4 @@ curl -H "Authorization: Bearer TOKEN" \
 ---
 
 **✅ All three user types (User, Vendor, Admin) are now fully integrated!**
+

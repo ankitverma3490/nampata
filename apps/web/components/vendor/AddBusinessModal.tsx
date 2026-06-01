@@ -9,7 +9,7 @@ import CategorySearchSelect from '../CategorySearchSelect';
 import { useAuth } from '../../context/AuthContext';
 import { usePlanFeature } from '../../hooks/usePlanFeature';
 import { useAddressConfig, fetchCountries } from '../../hooks/useAddressConfig';
-import { detectLocationForUi, sortAndDedupeCities } from '../../lib/location-detect';
+import { detectLocationForUi, sortAndDedupeCities, sortAndDedupeCountries } from '../../lib/location-detect';
 import { Lock } from 'lucide-react';
 import Link from 'next/link';
 
@@ -217,9 +217,16 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, business 
                     api.listings.getMyListings()
                 ]);
                 setCategories(cats);
-                setCities(sortAndDedupeCities(Array.isArray(cityList) ? cityList : []));
+                const uniqueCities = sortAndDedupeCities(Array.isArray(cityList) ? cityList : []);
+                setCities(uniqueCities);
                 const countriesFromApi = await fetchCountries();
-                setCountries(countriesFromApi.length > 0 ? countriesFromApi : (countryList || []).filter(Boolean).map((c: string) => ({ code: c, name: c })).sort((a: any, b: any) => a.name.localeCompare(b.name)));
+                const fallbackCountries = sortAndDedupeCountries(
+                    (countryList || []).filter(Boolean).map((c: string) => ({ code: c, name: c })),
+                );
+                const normalizedCountries = sortAndDedupeCountries(
+                    countriesFromApi.length > 0 ? countriesFromApi : fallbackCountries,
+                );
+                setCountries(normalizedCountries);
                 setAmenities(amenityList || []);
                 setMyListingsCount(businessesRes?.data?.length || 0);
 
@@ -231,7 +238,7 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, business 
                     setFormData(prev => ({
                         ...prev,
                         categoryId: cats[0]?.id || '',
-                        city: cityList[0]?.name || ''
+                        city: uniqueCities[0]?.name || ''
                     }));
                 }
             } catch (err) {

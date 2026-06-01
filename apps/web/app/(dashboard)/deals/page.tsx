@@ -32,7 +32,7 @@ import { api } from "../../../lib/api";
 import { useAuth } from "../../../context/AuthContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 import { usePlanFeature } from "../../../hooks/usePlanFeature";
 
 type OfferType = "offer" | "event";
@@ -101,7 +101,7 @@ export default function BusinessDealsPage() {
   const { user } = useAuth();
   const pathname = usePathname();
   
-  const featureName = "Deals & Offers";
+  const featureName = "Deals";
   const { features } = usePlanFeature();
   const [offers, setOffers] = useState<OfferItem[]>([]);
   const [businesses, setBusinesses] = useState<any[]>([]);
@@ -142,7 +142,7 @@ export default function BusinessDealsPage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const priceRequestRef = useRef(0);
 
-  // Deals & Offers is freely available to all businesses.
+  // Deals are freely available to all businesses.
   // Premium plan purchases (via /offer-plans) are for boosting/featuring only.
 
   const loadOffers = async (p = 1) => {
@@ -1070,3 +1070,4 @@ export default function BusinessDealsPage() {
     </FeatureGate>
   );
 }
+

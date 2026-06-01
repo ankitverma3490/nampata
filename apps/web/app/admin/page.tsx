@@ -16,7 +16,7 @@ import {
     X
 } from 'lucide-react';
 import { api } from '../../lib/api';
-import StatsGrid from '../../components/vendor/StatsGrid';
+import StatsGrid from '../../components/business/StatsGrid';
 import { Business } from '../../types/api';
 import Link from 'next/link';
 
@@ -204,3 +204,4 @@ export default function AdminDashboard() {
         </div>
     );
 }
+

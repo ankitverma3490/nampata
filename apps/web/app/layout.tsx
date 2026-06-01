@@ -2,23 +2,8 @@ import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import { SocketProvider } from "../context/SocketContext";
 import { Toaster } from 'react-hot-toast';
-import { Roboto, Outfit } from "next/font/google";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
-const roboto = Roboto({
-    subsets: ["latin"],
-    weight: ["300", "400", "500", "700"],
-    style: ["normal", "italic"],
-    variable: "--font-roboto",
-    display: "swap",
-});
-
-const outfit = Outfit({
-    subsets: ["latin"],
-    variable: "--font-outfit",
-    display: "swap",
-});
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
     (process.env.NODE_ENV === 'production' 
@@ -54,9 +39,9 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" className={`${roboto.variable} ${outfit.variable}`} suppressHydrationWarning>
+        <html lang="en" suppressHydrationWarning>
             <body
-                className={`${roboto.className} bg-white text-slate-900 min-h-screen antialiased`}
+                className="bg-white text-slate-900 min-h-screen antialiased"
                 suppressHydrationWarning
             >
                 <AuthProvider>

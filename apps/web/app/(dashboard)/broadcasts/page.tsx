@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAuth } from '../../../context/AuthContext';
 import { usePlanFeature } from '../../../hooks/usePlanFeature';
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 
 export default function BusinessBroadcastsPage() {
     const { user } = useAuth();
@@ -59,3 +59,4 @@ export default function BusinessBroadcastsPage() {
         </FeatureGate>
     );
 }
+

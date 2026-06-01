@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Settings, User, Phone, MapPin, Globe, Save, Loader2, CheckCircle2, AlertCircle, Upload, KeyRound, Camera, ChevronDown, Clock, Facebook, Instagram, Linkedin, Twitter, Youtube, ExternalLink, Trash2, Plus, Share2, AlertTriangle, RefreshCcw, Bell, Mail, ShieldCheck, Award, Lock } from 'lucide-react';
 import { api, getImageUrl } from '../../../lib/api';
-import VendorAvatar from '../../../components/VendorAvatar';
+import BusinessAvatar from '../../../components/BusinessAvatar';
 import { useAuth } from '../../../context/AuthContext';
 import { City } from '../../../types/api';
 
@@ -489,7 +489,7 @@ export default function AccountSettings() {
                         {/* Avatar Upload */}
                         <div className="flex flex-col sm:flex-row items-start gap-8 border-b border-slate-100 pb-8">
                             <div className="relative group">
-                                <VendorAvatar
+                                <BusinessAvatar
                                     src={avatarFile ? previewImage : formData.avatarUrl}
                                     alt={formData.fullName || 'User'}
                                     size="lg"
@@ -1141,3 +1141,4 @@ export default function AccountSettings() {
         </div>
     );
 }
+

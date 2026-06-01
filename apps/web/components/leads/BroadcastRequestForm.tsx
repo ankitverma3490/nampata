@@ -325,7 +325,7 @@ export default function BroadcastRequestForm({ onSuccess }: BroadcastRequestForm
                                     <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4 mt-4 text-left max-w-md mx-auto">
                                         <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">Broadcast Guidelines</h4>
                                         <ul className="text-xs text-slate-600 font-medium space-y-1 list-disc list-inside">
-                                            <li>Your request will be sent to verified professionals in your area.</li>
+                                            <li>Your request will be sent to matching businesses in your area.</li>
                                             <li>You will receive proposals directly in your inbox.</li>
                                             <li>Please ensure your budget and requirements are clear.</li>
                                         </ul>

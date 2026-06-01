@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Bell, Search, Users, Lock, UserCheck } from 'lucide-react';
 import { api } from '../../../lib/api';
 import { useAuth } from '../../../context/AuthContext';
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 import BusinessCard from '../../../components/BusinessCard';
 import { Business } from '../../../types/api';
 import Link from 'next/link';
@@ -92,3 +92,4 @@ export default function FollowingPage() {
         </FeatureGate>
     );
 }
+

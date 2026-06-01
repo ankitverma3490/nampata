@@ -17,7 +17,7 @@
       ▼                      ▼
 ┌──────────────┐      ┌──────────────┐
 │  User Side   │      │   12 API     │
-│ Vendor Side  │      │   Modules    │
+│ Business Side  │      │   Modules    │
 │ Admin Side   │      │              │
 └──────────────┘      └──────────────┘
 ```
@@ -34,7 +34,7 @@
 - Save favorites
 - Generate leads (contact businesses)
 
-### 2. **🏢 Vendor Side** (Business Owners)
+### 2. **🏢 Business Side** (Business Owners)
 - Create/manage business listings
 - View dashboard stats
 - Manage leads
@@ -73,7 +73,7 @@ import api from '@/lib/api';
 const businesses = await api.user.searchBusinesses({ city: 'Mumbai' });
 const categories = await api.user.getCategories();
 
-// Vendor Side
+// Business Side
 const stats = await api.vendor.getDashboardStats(token);
 const myBusinesses = await api.vendor.getMyBusinesses(token);
 
@@ -152,7 +152,7 @@ npm run dev
 
 ---
 
-### 🏢 Vendor Side Endpoints
+### 🏢 Business Side Endpoints
 
 #### Vendor Profile
 - `POST /vendors/become-vendor` - Register as vendor
@@ -236,7 +236,7 @@ const profile = await api.user.getProfile(token);
 ```typescript
 // Check user role
 if (user.role === 'vendor') {
-  // Show vendor dashboard
+  // Show business dashboard
   const stats = await api.vendor.getDashboardStats(token);
 } else if (user.role === 'admin') {
   // Show admin dashboard
@@ -263,9 +263,9 @@ curl https://local-business-listing-directory-production.up.railway.app/api/v1/c
 curl `${process.env.NEXT_PUBLIC_API_URL}`/subscriptions/plans
 ```
 
-### Test Vendor Side (requires auth token)
+### Test Business Side (requires auth token)
 ```bash
-# Get vendor dashboard stats
+# Get business dashboard stats
 curl -H "Authorization: Bearer YOUR_TOKEN" \
   `${process.env.NEXT_PUBLIC_API_URL}`/vendors/dashboard-stats
 
@@ -337,9 +337,9 @@ export default async function UserDashboard() {
 }
 ```
 
-### Vendor Dashboard Example
+### Business Dashboard Example
 ```typescript
-// app/vendor/dashboard/page.tsx
+// app/(dashboard)/dashboard/page.tsx
 import api from '@/lib/api';
 
 export default async function VendorDashboard() {
@@ -440,7 +440,7 @@ Response → Frontend → UI Update
 
 5. **Build Features**
    - Implement user dashboard
-   - Implement vendor dashboard
+   - Implement business dashboard
    - Implement admin dashboard
 
 ---
@@ -459,3 +459,4 @@ Response → Frontend → UI Update
 
 Generated: 2026-02-07 22:27 IST  
 Status: ✅ READY FOR DEVELOPMENT
+

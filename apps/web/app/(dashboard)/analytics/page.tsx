@@ -5,10 +5,10 @@ import { api, getImageUrl } from '../../../lib/api';
 import { ListingImage } from '../../../components/ListingImage';
 import { useAuth } from '../../../context/AuthContext';
 import { BarChart, TrendingUp, Eye, Phone, Heart, Star, ChevronRight, Loader2, Lock } from 'lucide-react';
-import PerformanceChart from '../../../components/vendor/PerformanceChart';
+import PerformanceChart from '../../../components/business/PerformanceChart';
 import Link from 'next/link';
 import { usePlanFeature } from '../../../hooks/usePlanFeature';
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 
 export default function BusinessAnalyticsPage() {
     const { user } = useAuth();
@@ -189,3 +189,4 @@ export default function BusinessAnalyticsPage() {
         </FeatureGate>
     );
 }
+

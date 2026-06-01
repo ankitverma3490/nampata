@@ -253,7 +253,7 @@ export default function PlansPage() {
                                             value={formData.name}
                                             onChange={e => setFormData({ ...formData, name: e.target.value })}
                                             className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                                            placeholder="e.g. Pro Vendor"
+                                            placeholder="e.g. Pro Business"
                                         />
                                     </div>
                                     <div>

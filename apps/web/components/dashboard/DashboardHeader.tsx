@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, Bell, Search, User, LogOut, MessageSquare, Shield, ChevronDown, Building2, Globe, Megaphone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
-import VendorAvatar from '../VendorAvatar';
+import BusinessAvatar from '../BusinessAvatar';
 import { api } from '../../lib/api';
 import { Category, City } from '../../types/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -235,7 +235,7 @@ export default function DashboardHeader({ toggleSidebar, unreadNotifications: pr
 
                     <div className="flex items-center gap-4 sm:gap-8">
                         {user?.role === 'user' && (
-                            <Link href="/upgrade" className="hidden sm:inline-block px-4 py-2 rounded-xl bg-[#FF7A30] text-white font-bold text-xs hover:bg-[#E86920] transition-all whitespace-nowrap">
+                            <Link href="/business-setup" className="hidden sm:inline-block px-4 py-2 rounded-xl bg-[#FF7A30] text-white font-bold text-xs hover:bg-[#E86920] transition-all whitespace-nowrap">
                                 List My Business
                             </Link>
                         )}
@@ -287,7 +287,7 @@ export default function DashboardHeader({ toggleSidebar, unreadNotifications: pr
 
                                 {/* Avatar */}
                                 <div className="w-10 h-10 rounded-xl overflow-hidden ring-2 ring-white shadow-sm flex items-center justify-center bg-slate-100 group-hover/user:ring-indigo-100 transition-all">
-                                    <VendorAvatar
+                                    <BusinessAvatar
                                         src={user?.avatarUrl}
                                         alt={user?.fullName || 'User'}
                                         size="sm"
@@ -302,7 +302,7 @@ export default function DashboardHeader({ toggleSidebar, unreadNotifications: pr
                                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1 px-2">Account</p>
                                     <div className="flex items-center gap-3 p-2">
                                         <div className="w-8 h-8 rounded-lg overflow-hidden bg-slate-100">
-                                            <VendorAvatar src={user?.avatarUrl} alt={user?.fullName} size="sm" />
+                                            <BusinessAvatar src={user?.avatarUrl} alt={user?.fullName} size="sm" />
                                         </div>
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold text-slate-900 truncate max-w-[120px]">{user?.fullName}</span>
@@ -338,3 +338,4 @@ export default function DashboardHeader({ toggleSidebar, unreadNotifications: pr
         </header>
     );
 }
+

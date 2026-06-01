@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../../../lib/api';
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 import {
     Send, Mail, Phone, Clock, Search, RefreshCw,
     CheckCircle, XCircle, PhoneCall, TrendingUp,
@@ -267,6 +267,10 @@ export default function BusinessEnquiriesPage() {
         fetchEnquiries();
     }, [user, fetchEnquiries]);
 
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [page]);
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -501,3 +505,4 @@ export default function BusinessEnquiriesPage() {
         </FeatureGate>
     );
 }
+

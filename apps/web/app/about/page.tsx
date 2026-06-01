@@ -30,7 +30,7 @@ const values = [
     {
         icon: Shield,
         title: "Trust & Transparency",
-        desc: "Trusted listings, honest reviews, and clear pricing. We hold ourselves and every business on our platform to high standards.",
+        desc: "Clear listings, honest reviews, and transparent pricing. We hold ourselves and every business on our platform to high standards.",
         color: "text-indigo-500 bg-indigo-50",
     },
     {

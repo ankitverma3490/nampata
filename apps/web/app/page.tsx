@@ -74,8 +74,8 @@ export default function HomePage() {
   const highlights = [
     {
       icon: <ShieldCheck className="w-5 h-5 text-orange-500" />,
-      title: "Trusted Businesses",
-      desc: "Trusted and reliable listings",
+      title: "Local Businesses",
+      desc: "Active and reliable listings",
     },
     {
       icon: <Search className="w-5 h-5 text-green-500" />,
@@ -321,7 +321,7 @@ export default function HomePage() {
             </div> */}
 
             <h1 className="text-5xl md:text-7xl font-black text-[#112D4E] mb-6 tracking-tight leading-[1.1]">
-              Discover Trusted Local Businesses <br />
+              Discover Local Businesses <br />
               <span className="text-orange-500">Instantly</span>
             </h1>
 
@@ -594,7 +594,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-bold text-[#202124] mb-3">Search & Find</h3>
               <p className="text-[#70757a] text-sm leading-relaxed">
-                Choose the service you need from our trusted categories.
+                Choose the service you need from our top categories.
               </p>
             </div>
             <div className="flex flex-col items-center text-center">
@@ -650,7 +650,7 @@ export default function HomePage() {
             ) : (
               <div className="col-span-full py-12 text-center bg-white rounded-3xl border border-slate-100">
                 <p className="text-slate-500 font-bold">
-                  More offers and events coming soon from our trusted businesses.
+                  More offers and events coming soon from local businesses.
                 </p>
               </div>
             )}
@@ -750,7 +750,7 @@ export default function HomePage() {
               id: "f3",
               name: "Bilal K.",
               location: "Islamabad",
-              text: "Trusted and reliable listings. Best platform for Pakistan.",
+              text: "Active and reliable listings. Best platform for Pakistan.",
               rating: 5,
               img: "https://i.pravatar.cc/150?u=bilal",
             },

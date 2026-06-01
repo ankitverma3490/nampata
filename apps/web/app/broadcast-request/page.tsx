@@ -145,7 +145,7 @@ export default function BroadcastsPage() {
                             <p className="text-[15px] sm:text-base text-slate-500 leading-7 font-medium mb-10">
                                 Connect with local businesses instantly.
                                 Share your requirements and receive tailored responses
-                                from trusted experts near you.
+                                from businesses near you.
                             </p>
 
                             {/* Steps */}

@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getImageUrl, api } from '../../lib/api';
-import VendorAvatar from '../VendorAvatar';
+import BusinessAvatar from '../BusinessAvatar';
 import { chatApi } from '../../services/chat.service';
 import { usePlanFeature, DashboardFeatures } from '../../hooks/usePlanFeature';
 import { useSocket } from '../../context/SocketContext';
@@ -53,11 +53,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
     const menuItems: { name: string; icon: any; href: string; badge: string | null; feature?: keyof DashboardFeatures; iconColor?: string }[] = [
         { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', badge: null },
-        { name: 'List My Business', icon: Plus, href: '/upgrade', badge: 'Upgrade' },
+        { name: 'List My Business', icon: Plus, href: '/business-setup', badge: null },
         { name: 'My Listings', icon: ListTree, href: '/listings', badge: null, feature: 'showListings' },
         { name: 'Add Listing', icon: Plus, href: '/add-listing', badge: null, feature: 'canAddListing' },
         { name: 'Leads', icon: Phone, href: '/leads', badge: null, feature: 'showLeads' },
-        { name: 'Deals & Offers', icon: Megaphone, href: '/deals', badge: null, feature: 'showOffers' },
+        { name: 'Deals', icon: Megaphone, href: '/deals', badge: null, feature: 'showOffers' },
         { name: 'Events', icon: Clock, href: '/events', badge: null, feature: 'showOffers' },
         { name: 'Reviews', icon: Star, href: '/reviews', badge: null, feature: 'showReviews' },
         { name: 'Analytics', icon: BarChart, href: '/analytics', badge: null, feature: 'showAnalytics' },
@@ -93,7 +93,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="flex flex-col items-center mb-10 pt-4 px-4">
                 <div className="relative mb-5 group cursor-pointer">
                     <div className="absolute inset-0 bg-indigo-500 rounded-[32px] blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-                    <VendorAvatar
+                    <BusinessAvatar
                         src={getImageUrl(user?.avatarUrl)}
                         alt={user?.fullName || 'Business User'}
                         size="lg"
@@ -219,3 +219,4 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         </>
     );
 }
+

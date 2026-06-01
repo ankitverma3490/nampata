@@ -42,7 +42,14 @@ import { City, Category } from '../../types/api';
 import CategorySearchSelect from '../../components/CategorySearchSelect';
 
 import { DEFAULT_DIAL_CODES } from '../../lib/phone-codes';
-import { sortAndDedupeCities, tryDetectDeviceLocation, reverseGeocodeFromCoords, getBrowserTimezone } from '../../lib/location-detect';
+import {
+    sortAndDedupeCities,
+    sortAndDedupeCountries,
+    cityMatchesCountry,
+    tryDetectDeviceLocation,
+    reverseGeocodeFromCoords,
+    getBrowserTimezone,
+} from '../../lib/location-detect';
 import AddressPlacesAutocomplete from '../../components/AddressPlacesAutocomplete';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 
@@ -133,6 +140,8 @@ export default function BusinessSetupWizard() {
     const [setupQuestions, setSetupQuestions] = useState<Array<{ id: string; category: string; question: string; options: string[] }>>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [activatingBusiness, setActivatingBusiness] = useState(false);
+    const [activationError, setActivationError] = useState<string | null>(null);
     const [currentStep, setCurrentStep] = useState(0);
     const [completed, setCompleted] = useState(false);
     
@@ -280,14 +289,7 @@ export default function BusinessSetupWizard() {
                     router.push('/verify-email');
                     return;
                 }
-                if (user.role !== 'vendor') {
-                    router.push('/');
-                    return;
-                }
-
-                const [status, profile, cats, citiesData, countriesData, questionsData] = await Promise.all([
-                    api.businessSetup.getStatus(),
-                    api.businessProfiles.getProfile(),
+                const [cats, citiesData, countriesData, questionsData] = await Promise.all([
                     api.categories.getAll(),
                     api.cities.getAll(),
                     api.addressConfig.getCountries({ silent: true }).catch(() => []),
@@ -296,12 +298,30 @@ export default function BusinessSetupWizard() {
 
                 setSetupQuestions(Array.isArray(questionsData) ? questionsData : []);
 
-                const options = ((countriesData || []) as { code: string; name: string }[])
-                    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+                const options = sortAndDedupeCountries((countriesData || []) as { code: string; name: string }[]);
                 setCountryOptions(options);
                 setCountries(options.map((c) => c.name).filter(Boolean));
                 setAllCities(sortAndDedupeCities(citiesData || []));
                 setCategories(cats || []);
+
+                if (user.role !== 'vendor') {
+                    setStepData((prev) => ({
+                        ...prev,
+                        businessName: prev.businessName || user.vendor?.businessName || user.fullName || '',
+                        businessEmail: prev.businessEmail || user.email || '',
+                        phoneNumber: prev.phoneNumber || (user.phone || '').replace(/^\+\d{1,4}/, ''),
+                        address: prev.address || user.vendor?.businessAddress || '',
+                        country: prev.country || user.country || options[0]?.name || '',
+                        city: prev.city || user.city || '',
+                        state: prev.state || user.state || '',
+                    }));
+                    return;
+                }
+
+                const [status, profile] = await Promise.all([
+                    api.businessSetup.getStatus(),
+                    api.businessProfiles.getProfile(),
+                ]);
 
                 // Load existing vendor attributes if they exist
                 if (status && status.answers) {
@@ -429,27 +449,8 @@ export default function BusinessSetupWizard() {
     // Filter cities based on country, de-duplicate, and sort alphabetically
     useEffect(() => {
         const countryName = stepData.country;
-        const filtered = allCities.filter(c => {
-            const cCountryName = c.country === 'PK' ? 'Pakistan' :
-                                 c.country === 'IN' ? 'India' :
-                                 c.country === 'AE' ? 'United Arab Emirates' :
-                                 c.country === 'US' || c.country === 'USA' ? 'United States' :
-                                 c.country === 'GB' || c.country === 'UK' ? 'United Kingdom' :
-                                 c.country === 'MY' ? 'Malaysia' : c.country;
-            return cCountryName?.toLowerCase() === countryName?.toLowerCase() || c.country?.toLowerCase() === countryName?.toLowerCase();
-        });
-        
-        // De-duplicate by city name (case-insensitive)
-        const uniqueMap: Record<string, any> = {};
-        filtered.forEach(c => {
-            if (c && c.name) {
-                const key = c.name.trim().toLowerCase();
-                if (!uniqueMap[key]) {
-                    uniqueMap[key] = c;
-                }
-            }
-        });
-        const uniqueCities = sortAndDedupeCities(Object.values(uniqueMap) as City[]);
+        const filtered = allCities.filter((city) => cityMatchesCountry(city, countryName));
+        const uniqueCities = sortAndDedupeCities(filtered);
         setFilteredCities(uniqueCities);
 
         const getCountryCode = (cName: string) => {
@@ -471,6 +472,43 @@ export default function BusinessSetupWizard() {
         };
         fetchAddressConfig();
     }, [stepData.country, allCities, countryOptions]);
+
+    const handleActivateBusiness = async () => {
+        setActivationError(null);
+
+        const businessName = stepData.businessName.trim();
+        const normalizedPhone = stepData.phoneNumber.replace(/^0+/, '');
+        const businessPhone = `${stepData.phoneCode}${normalizedPhone}`;
+        const businessAddress = stepData.address.trim();
+
+        if (businessName.length < 2) {
+            setActivationError('Please enter your business name first.');
+            return;
+        }
+        if (!/^\+[1-9]\d{7,14}$/.test(businessPhone)) {
+            setActivationError('Please enter a valid business phone number.');
+            return;
+        }
+        if (businessAddress.length < 5) {
+            setActivationError('Please enter your business address before continuing.');
+            return;
+        }
+
+        setActivatingBusiness(true);
+        try {
+            await api.businessProfiles.register({
+                businessName,
+                businessPhone,
+                businessAddress,
+            });
+            await syncProfile();
+            router.replace('/business-setup');
+        } catch (err: any) {
+            setActivationError(err.message || 'Unable to activate your business account right now.');
+        } finally {
+            setActivatingBusiness(false);
+        }
+    };
 
     // GPS-only location detect (consistent with all other screens)
     const detectMyLocation = async () => {
@@ -2375,6 +2413,129 @@ export default function BusinessSetupWizard() {
         );
     }
 
+    if (user && user.role !== 'vendor') {
+        return (
+            <div className="min-h-screen bg-slate-50 flex flex-col">
+                <Navbar />
+                <main className="flex-grow py-12 px-4">
+                    <div className="max-w-3xl mx-auto">
+                        <div className="text-center mb-10">
+                            <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
+                                Business Setup
+                            </span>
+                            <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-2 tracking-tight">
+                                Start Your Business Profile
+                            </h1>
+                            <p className="text-slate-500 font-bold text-sm">
+                                Confirm a few business details first. After that, the full 21-step setup will open automatically.
+                            </p>
+                        </div>
+
+                        <div className="p-8 rounded-3xl bg-white border border-slate-100 shadow-2xl space-y-6">
+                            {activationError && (
+                                <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
+                                    {activationError}
+                                </div>
+                            )}
+
+                            <div className="grid gap-5 md:grid-cols-2">
+                                <div className="md:col-span-2">
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Business Name</label>
+                                    <input
+                                        type="text"
+                                        value={stepData.businessName}
+                                        onChange={(e) => setStepData((prev) => ({ ...prev, businessName: e.target.value }))}
+                                        className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                        placeholder="Your business name"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Phone Code</label>
+                                    <select
+                                        value={stepData.phoneCode}
+                                        onChange={(e) => setStepData((prev) => ({ ...prev, phoneCode: e.target.value }))}
+                                        className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    >
+                                        {DIAL_CODES.map((dial) => (
+                                            <option key={`${dial.code}-${dial.dialCode}`} value={dial.dialCode}>
+                                                {dial.country} ({dial.dialCode})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Business Phone</label>
+                                    <input
+                                        type="tel"
+                                        value={stepData.phoneNumber}
+                                        onChange={(e) => setStepData((prev) => ({ ...prev, phoneNumber: e.target.value.replace(/[^\d]/g, '') }))}
+                                        className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                        placeholder="3001234567"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Country</label>
+                                    <select
+                                        value={stepData.country}
+                                        onChange={(e) => setStepData((prev) => ({ ...prev, country: e.target.value, city: '' }))}
+                                        className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    >
+                                        <option value="">Select a country</option>
+                                        {countryOptions.map((country) => (
+                                            <option key={`${country.code}-${country.name}`} value={country.name}>
+                                                {country.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">City</label>
+                                    <select
+                                        value={stepData.city}
+                                        onChange={(e) => setStepData((prev) => ({ ...prev, city: e.target.value }))}
+                                        className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    >
+                                        <option value="">Select a city</option>
+                                        {filteredCities.map((city) => (
+                                            <option key={city.id} value={city.name}>
+                                                {city.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Business Address</label>
+                                    <textarea
+                                        value={stepData.address}
+                                        onChange={(e) => setStepData((prev) => ({ ...prev, address: e.target.value }))}
+                                        rows={4}
+                                        className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                                        placeholder="Street address, building, floor, landmark"
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={handleActivateBusiness}
+                                disabled={activatingBusiness}
+                                className="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20 disabled:opacity-60"
+                            >
+                                {activatingBusiness ? 'Activating...' : 'Continue As Business'}
+                            </button>
+                        </div>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
     if (completed) {
         return (
             <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
@@ -2406,7 +2567,7 @@ export default function BusinessSetupWizard() {
                             Personalize Your Listing
                         </h1>
                         <p className="text-slate-500 font-bold text-sm">
-                            Submit detailed profile data to verify services and improve customer visibility.
+                            Submit detailed profile data to strengthen your listing and improve customer visibility.
                         </p>
                     </div>
 

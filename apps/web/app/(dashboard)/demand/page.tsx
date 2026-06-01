@@ -6,7 +6,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../lib/api';
 import { usePlanFeature } from '../../../hooks/usePlanFeature';
 import { detectLocationForUi } from '../../../lib/location-detect';
-import { FeatureGate } from '../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../components/business/FeatureGate';
 
 export default function BusinessDemandPage() {
     const { user } = useAuth();
@@ -165,3 +165,4 @@ export default function BusinessDemandPage() {
         </FeatureGate>
     );
 }
+

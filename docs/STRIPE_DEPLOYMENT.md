@@ -73,7 +73,8 @@ Once deployed, perform these tests:
     - Complete the purchase.
     - Check the `subscriptions` table in the database to see if the record was created automatically via the webhook.
 4. **WebSocket Pulse**:
-    - Open the vendor dashboard in two browser windows.
+    - Open the business dashboard in two browser windows.
     - Submit a lead on an owned business listing.
     - Verify a toast notification appears instantly in the other window.
 5. **Logs**: Check `docker logs aura-nginx` and `docker logs aura-api` for any 403 or 500 errors during traffic proxying.
+

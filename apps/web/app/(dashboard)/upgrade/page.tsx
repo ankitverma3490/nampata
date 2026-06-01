@@ -19,8 +19,14 @@ export default function BusinessUpgradePage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         setError('');
+
+        if (!agreed) {
+            setError('Please accept the Terms & Conditions and Privacy Policy before continuing.');
+            return;
+        }
+
+        setLoading(true);
 
         try {
             await api.businessProfiles.register({

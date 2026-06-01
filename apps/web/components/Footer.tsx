@@ -15,7 +15,7 @@ export default function Footer() {
               <img src="/logo.png" alt="naampata" className="h-[10.5rem] w-auto object-contain -ml-8 -my-8" />
             </Link>
             <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-xs">
-              Discover the best local businesses, services, and professionals in your area. Your trusted local guide to everything around you.
+              Discover the best local businesses, services, and professionals in your area. Your local guide to everything around you.
             </p>
           </div>
 

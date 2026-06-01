@@ -48,10 +48,18 @@ export default function VerifyEmailPage() {
         }
     }, []);
 
+    useEffect(() => {
+        if (otp.every((digit) => digit !== '') && !isSubmitting) {
+            void handleVerify();
+        }
+    }, [otp]);
+
     const handleChange = (element: HTMLInputElement, index: number) => {
         const value = element.value;
         if (isNaN(Number(value))) return;
 
+        setError(null);
+        setSuccessMsg(null);
         const newOtp = [...otp];
         newOtp[index] = value.substring(value.length - 1); // Take last digit
         setOtp(newOtp);
@@ -63,6 +71,7 @@ export default function VerifyEmailPage() {
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+        setError(null);
         if (e.key === 'Backspace') {
             const newOtp = [...otp];
             if (!otp[index] && index > 0) {
@@ -86,13 +95,15 @@ export default function VerifyEmailPage() {
         const pastedData = e.clipboardData.getData("text").trim();
         if (pastedData.length !== 6 || isNaN(Number(pastedData))) return;
 
+        setError(null);
+        setSuccessMsg(null);
         const pastedArray = pastedData.split("");
         setOtp(pastedArray);
         inputRefs.current[5]?.focus();
     };
 
-    const handleVerify = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleVerify = async (e?: React.FormEvent) => {
+        e?.preventDefault();
         setError(null);
         setSuccessMsg(null);
 
@@ -187,7 +198,9 @@ export default function VerifyEmailPage() {
                             {otp.map((data, index) => (
                                 <input
                                     key={index}
-                                    type="text"
+                                    type="tel"
+                                    inputMode="numeric"
+                                    autoComplete={index === 0 ? 'one-time-code' : 'off'}
                                     maxLength={1}
                                     ref={(el) => {
                                         inputRefs.current[index] = el;

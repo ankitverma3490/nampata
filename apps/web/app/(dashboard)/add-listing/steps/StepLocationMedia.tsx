@@ -3,7 +3,7 @@ import { StepProps } from '../types';
 import { Loader2, MapPin, ImagePlus, Plus, Trash2, HelpCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import AddressPlacesAutocomplete from '../../../../components/AddressPlacesAutocomplete';
-import { FeatureGate } from '../../../../components/vendor/FeatureGate';
+import { FeatureGate } from '../../../../components/business/FeatureGate';
 
 const inputClass = "w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all placeholder:text-slate-400";
 const labelClass = "block text-xs font-black uppercase tracking-widest text-slate-400 mb-2";
@@ -195,3 +195,4 @@ export const Step17FAQs = ({ formData, setFormData }: StepProps) => {
     );
 };
 import { X } from 'lucide-react';
+

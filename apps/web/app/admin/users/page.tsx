@@ -492,7 +492,7 @@ export default function AdminUsersPage() {
                                             <StatusBadge active={selectedUser.isActive} />
                                             {selectedUserDetails?.vendor?.isVerified && (
                                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                                    <BadgeCheck className="w-3.5 h-3.5" /> Trusted Business
+                                                    <BadgeCheck className="w-3.5 h-3.5" /> Recommended Business
                                                 </span>
                                             )}
                                         </div>

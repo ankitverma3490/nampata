@@ -12,7 +12,7 @@ Updated: 2026-05-25
 | 4 | Subcategories cap `<=3` enforced | PASS | `backend/src/modules/businesses/businesses.service.ts` create/update checks |
 | 5 | Named phones cap `<=5` enforced backend | PASS | `backend/src/modules/businesses/businesses.service.ts` |
 | 6 | Named phones manager in Add Listing page | PASS | `apps/web/app/(dashboard)/add-listing/page.tsx` |
-| 7 | Named phones manager in AddBusinessModal | PASS | `apps/web/components/vendor/AddBusinessModal.tsx` |
+| 7 | Named phones manager in AddBusinessModal | PASS | `apps/web/components/business/AddBusinessModal.tsx` |
 | 8 | Albums paid-only gate + CRUD | PASS | `backend/src/modules/businesses/businesses.controller.ts` + `businesses.service.ts` |
 | 9 | Customer notes paid-only gate | PASS | `backend/src/modules/chat/chat.service.ts` |
 | 10 | Offers/Events publish blocked without add-on entitlement | PASS | `backend/src/modules/offers/offers.service.ts` (`publish`) |
@@ -33,3 +33,4 @@ Updated: 2026-05-25
 
 - This matrix is Doc2-focused only.
 - Any policy/business wording changes (e.g., promotions/ads boundary) are tracked separately.
+

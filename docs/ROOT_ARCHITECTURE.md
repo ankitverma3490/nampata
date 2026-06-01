@@ -143,12 +143,12 @@ The system follows a modular, microservices-ready monolithic architecture (Modul
 *   `/biz/[slug]` - Business Detail Page (SEO Optimized).
 *   `/login`, `/register` - Auth pages.
 
-**Vendor Dashboard (`/vendor`)**
-*   `/vendor/dashboard` - Overview.
-*   `/vendor/listings` - Manage businesses.
-*   `/vendor/listings/new` - Add business.
-*   `/vendor/leads` - View interactions.
-*   `/vendor/subscription` - Manage plan.
+**Business Dashboard (`/dashboard`)**
+*   `/dashboard` - Overview.
+*   `/dashboard/listings` - Manage businesses.
+*   `/dashboard/add-listing` - Add business.
+*   `/dashboard/leads` - View interactions.
+*   `/dashboard/subscription` - Manage plan.
 
 **Admin Panel (`/admin`)**
 *   `/admin/dashboard` - Stats.
@@ -227,3 +227,4 @@ The system follows a modular, microservices-ready monolithic architecture (Modul
 *   **Linting:** ESLint + Prettier enforced via CI.
 *   **Testing:** Jest for Unit/Integration tests.
 *   **Monorepo:** Organized workspace for shared types/utils.
+
