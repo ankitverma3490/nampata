@@ -27,13 +27,14 @@ export const Step7Address = ({ formData, setFormData }: StepProps) => {
     return (
         <div className="space-y-6">
             <div>
-                <label className={labelClass}>Search Address</label>
+                <label className={labelClass}>Search Address *</label>
                 <AddressPlacesAutocomplete
                     value={formData.address}
                     onChange={(val: string) => setFormData(p => ({ ...p, address: val }))}
                     onPlaceSelected={handlePlaceSelected}
                     placeholder="Start typing your address..."
                     className={inputClass}
+                    required
                 />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -143,6 +143,7 @@ export const Step19Media = ({ formData, setFormData }: StepProps) => {
                     </div>
                     <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
                 </label>
+                <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-wider">Recommended: 400×400px, PNG or JPG. Max 5MB.</p>
             </div>
 
             <div>

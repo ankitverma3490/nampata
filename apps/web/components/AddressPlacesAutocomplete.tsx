@@ -25,6 +25,7 @@ type Props = {
     placeholder?: string;
     className?: string;
     disabled?: boolean;
+    required?: boolean;
 };
 
 export default function AddressPlacesAutocomplete({
@@ -35,6 +36,7 @@ export default function AddressPlacesAutocomplete({
     placeholder = 'Start typing street address (min 3 characters)...',
     className = '',
     disabled = false,
+    required = false,
 }: Props) {
     const sessionRef = useRef(createPlacesSessionToken());
     const [suggestions, setSuggestions] = useState<Array<{ placeId: string; description: string }>>([]);
@@ -111,6 +113,7 @@ export default function AddressPlacesAutocomplete({
                 value={value}
                 disabled={disabled}
                 placeholder={placeholder}
+                required={required}
                 onChange={(e) => {
                     resetPlacesSessionToken(sessionRef);
                     onChange(e.target.value);

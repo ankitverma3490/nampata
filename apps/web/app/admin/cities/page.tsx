@@ -637,10 +637,10 @@ export default function AdminCitiesPage() {
                                     <div className="flex gap-4 items-start">
                                         {formData.heroImageUrl && (
                                             <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-2 border-slate-100 flex-shrink-0 group">
-                                                <img 
-                                                    src={getImageUrl(formData.heroImageUrl) || ""} 
-                                                    className="w-full h-full object-cover" 
-                                                    alt="Preview" 
+                                                <img
+                                                    src={getImageUrl(formData.heroImageUrl) || ""}
+                                                    className="w-full h-full object-cover"
+                                                    alt="Preview"
                                                 />
                                                 <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                                                     <RefreshCw className="w-5 h-5 text-white" />
@@ -662,6 +662,7 @@ export default function AdminCitiesPage() {
                                             )}
                                         </label>
                                     </div>
+                                    <p className="text-[10px] text-slate-400 font-bold ml-1 uppercase tracking-wider">Recommended: 1200×600px (2:1), PNG/JPG, max 5MB.</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">

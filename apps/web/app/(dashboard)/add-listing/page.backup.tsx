@@ -1188,6 +1188,7 @@ export default function AddListingPage() {
                                                             }}
                                                             placeholder="Start typing street address (min 3 characters)..."
                                                             className={inputClass}
+                                                            required={!!field.required}
                                                         />
                                                     </div>
                                                 );

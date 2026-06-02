@@ -27,6 +27,7 @@ export default function AffiliateDashboard() {
     const [payoutMethod, setPayoutMethod] = useState('UPI');
     const [payoutDetails, setPayoutDetails] = useState('');
     const [submittingPayout, setSubmittingPayout] = useState(false);
+    const [payoutAgreed, setPayoutAgreed] = useState(false);
 
     useEffect(() => {
         setIsMounted(true);
@@ -82,6 +83,11 @@ export default function AffiliateDashboard() {
 
         if (!payoutDetails) {
             alert('Please provide payment details');
+            return;
+        }
+
+        if (!payoutAgreed) {
+            alert('Please confirm the payment details are accurate before submitting.');
             return;
         }
 
@@ -351,6 +357,22 @@ export default function AffiliateDashboard() {
                                                 required
                                             />
                                         </div>
+                                        <label className="flex items-start gap-3 cursor-pointer group p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                            <div className="relative flex items-center justify-center mt-0.5">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={payoutAgreed}
+                                                    onChange={(e) => setPayoutAgreed(e.target.checked)}
+                                                    className="w-5 h-5 appearance-none border-2 border-slate-300 rounded-lg checked:border-orange-500 checked:bg-orange-500 transition-colors cursor-pointer peer"
+                                                />
+                                                <svg className="w-3 h-3 text-white absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                    <polyline points="20 6 9 17 4 12" />
+                                                </svg>
+                                            </div>
+                                            <span className="text-[11px] text-slate-600 font-medium leading-relaxed">
+                                                I confirm that the payment details above are accurate and authorize the platform to process this withdrawal. *
+                                            </span>
+                                        </label>
                                         <div className="flex gap-4 pt-4">
                                             <button
                                                 type="button"
@@ -361,8 +383,8 @@ export default function AffiliateDashboard() {
                                             </button>
                                             <button
                                                 type="submit"
-                                                disabled={submittingPayout}
-                                                className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-orange-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200"
+                                                disabled={submittingPayout || !payoutAgreed}
+                                                className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-orange-500 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200"
                                             >
                                                 {submittingPayout ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Submit Request'}
                                             </button>

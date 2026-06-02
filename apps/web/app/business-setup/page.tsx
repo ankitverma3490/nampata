@@ -1329,6 +1329,7 @@ export default function BusinessSetupWizard() {
                                     }}
                                     placeholder="Start typing street address (min 3 characters)..."
                                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 font-bold"
+                                    required
                                 />
                                 <p className="text-[10px] text-slate-400 mt-1 font-medium">Google Places suggestions — or type manually if unavailable.</p>
                             </div>
@@ -2314,7 +2315,7 @@ export default function BusinessSetupWizard() {
                                         </label>
                                     )}
                                 </div>
-                                <p className="text-[9px] text-slate-400 font-bold mt-1 uppercase tracking-wider">Showcase your products, store fronts, or portfolio. WebP CDN compression is applied.</p>
+                                <p className="text-[9px] text-slate-400 font-bold mt-1 uppercase tracking-wider">Showcase your products, store fronts, or portfolio. Recommended: 800×800px or larger, PNG/JPG/WebP, max 5MB each. WebP CDN compression is applied.</p>
                             </div>
                         </div>
                     </div>

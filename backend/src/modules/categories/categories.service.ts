@@ -777,70 +777,169 @@ export class CategoriesService {
     }
 
     /**
-     * Smart Category Suggestion (AI-driven via Elasticsearch)
+     * Smart Category Suggestion (AI-driven via Elasticsearch + optional OpenAI)
+     *
+     * Strategy (layered, plug-and-play):
+     *  1. OpenAI semantic match (only if OPENAI_API_KEY is set + catalogue present)
+     *  2. Elasticsearch similar businesses → their categories
+     *  3. Keyword ILIKE match against category names/descriptions
+     *
+     * Each layer adds to the pool; the final list is de-duplicated and capped at 5.
      */
     async suggestCategories(title: string, description: string): Promise<any[]> {
         const query = `${title} ${description}`.trim();
         if (!query) return [];
 
-        let suggestedIds: string[] = [];
+        const seen = new Set<string>();
+        const combined: any[] = [];
 
-        // 1. Try to find similar businesses in ES to see what categories they use
+        const pushUnique = (cat: any) => {
+            if (!cat || !cat.id) return;
+            if (seen.has(cat.id)) return;
+            seen.add(cat.id);
+            combined.push(cat);
+        };
+
+        // 1. OpenAI semantic ranking (optional)
+        if (process.env.OPENAI_API_KEY) {
+            try {
+                const aiPicks = await this.openAiRankCategories(query);
+                for (const pick of aiPicks) pushUnique(pick);
+            } catch (err) {
+                console.error('[CategoriesService] OpenAI suggestion error:', err);
+            }
+        }
+
+        // 2. Elasticsearch similar businesses
         if (this.searchService.isAvailable()) {
             try {
                 const results = await this.searchService.search({ query });
-                // Extract categories from similar businesses
                 const catNames = results
                     .map((r: any) => r.category)
                     .filter((c: any) => !!c);
-                
+
                 if (catNames.length > 0) {
-                    // Find those categories in DB
                     const matchedCats = await this.categoryRepository.find({
                         where: catNames.map((name: string) => ({ name: ILike(`%${name}%`) })),
-                        take: 5
+                        take: 5,
                     });
-                    suggestedIds = matchedCats.map(c => c.id);
+                    for (const cat of matchedCats) {
+                        pushUnique({
+                            id: cat.id,
+                            name: cat.name,
+                            slug: cat.slug,
+                            icon: cat.icon,
+                        });
+                    }
                 }
             } catch (err) {
                 console.error('[CategoriesService] ES Suggestion Error:', err);
             }
         }
 
-        // 2. Keyword matching against Category names and descriptions
-        const keywords = query.split(/\s+/).filter(k => k.length > 3);
-        const keywordMatches = await this.categoryRepository
-            .createQueryBuilder('category')
-            .where('category.status = :status', { status: CategoryStatus.ACTIVE })
-            .andWhere(
-                new Brackets(qb => {
-                    keywords.forEach((k, i) => {
-                        qb.orWhere(`category.name ILIKE :k${i}`, { [`k${i}`]: `%${k}%` });
-                        qb.orWhere(`category.description ILIKE :k${i}`, { [`k${i}`]: `%${k}%` });
-                    });
-                })
-            )
-            .limit(5)
-            .getMany();
+        // 3. Keyword ILIKE matching
+        const keywords = query.split(/\s+/).filter((k) => k.length > 3);
+        if (keywords.length > 0) {
+            const keywordMatches = await this.categoryRepository
+                .createQueryBuilder('category')
+                .where('category.status = :status', { status: CategoryStatus.ACTIVE })
+                .andWhere(
+                    new Brackets((qb) => {
+                        keywords.forEach((k, i) => {
+                            qb.orWhere(`category.name ILIKE :k${i}`, { [`k${i}`]: `%${k}%` });
+                            qb.orWhere(`category.description ILIKE :k${i}`, { [`k${i}`]: `%${k}%` });
+                        });
+                    }),
+                )
+                .limit(5)
+                .getMany();
 
-        const combinedSuggestions = [...keywordMatches];
-        
-        // Add ES matches if they are not already in the list
-        if (suggestedIds.length > 0) {
-            const existingIds = new Set(combinedSuggestions.map(c => c.id));
-            const esMatches = await this.categoryRepository.findByIds(suggestedIds);
-            for (const match of esMatches) {
-                if (!existingIds.has(match.id)) {
-                    combinedSuggestions.push(match);
-                }
+            for (const cat of keywordMatches) {
+                pushUnique({
+                    id: cat.id,
+                    name: cat.name,
+                    slug: cat.slug,
+                    icon: cat.icon,
+                });
             }
         }
 
-        return combinedSuggestions.slice(0, 5).map(c => ({
-            id: c.id,
-            name: c.name,
-            slug: c.slug,
-            icon: c.icon
-        }));
+        return combined.slice(0, 5);
+    }
+
+    /**
+     * Use OpenAI to semantically rank active categories against the user's title+description.
+     * Returns the top N matches. Returns [] on any error so the caller can fall back.
+     *
+     * Plug-and-play: only runs when OPENAI_API_KEY is set in the environment.
+     * The category catalogue is trimmed to {name, slug} to keep tokens low.
+     */
+    private async openAiRankCategories(query: string): Promise<any[]> {
+        const apiKey = process.env.OPENAI_API_KEY;
+        if (!apiKey) return [];
+
+        const catalogue = await this.categoryRepository.find({
+            where: { status: CategoryStatus.ACTIVE },
+            select: ['id', 'name', 'slug', 'icon'],
+        });
+        if (catalogue.length === 0) return [];
+
+        const model = process.env.OPENAI_CATEGORY_MODEL || 'gpt-4o-mini';
+        const systemPrompt =
+            'You are a category-classification assistant. Given a business title+description and a list ' +
+            'of available categories, return the most relevant 5 category names from the list, ordered ' +
+            'by relevance. Reply with a JSON array of strings only — no commentary.';
+
+        const userPrompt = `Business: ${query}\n\nCategories:\n${catalogue
+            .map((c) => `- ${c.name} (slug: ${c.slug})`)
+            .join('\n')}`;
+
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+                model,
+                temperature: 0,
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userPrompt },
+                ],
+                response_format: { type: 'json_object' },
+            }),
+        });
+
+        if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`OpenAI API ${res.status}: ${errText}`);
+        }
+
+        const data: any = await res.json();
+        const content = data?.choices?.[0]?.message?.content;
+        if (!content) return [];
+
+        let parsed: any;
+        try {
+            parsed = JSON.parse(content);
+        } catch {
+            // Try to extract a JSON array if the model returned a string
+            const match = String(content).match(/\[[^\]]*\]/);
+            if (!match) return [];
+            parsed = JSON.parse(match[0]);
+        }
+
+        const names: string[] = Array.isArray(parsed)
+            ? parsed
+            : Array.isArray(parsed?.categories)
+                ? parsed.categories
+                : [];
+
+        const byName = new Map(catalogue.map((c) => [c.name.toLowerCase(), c]));
+        return names
+            .map((n) => byName.get(String(n).trim().toLowerCase()))
+            .filter((c): c is Category => !!c)
+            .map((c) => ({ id: c.id, name: c.name, slug: c.slug, icon: c.icon }));
     }
 }

@@ -2054,7 +2054,7 @@ export default function BusinessDetailClient({
                       ) : (
                         <span className="text-4xl font-black text-slate-200">
                           {(
-                            business.title?.[0] || business.vendor?.user?.fullName?.[0] || "V"
+                            business.title?.[0] || business.vendor?.user?.fullName?.[0] || "B"
                           ).toUpperCase()}
                         </span>
                       )}

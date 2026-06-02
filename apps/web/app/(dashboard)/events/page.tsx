@@ -957,6 +957,7 @@ export default function BusinessEventsPage() {
                                 </>
                               )}
                             </button>
+                            <p className="text-[9px] text-slate-400 font-bold mt-2 uppercase tracking-wider">Recommended: 1200×675px (16:9), PNG/JPG, max 5MB.</p>
                             <input
                               type="file"
                               ref={fileRef}

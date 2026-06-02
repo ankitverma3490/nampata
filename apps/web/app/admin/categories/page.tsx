@@ -488,7 +488,7 @@ export default function AdminCategoriesPage() {
                                             <div className="flex flex-col items-center gap-2 text-slate-400">
                                                 <ImageIcon className="w-8 h-8" />
                                                 <span className="text-sm font-bold">Click to upload image</span>
-                                                <span className="text-xs">PNG, JPG, WEBP up to 10MB</span>
+                                                <span className="text-xs">Recommended: 400×400px, PNG, JPG, WEBP up to 10MB</span>
                                             </div>
                                         )}
                                         <input

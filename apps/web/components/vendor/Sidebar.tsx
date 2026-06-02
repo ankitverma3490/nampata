@@ -51,26 +51,26 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         return () => clearInterval(interval);
     }, [user]);
 
-    const menuItems: { name: string; icon: any; href: string; badge: string | null; feature?: keyof DashboardFeatures; iconColor?: string }[] = [
-        { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', badge: null },
-        { name: 'List My Business', icon: Plus, href: '/business-setup', badge: null },
-        { name: 'My Listings', icon: ListTree, href: '/listings', badge: null, feature: 'showListings' },
-        { name: 'Add Listing', icon: Plus, href: '/add-listing', badge: null, feature: 'canAddListing' },
-        { name: 'Leads', icon: Phone, href: '/leads', badge: null, feature: 'showLeads' },
-        { name: 'Deals', icon: Megaphone, href: '/deals', badge: null, feature: 'showOffers' },
-        { name: 'Events', icon: Clock, href: '/events', badge: null, feature: 'showOffers' },
-        { name: 'Reviews', icon: Star, href: '/reviews', badge: null, feature: 'showReviews' },
-        { name: 'Analytics', icon: BarChart, href: '/analytics', badge: null, feature: 'showAnalytics' },
-        { name: 'Saved Businesses', icon: Heart, href: '/saved', badge: null, feature: 'showSaved' },
-        { name: 'Following', icon: UserPlus, href: '/following', badge: null, feature: 'showFollowing' },
-        { name: 'Queries', icon: Send, href: '/messages', badge: newEnquiryCount > 0 ? String(newEnquiryCount) : null, feature: 'showQueries' },
-        { name: 'Live Chat', icon: MessageSquare, iconColor: 'text-emerald-500', href: '/chat', badge: unreadChatCount > 0 ? String(unreadChatCount) : null, feature: 'showChat' },
-        { name: 'Hot Demand Insights', icon: TrendingUp, href: '/demand', badge: null, feature: 'showDemand' },
-        { name: 'Subscription & Billing', icon: CreditCard, href: '/subscription', badge: null },
-        { name: 'Broadcast Feed', icon: Megaphone, href: '/broadcasts', badge: newBroadcastCount > 0 ? String(newBroadcastCount) : null, feature: 'showBroadcast' },
-        { name: 'Notifications', icon: Bell, href: '/notifications', badge: unreadNotificationCount > 0 ? String(unreadNotificationCount) : null },
-        { name: 'Affiliate', icon: Gift, href: '/affiliate', badge: 'Rewards' },
-        { name: 'Settings', icon: Settings, href: '/settings', badge: null },
+    const menuItems: { name: string; icon: any; href: string; badge: string | null; feature?: keyof DashboardFeatures; iconColor?: string; description?: string }[] = [
+        { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', badge: null, description: 'Overview of your activity' },
+        { name: 'List My Business', icon: Plus, href: '/business-setup', badge: null, description: 'Start the guided business onboarding' },
+        { name: 'My Listings', icon: ListTree, href: '/listings', badge: null, feature: 'showListings', description: 'Manage your published businesses' },
+        { name: 'Add Listing', icon: Plus, href: '/add-listing', badge: null, feature: 'canAddListing', description: 'Add a new business listing' },
+        { name: 'Leads', icon: Phone, href: '/leads', badge: null, feature: 'showLeads', description: 'My Inquiries & Claims from customers' },
+        { name: 'Deals', icon: Megaphone, href: '/deals', badge: null, feature: 'showOffers', description: 'Promotional offers you have published' },
+        { name: 'Events', icon: Clock, href: '/events', badge: null, feature: 'showOffers', description: 'Upcoming events you are hosting' },
+        { name: 'Reviews', icon: Star, href: '/reviews', badge: null, feature: 'showReviews', description: 'My Reviews — ratings left by customers' },
+        { name: 'Analytics', icon: BarChart, href: '/analytics', badge: null, feature: 'showAnalytics', description: 'Performance and traffic insights' },
+        { name: 'Saved Businesses', icon: Heart, href: '/saved', badge: null, feature: 'showSaved', description: 'Businesses you have bookmarked' },
+        { name: 'Following', icon: UserPlus, href: '/following', badge: null, feature: 'showFollowing', description: 'Businesses you follow for updates' },
+        { name: 'Queries', icon: Send, href: '/messages', badge: newEnquiryCount > 0 ? String(newEnquiryCount) : null, feature: 'showQueries', description: 'Direct customer messages & contact requests' },
+        { name: 'Live Chat', icon: MessageSquare, iconColor: 'text-emerald-500', href: '/chat', badge: unreadChatCount > 0 ? String(unreadChatCount) : null, feature: 'showChat', description: 'Real-time chat with customers' },
+        { name: 'Hot Demand Insights', icon: TrendingUp, href: '/demand', badge: null, feature: 'showDemand', description: 'Trending searches in your categories' },
+        { name: 'Subscription & Billing', icon: CreditCard, href: '/subscription', badge: null, description: 'Your plan, invoices and renewals' },
+        { name: 'Broadcast Feed', icon: Megaphone, href: '/broadcasts', badge: newBroadcastCount > 0 ? String(newBroadcastCount) : null, feature: 'showBroadcast', description: 'My Broadcasts — service requests from customers' },
+        { name: 'Notifications', icon: Bell, href: '/notifications', badge: unreadNotificationCount > 0 ? String(unreadNotificationCount) : null, description: 'Alerts — system & engagement notifications' },
+        { name: 'Affiliate', icon: Gift, href: '/affiliate', badge: 'Rewards', description: 'Refer friends and earn rewards' },
+        { name: 'Settings', icon: Settings, href: '/settings', badge: null, description: 'Account preferences and security' },
     ];
 
     const filteredItems = menuItems.filter(item => {
@@ -135,10 +135,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         <Link
                             key={item.name}
                             href={item.href}
+                            title={item.description || item.name}
+                            aria-label={item.description || item.name}
                             className={`flex items-center justify-between px-4 py-3.5 rounded-2xl group transition-all duration-300 relative overflow-hidden ${isActive
                                 ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100 translate-x-1'
                                 : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 hover:translate-x-1'
-                                }`}
+                            }`}
                         >
                             <div className="flex items-center gap-3.5 relative z-10">
                                 <item.icon className={`w-5 h-5 transition-all duration-500 ${isActive

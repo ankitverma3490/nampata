@@ -68,8 +68,9 @@ function RegisterForm() {
         const hasUppercase = /[A-Z]/.test(password);
         const hasLowercase = /[a-z]/.test(password);
         const hasNumber = /[0-9]/.test(password);
-        if (!hasMinLength || !hasUppercase || !hasLowercase || !hasNumber) {
-            setError('Password must meet all strength requirements.');
+        const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password);
+        if (!hasMinLength || !hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+            setError('Password must meet all strength requirements (8+ chars, upper, lower, number, special character).');
             return;
         }
 
@@ -235,6 +236,7 @@ function RegisterForm() {
                                             { label: 'At least one uppercase letter', check: /[A-Z]/.test(password) },
                                             { label: 'At least one lowercase letter', check: /[a-z]/.test(password) },
                                             { label: 'At least one number', check: /[0-9]/.test(password) },
+                                            { label: 'At least one special character (!@#$%^&*)', check: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password) },
                                         ].map(({ label, check }) => (
                                             <div key={label} className="flex items-center gap-2">
                                                 <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${check ? 'bg-emerald-500' : 'bg-slate-300'}`} />

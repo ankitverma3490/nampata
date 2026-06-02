@@ -5,7 +5,7 @@ import {
     Settings, Save, Globe, Info, Mail, Phone,
     Share2, Facebook, Twitter, Instagram, Linkedin,
     Shield, Bell, Database, RefreshCw, Loader2,
-    CheckCircle2, AlertCircle
+    CheckCircle2, AlertCircle, Zap
 } from 'lucide-react';
 import { api } from '../../../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,11 +23,14 @@ export default function AdminSettingsPage() {
         tw_url: '',
         ig_url: '',
         li_url: '',
+        auto_approve_listings: 'true',
+        auto_approve_reviews: 'true',
+        auto_approve_broadcasts: 'false',
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-    const [activeTab, setActiveTab] = useState<'general' | 'contact' | 'social'>('general');
+    const [activeTab, setActiveTab] = useState<'general' | 'contact' | 'social' | 'approvals'>('general');
 
     useEffect(() => {
         fetchSettings();
@@ -78,6 +81,7 @@ export default function AdminSettingsPage() {
         { id: 'general', name: 'General', icon: Globe },
         { id: 'contact', name: 'Contact Info', icon: Mail },
         { id: 'social', name: 'Social Links', icon: Share2 },
+        { id: 'approvals', name: 'Auto-Approvals', icon: Zap },
     ];
 
     return (
@@ -252,6 +256,73 @@ export default function AdminSettingsPage() {
                                                 />
                                             </div>
                                         ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'approvals' && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="w-10 h-10 rounded-2xl bg-violet-50 flex items-center justify-center">
+                                            <Zap className="w-5 h-5 text-violet-500" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-black text-slate-900">Auto-Approval Rules</h3>
+                                            <p className="text-xs text-slate-400 font-bold mt-1">Control whether new content is published instantly or held for manual review.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        {[
+                                            {
+                                                key: 'auto_approve_listings',
+                                                title: 'New Business Listings',
+                                                description: 'When ON, new business listings go live immediately. When OFF, listings stay in the verification queue for admin review.',
+                                                badge: 'On by default',
+                                            },
+                                            {
+                                                key: 'auto_approve_reviews',
+                                                title: 'Customer Reviews',
+                                                description: 'When ON, new reviews appear on business profiles right away. When OFF, reviews wait for admin moderation.',
+                                                badge: 'On by default',
+                                            },
+                                            {
+                                                key: 'auto_approve_broadcasts',
+                                                title: 'Customer Broadcasts',
+                                                description: 'When ON, customer broadcast requests are sent to all matching businesses instantly. When OFF, broadcasts are queued for admin review first.',
+                                                badge: 'Manual review recommended',
+                                            },
+                                        ].map(item => {
+                                            const isOn = (settings[item.key] || 'false') === 'true';
+                                            return (
+                                                <div key={item.key} className="p-6 bg-slate-50/60 border border-slate-100 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <h4 className="font-black text-slate-900 text-sm">{item.title}</h4>
+                                                            <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rounded-full ${isOn ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                                                                {isOn ? 'Auto-Approved' : 'Manual Review'}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-slate-500 font-medium leading-relaxed">{item.description}</p>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleChange(item.key, isOn ? 'false' : 'true')}
+                                                        className={`relative w-16 h-9 rounded-full transition-all flex-shrink-0 ${isOn ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                                                        aria-label={`Toggle ${item.title}`}
+                                                    >
+                                                        <span className={`absolute top-1 left-1 w-7 h-7 bg-white rounded-full shadow-md transition-transform ${isOn ? 'translate-x-7' : 'translate-x-0'}`} />
+                                                    </button>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    <div className="p-4 bg-blue-50/60 border border-blue-100 rounded-2xl flex items-start gap-3">
+                                        <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                                        <p className="text-xs text-blue-700 font-semibold leading-relaxed">
+                                            Changes apply across the platform immediately after saving. Existing pending items already in the verification queue are not affected.
+                                        </p>
                                     </div>
                                 </div>
                             )}

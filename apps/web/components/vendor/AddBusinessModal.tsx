@@ -44,6 +44,7 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, business 
     const [countries, setCountries] = useState<{ code: string; name: string }[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState('general');
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -319,6 +320,11 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, business 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!agreedToTerms) {
+            setError('Please confirm that the business details are accurate and you agree to the Terms & Privacy Policy.');
+            setActiveTab('general');
+            return;
+        }
         setLoading(true);
         setError(null);
         try {
@@ -878,6 +884,7 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, business 
                                                         Gallery Images ({galleryPreviews.length}/{isFree ? '3' : '∞'})
                                                         <span className="text-[9px] text-slate-300 normal-case tracking-normal">{isFree ? 'Up to 3 photos' : 'Unlimited photos'}</span>
                                                     </label>
+                                                    <p className="text-[9px] text-slate-400 font-bold ml-1 uppercase tracking-wider">Recommended: 800×800px or larger, PNG/JPG/WebP. Max 5MB each.</p>
                                                     <div className="grid grid-cols-4 gap-3">
                                                         {galleryPreviews.map((url, idx) => (
                                                             <div key={idx} className="relative group aspect-square rounded-2xl overflow-hidden border-2 border-slate-100">
@@ -1180,10 +1187,29 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, business 
                                     </AnimatePresence>
                                 </div>
 
-                                <div className="p-6 border-t border-slate-100 bg-white/80 backdrop-blur-md">
-                                    <button 
-                                        disabled={loading || galleryUploading || (!business && !canAddListing)} 
-                                        type="submit" 
+                                <div className="p-6 border-t border-slate-100 bg-white/80 backdrop-blur-md space-y-4">
+                                    <label className="flex items-start gap-3 cursor-pointer group">
+                                        <div className="relative flex items-center justify-center mt-0.5">
+                                            <input
+                                                type="checkbox"
+                                                checked={agreedToTerms}
+                                                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                                className="w-5 h-5 appearance-none border-2 border-slate-300 rounded-lg checked:border-orange-500 checked:bg-orange-500 transition-colors cursor-pointer peer"
+                                            />
+                                            <svg className="w-3 h-3 text-white absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                        </div>
+                                        <span className="text-[11px] text-slate-500 font-medium leading-relaxed">
+                                            I confirm that the business details submitted are accurate and I agree to the{' '}
+                                            <Link href="/terms" className="text-orange-600 font-bold hover:underline">Terms of Service</Link>
+                                            {' '}and{' '}
+                                            <Link href="/privacy" className="text-orange-600 font-bold hover:underline">Privacy Policy</Link>. *
+                                        </span>
+                                    </label>
+                                    <button
+                                        disabled={loading || galleryUploading || (!business && !canAddListing) || !agreedToTerms}
+                                        type="submit"
                                         className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-orange-500 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all"
                                     >
                                         {loading || galleryUploading ? (
