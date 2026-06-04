@@ -8,6 +8,7 @@ import { BusinessQuestion } from '../../entities/business-question.entity';
 import { VendorAttribute } from '../../entities/vendor-attribute.entity';
 import { Vendor } from '../../entities/vendor.entity';
 import { Listing } from '../../entities/business.entity';
+import { BusinessConsentLog } from '../../entities/business-consent-log.entity';
 import { SaveAnswersDto } from './dto/save-answers.dto';
 import { DuplicateCheckDto } from './dto/duplicate-check.dto';
 import { normalizeGlobalPhone } from '../../common/utils/phone.util';
@@ -50,10 +51,40 @@ export class BusinessSetupService implements OnModuleInit {
         private subscriptionPlanRepository: Repository<SubscriptionPlan>,
         @InjectRepository(ActivePlan)
         private activePlanRepository: Repository<ActivePlan>,
+        @InjectRepository(BusinessConsentLog)
+        private consentLogRepository: Repository<BusinessConsentLog>,
     ) { }
 
     async onModuleInit() {
         try {
+            await this.consentLogRepository.query(`
+                CREATE TABLE IF NOT EXISTS business_consent_logs (
+                    id uuid PRIMARY KEY,
+                    user_id uuid NULL,
+                    vendor_id uuid NOT NULL,
+                    listing_id uuid NULL,
+                    source varchar(32) NOT NULL,
+                    accepted_at timestamp NOT NULL,
+                    terms_accepted boolean DEFAULT false,
+                    privacy_accepted boolean DEFAULT false,
+                    moderation_accepted boolean DEFAULT false,
+                    accuracy_confirmed boolean DEFAULT false,
+                    public_location_consent boolean DEFAULT false,
+                    marketing_updates_consent boolean DEFAULT false,
+                    terms_version varchar(50) NULL,
+                    privacy_version varchar(50) NULL,
+                    session_id varchar(120) NULL,
+                    device_id varchar(255) NULL,
+                    ip_address varchar(120) NULL,
+                    retention_until timestamp NOT NULL,
+                    payload jsonb DEFAULT '{}'::jsonb,
+                    created_at timestamp DEFAULT NOW()
+                );
+                CREATE INDEX IF NOT EXISTS idx_business_consent_logs_vendor_id ON business_consent_logs(vendor_id);
+                CREATE INDEX IF NOT EXISTS idx_business_consent_logs_user_id ON business_consent_logs(user_id);
+                CREATE INDEX IF NOT EXISTS idx_business_consent_logs_listing_id ON business_consent_logs(listing_id);
+            `);
+
             await this.questionRepository
                 .createQueryBuilder()
                 .update(BusinessQuestion)
@@ -425,6 +456,44 @@ export class BusinessSetupService implements OnModuleInit {
                 });
                 await this.attributeRepository.save(attribute);
             }
+        }
+
+        const legalConsentAccepted = String(
+            (normalizedAnswers as any).legalConsentAccepted?.[0] ||
+            (normalizedAnswers as any).legalConsentAccepted ||
+            ''
+        ).toLowerCase() === 'true';
+
+        if (legalConsentAccepted) {
+            const acceptedAtValue =
+                (normalizedAnswers as any).legalConsentAcceptedAt?.[0] ||
+                (normalizedAnswers as any).legalConsentAcceptedAt;
+            const acceptedAt = acceptedAtValue ? new Date(String(acceptedAtValue)) : new Date();
+            const retentionUntil = new Date(acceptedAt);
+            retentionUntil.setFullYear(retentionUntil.getFullYear() + 7);
+
+            await this.consentLogRepository.save(
+                this.consentLogRepository.create({
+                    userId,
+                    vendorId,
+                    listingId: null,
+                    source: 'business_setup',
+                    acceptedAt,
+                    termsAccepted: String((normalizedAnswers as any).legalConsentTerms?.[0] || (normalizedAnswers as any).legalConsentTerms || '').toLowerCase() === 'true',
+                    privacyAccepted: String((normalizedAnswers as any).legalConsentPrivacy?.[0] || (normalizedAnswers as any).legalConsentPrivacy || '').toLowerCase() === 'true',
+                    moderationAccepted: String((normalizedAnswers as any).legalConsentModeration?.[0] || (normalizedAnswers as any).legalConsentModeration || '').toLowerCase() === 'true',
+                    accuracyConfirmed: String((normalizedAnswers as any).legalConsentAccuracy?.[0] || (normalizedAnswers as any).legalConsentAccuracy || '').toLowerCase() === 'true',
+                    publicLocationConsent: String((normalizedAnswers as any).legalConsentPublicLocation?.[0] || (normalizedAnswers as any).legalConsentPublicLocation || '').toLowerCase() === 'true',
+                    marketingUpdatesConsent: String((normalizedAnswers as any).legalConsentMarketing?.[0] || (normalizedAnswers as any).legalConsentMarketing || '').toLowerCase() === 'true',
+                    termsVersion: String((normalizedAnswers as any).termsVersion?.[0] || (normalizedAnswers as any).termsVersion || 'v1'),
+                    privacyVersion: String((normalizedAnswers as any).privacyVersion?.[0] || (normalizedAnswers as any).privacyVersion || 'v1'),
+                    sessionId: String((normalizedAnswers as any).legalConsentSessionId?.[0] || (normalizedAnswers as any).legalConsentSessionId || ''),
+                    deviceId: String((normalizedAnswers as any).legalConsentDeviceId?.[0] || (normalizedAnswers as any).legalConsentDeviceId || ''),
+                    ipAddress: String((normalizedAnswers as any).legalConsentIpAddress?.[0] || (normalizedAnswers as any).legalConsentIpAddress || requestMeta?.ipAddress || ''),
+                    retentionUntil,
+                    payload: normalizedAnswers,
+                }),
+            );
         }
 
         return { success: true };

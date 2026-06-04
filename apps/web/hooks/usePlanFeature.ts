@@ -24,6 +24,7 @@ export interface DashboardFeatures {
     maxEvents?: number;
     maxFaqs?: number;
     maxSubCategories?: number;
+    maxNamedPhoneNumbers?: number;
     canCreateAlbums?: boolean;
     isFeatured?: boolean;
     [key: string]: any;
@@ -58,6 +59,7 @@ export const usePlanFeature = () => {
         maxKeywords: 0,
         maxFaqs: 0,
         maxSubCategories: 0,
+        maxNamedPhoneNumbers: 0,
         canCreateAlbums: false,
         isFeatured: false,
     };
@@ -81,6 +83,9 @@ export const usePlanFeature = () => {
         if (user?.role === 'admin' || user?.role === 'superadmin') {
             if (featureName.startsWith('max')) return 999999;
             return true;
+        }
+        if (featureName === 'maxListings') {
+            return Math.min(Number(features[featureName] ?? 1), 1);
         }
         return features[featureName];
     };

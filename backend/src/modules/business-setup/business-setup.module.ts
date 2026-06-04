@@ -9,6 +9,7 @@ import { Listing } from '../../entities/business.entity';
 import { Subscription } from '../../entities/subscription.entity';
 import { SubscriptionPlan } from '../../entities/subscription-plan.entity';
 import { ActivePlan } from '../../entities/active-plan.entity';
+import { BusinessConsentLog } from '../../entities/business-consent-log.entity';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { ActivePlan } from '../../entities/active-plan.entity';
             Subscription,
             SubscriptionPlan,
             ActivePlan,
+            BusinessConsentLog,
         ]),
     ],
     controllers: [BusinessSetupController],

@@ -125,6 +125,7 @@ export default function AddListingPage() {
         phoneNumber: '',
         whatsapp: '',
         contactPersonName: '',
+        namedPhoneNumbers: [],
         businessHours: [],
         yearEstablished: '',
         employeeCount: '',
@@ -151,6 +152,7 @@ export default function AddListingPage() {
         logoUrl: '',
         coverImageUrl: '',
         images: [],
+        imageCaptions: {},
         agreed: false,
     });
 
@@ -158,7 +160,7 @@ export default function AddListingPage() {
     useEffect(() => { formDataRef.current = formData; }, [formData]);
 
     const { getFeatureValue, planName, isFree } = usePlanFeature();
-    const maxListings = getFeatureValue('maxListings') || 1;
+    const maxListings = Math.min(Number(getFeatureValue('maxListings') || 1), 1);
     const maxImages = isFree ? 3 : 999;
     const isVendor = user?.role === 'vendor';
     const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
@@ -229,6 +231,9 @@ export default function AddListingPage() {
             shortDescription: rawData.shortDescription.trim() || undefined,
             phone,
             whatsapp,
+            namedPhoneNumbers: Array.isArray(rawData.namedPhoneNumbers) && rawData.namedPhoneNumbers.length
+                ? rawData.namedPhoneNumbers.filter((item) => item.label?.trim() && item.number?.trim())
+                : undefined,
             website,
             address: rawData.address.trim(),
             addressLine2: rawData.addressLine2.trim() || undefined,
@@ -241,6 +246,9 @@ export default function AddListingPage() {
             logoUrl,
             coverImageUrl,
             images,
+            imageCaptions: rawData.imageCaptions && Object.keys(rawData.imageCaptions).length
+                ? rawData.imageCaptions
+                : undefined,
             yearEstablished: Number.isInteger(yearEstablished as number) ? yearEstablished : undefined,
             employeeCount: rawData.employeeCount || undefined,
             businessHours,
@@ -250,6 +258,22 @@ export default function AddListingPage() {
             faqs,
             legalConsentAccepted: true,
             legalConsentAcceptedAt: new Date().toISOString(),
+            legalConsentSessionId: typeof window !== 'undefined'
+                ? (sessionStorage.getItem('listingConsentSessionId') || (() => {
+                    const value = `sess-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+                    sessionStorage.setItem('listingConsentSessionId', value);
+                    return value;
+                })())
+                : undefined,
+            legalConsentDeviceId: typeof window !== 'undefined'
+                ? (localStorage.getItem('listingConsentDeviceId') || (() => {
+                    const value = `dev-${Math.random().toString(36).slice(2, 14)}`;
+                    localStorage.setItem('listingConsentDeviceId', value);
+                    return value;
+                })())
+                : undefined,
+            termsVersion: 'v1',
+            privacyVersion: 'v1',
         };
 
         try {

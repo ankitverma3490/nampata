@@ -33,6 +33,7 @@ import { SearchService } from '../search/search.service';
 import { DemandService } from '../demand/demand.service';
 import { GeocodingQueueService } from './geocoding-queue.service';
 import { AffiliateService } from '../affiliate/affiliate.service';
+import { BusinessConsentLog } from '../../entities/business-consent-log.entity';
 
 @Injectable()
 export class BusinessesService implements OnModuleInit {
@@ -57,6 +58,8 @@ export class BusinessesService implements OnModuleInit {
         private subscriptionRepository: Repository<Subscription>,
         @InjectRepository(SubscriptionPlan)
         private subscriptionPlanRepository: Repository<SubscriptionPlan>,
+        @InjectRepository(BusinessConsentLog)
+        private consentLogRepository: Repository<BusinessConsentLog>,
         private notificationsService: NotificationsService,
         private searchService: SearchService,
         private demandService: DemandService,
@@ -322,7 +325,36 @@ export class BusinessesService implements OnModuleInit {
                 );
                 CREATE INDEX IF NOT EXISTS idx_business_subcategories_category ON business_subcategories(category_id);
                 ALTER TABLE businesses ADD COLUMN IF NOT EXISTS albums JSONB DEFAULT '[]';
+                ALTER TABLE businesses ADD COLUMN IF NOT EXISTS named_phone_numbers JSONB DEFAULT '[]';
+                ALTER TABLE businesses ADD COLUMN IF NOT EXISTS image_captions JSONB DEFAULT '{}'::jsonb;
                 ALTER TABLE users ADD COLUMN IF NOT EXISTS pending_referral_code VARCHAR(32) NULL;
+            `);
+            await this.listingRepository.query(`
+                CREATE TABLE IF NOT EXISTS business_consent_logs (
+                    id uuid PRIMARY KEY,
+                    user_id uuid NULL,
+                    vendor_id uuid NOT NULL,
+                    listing_id uuid NULL,
+                    source varchar(32) NOT NULL,
+                    accepted_at timestamp NOT NULL,
+                    terms_accepted boolean DEFAULT false,
+                    privacy_accepted boolean DEFAULT false,
+                    moderation_accepted boolean DEFAULT false,
+                    accuracy_confirmed boolean DEFAULT false,
+                    public_location_consent boolean DEFAULT false,
+                    marketing_updates_consent boolean DEFAULT false,
+                    terms_version varchar(50) NULL,
+                    privacy_version varchar(50) NULL,
+                    session_id varchar(120) NULL,
+                    device_id varchar(255) NULL,
+                    ip_address varchar(120) NULL,
+                    retention_until timestamp NOT NULL,
+                    payload jsonb DEFAULT '{}'::jsonb,
+                    created_at timestamp DEFAULT NOW()
+                );
+                CREATE INDEX IF NOT EXISTS idx_business_consent_logs_vendor_id ON business_consent_logs(vendor_id);
+                CREATE INDEX IF NOT EXISTS idx_business_consent_logs_user_id ON business_consent_logs(user_id);
+                CREATE INDEX IF NOT EXISTS idx_business_consent_logs_listing_id ON business_consent_logs(listing_id);
             `);
             console.log('[BusinessesService] Database performance indexes auto-sync completed.');
         } catch (error) {
@@ -458,6 +490,42 @@ export class BusinessesService implements OnModuleInit {
         });
 
         const savedListing = await this.listingRepository.save(listing);
+
+        if (createBusinessDto.legalConsentAccepted) {
+            const acceptedAt = createBusinessDto.legalConsentAcceptedAt
+                ? new Date(createBusinessDto.legalConsentAcceptedAt)
+                : new Date();
+            const retentionUntil = new Date(acceptedAt);
+            retentionUntil.setFullYear(retentionUntil.getFullYear() + 7);
+
+            await this.consentLogRepository.save(
+                this.consentLogRepository.create({
+                    userId: user.id,
+                    vendorId: vendor.id,
+                    listingId: savedListing.id,
+                    source: 'listing_create',
+                    acceptedAt,
+                    termsAccepted: true,
+                    privacyAccepted: true,
+                    moderationAccepted: true,
+                    accuracyConfirmed: true,
+                    publicLocationConsent: true,
+                    marketingUpdatesConsent: false,
+                    termsVersion: createBusinessDto.termsVersion || 'v1',
+                    privacyVersion: createBusinessDto.privacyVersion || 'v1',
+                    sessionId: createBusinessDto.legalConsentSessionId || context?.sessionId || null,
+                    deviceId: createBusinessDto.legalConsentDeviceId || context?.deviceId || null,
+                    ipAddress: context?.ipAddress || null,
+                    retentionUntil,
+                    payload: {
+                        legalConsentAccepted: true,
+                        legalConsentAcceptedAt: createBusinessDto.legalConsentAcceptedAt || acceptedAt.toISOString(),
+                        termsVersion: createBusinessDto.termsVersion || 'v1',
+                        privacyVersion: createBusinessDto.privacyVersion || 'v1',
+                    },
+                }),
+            );
+        }
 
         // If coordinates are missing, enqueue for geocoding
         if ((!savedListing.latitude || !savedListing.longitude) && savedListing.address) {
@@ -1031,7 +1099,7 @@ export class BusinessesService implements OnModuleInit {
         const textFields = [
             'description', 'shortDescription', 'email', 'phone', 'whatsapp',
             'website', 'address', 'addressLine2', 'city', 'state', 'pincode', 'latitude', 'longitude',
-            'logoUrl', 'coverImageUrl', 'images', 'metaTitle', 'metaDescription',
+            'logoUrl', 'coverImageUrl', 'images', 'imageCaptions', 'namedPhoneNumbers', 'metaTitle', 'metaDescription',
             'metaKeywords', 'hasOffer', 'offerTitle', 'offerDescription', 'offerBadge',
             'offerExpiresAt', 'offerBannerUrl', 'faqs'
         ];

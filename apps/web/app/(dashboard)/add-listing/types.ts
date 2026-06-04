@@ -27,6 +27,7 @@ export interface ListingFormData {
     phoneNumber: string;
     whatsapp: string;
     contactPersonName: string;
+    namedPhoneNumbers: { label: string; number: string }[];
     
     businessHours: any[];
     
@@ -62,7 +63,8 @@ export interface ListingFormData {
     logoUrl: string;
     coverImageUrl: string;
     images: string[];
-    
+    imageCaptions: Record<string, string>;
+
     agreed: boolean;
 }
 

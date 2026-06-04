@@ -219,6 +219,13 @@ export default function BusinessDetailClient({
     if (!business?.latitude || !business?.longitude) return null;
     return `https://www.google.com/maps?q=${business.latitude},${business.longitude}`;
   }, [business]);
+  const additionalPhoneNumbers = useMemo(
+    () =>
+      (business?.namedPhoneNumbers || []).filter(
+        (item) => item?.label && item?.number
+      ),
+    [business?.namedPhoneNumbers]
+  );
 
   useEffect(() => {
     const loadBusiness = async () => {
@@ -1874,6 +1881,28 @@ export default function BusinessDetailClient({
                     </button>
                   )}
                 </div>
+
+                {additionalPhoneNumbers.length > 0 && (
+                  <div className="mb-6 relative z-10 space-y-2">
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                      Additional contact numbers
+                    </p>
+                    {additionalPhoneNumbers.map((item, index) => (
+                      <a
+                        key={`${item.label}-${item.number}-${index}`}
+                        href={`tel:${item.number}`}
+                        className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 hover:bg-white/10 transition-colors"
+                      >
+                        <span className="text-sm font-bold text-white">
+                          {item.label}
+                        </span>
+                        <span className="text-sm text-slate-300">
+                          {item.number}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                )}
 
                 {!isOwner && (
                   <div className="space-y-4 relative z-10">

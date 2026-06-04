@@ -296,7 +296,8 @@ export class VendorsService {
             { val: vendor.businessAddress, weight: 10 },
             { val: vendor.city, weight: 10 },
             { val: vendor.socialLinks?.length > 0, weight: 10 },
-            { val: vendor.isVerified, weight: 20 },
+            { val: vendor.businessHours && Object.keys(vendor.businessHours).length > 0, weight: 10 },
+            { val: businessCount > 0, weight: 10 },
         ];
 
         fields.forEach(f => {
@@ -388,6 +389,7 @@ export class VendorsService {
             slug: vendor.slug,
             businessName: vendor.businessName || vendor.user?.fullName || 'Unnamed Business',
             vendorName: vendor.user?.fullName || 'Vendor',
+            contactName: vendor.user?.fullName || 'Business Team',
             businessEmail: vendor.businessEmail || vendor.user?.email,
             businessPhone: vendor.businessPhone,
             businessAddress: vendor.businessAddress,
@@ -401,6 +403,7 @@ export class VendorsService {
             totalViews,
             categories,
             createdAt: vendor.user?.createdAt,
+            namedPhoneNumbers: listings[0]?.namedPhoneNumbers || [],
             listings: listings.map(l => ({
                 id: l.id,
                 title: l.title,
@@ -408,6 +411,7 @@ export class VendorsService {
                 images: l.images,
                 coverImageUrl: l.coverImageUrl || null,
                 logoUrl: l.logoUrl || null,
+                namedPhoneNumbers: l.namedPhoneNumbers || [],
                 averageRating: l.averageRating,
                 totalReviews: l.totalReviews,
                 city: l.city,

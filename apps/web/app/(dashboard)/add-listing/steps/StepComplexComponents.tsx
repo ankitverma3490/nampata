@@ -102,6 +102,10 @@ export const Step5Category = ({ formData, setFormData, categories = [] }: StepPr
 
 export const Step9Contact = ({ formData, setFormData }: StepProps) => {
     const [phoneError, setPhoneError] = useState<string | null>(null);
+    const { getFeatureValue } = usePlanFeature();
+    const maxNamedPhoneNumbers = Number(getFeatureValue('maxNamedPhoneNumbers') || 0);
+    const canManageNamedPhones = maxNamedPhoneNumbers > 0;
+    const namedPhoneNumbers = Array.isArray(formData.namedPhoneNumbers) ? formData.namedPhoneNumbers : [];
 
     const handlePhoneChange = (val: string, type: 'phone' | 'whatsapp') => {
         // Strip non-digits except +
@@ -124,8 +128,34 @@ export const Step9Contact = ({ formData, setFormData }: StepProps) => {
         }
     };
 
+    const addNamedPhone = () => {
+        if (!canManageNamedPhones || namedPhoneNumbers.length >= maxNamedPhoneNumbers) return;
+        setFormData((prev) => ({
+            ...prev,
+            namedPhoneNumbers: [...(Array.isArray(prev.namedPhoneNumbers) ? prev.namedPhoneNumbers : []), { label: '', number: '' }],
+        }));
+    };
+
+    const updateNamedPhone = (index: number, field: 'label' | 'number', value: string) => {
+        setFormData((prev) => {
+            const next = [...(Array.isArray(prev.namedPhoneNumbers) ? prev.namedPhoneNumbers : [])];
+            next[index] = {
+                ...(next[index] || { label: '', number: '' }),
+                [field]: field === 'number' ? value.replace(/[^\d+]/g, '') : value,
+            };
+            return { ...prev, namedPhoneNumbers: next };
+        });
+    };
+
+    const removeNamedPhone = (index: number) => {
+        setFormData((prev) => ({
+            ...prev,
+            namedPhoneNumbers: (Array.isArray(prev.namedPhoneNumbers) ? prev.namedPhoneNumbers : []).filter((_, i) => i !== index),
+        }));
+    };
+
     return (
-        <div className="space-y-6 overflow-hidden">
+        <div className="space-y-6 pb-4">
             <div>
                 <label className={labelClass}>Contact Person Name</label>
                 <input 
@@ -165,7 +195,7 @@ export const Step9Contact = ({ formData, setFormData }: StepProps) => {
                     </div>
                 </div>
             </div>
-            <div className="pt-2">
+            <div className="pt-2 pb-2">
                 <label className={labelClass}>WhatsApp Number (Optional)</label>
                 <div className="flex items-center gap-2 min-w-0">
                     <select className="shrink-0 w-[140px] px-3 py-3.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-semibold text-sm appearance-none cursor-pointer" disabled>
@@ -179,6 +209,65 @@ export const Step9Contact = ({ formData, setFormData }: StepProps) => {
                         className="flex-1 min-w-0 w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all placeholder:text-slate-400"
                     />
                 </div>
+            </div>
+            <div className="space-y-3 border-t border-slate-100 pt-4">
+                <div className="flex items-center justify-between gap-3">
+                    <label className={labelClass + " mb-0"}>Additional Named Numbers</label>
+                    {canManageNamedPhones ? (
+                        <span className="text-[10px] font-black text-slate-500">
+                            {namedPhoneNumbers.length}/{maxNamedPhoneNumbers}
+                        </span>
+                    ) : (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-black text-amber-600">
+                            <Lock className="w-3 h-3" />
+                            Paid only
+                        </span>
+                    )}
+                </div>
+
+                {!canManageNamedPhones && (
+                    <div className="rounded-xl border border-dashed border-amber-200 bg-amber-50/50 px-4 py-3 text-xs font-bold text-amber-700">
+                        Paid business plans can add up to 5 named phone numbers for teams like Sales, Support, or Bookings.
+                    </div>
+                )}
+
+                {namedPhoneNumbers.map((item, idx) => (
+                    <div key={`${idx}-${item.label || 'phone'}`} className="grid grid-cols-12 gap-2">
+                        <input
+                            type="text"
+                            value={item.label}
+                            onChange={(e) => updateNamedPhone(idx, 'label', e.target.value)}
+                            placeholder="Label"
+                            className="col-span-4 px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold"
+                            disabled={!canManageNamedPhones}
+                        />
+                        <input
+                            type="tel"
+                            value={item.number}
+                            onChange={(e) => updateNamedPhone(idx, 'number', e.target.value)}
+                            placeholder="+923001234567"
+                            className="col-span-7 px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold"
+                            disabled={!canManageNamedPhones}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => removeNamedPhone(idx)}
+                            className="col-span-1 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 flex items-center justify-center"
+                            disabled={!canManageNamedPhones}
+                        >
+                            <Trash2 className="w-4 h-4" />
+                        </button>
+                    </div>
+                ))}
+
+                <button
+                    type="button"
+                    onClick={addNamedPhone}
+                    disabled={!canManageNamedPhones || namedPhoneNumbers.length >= maxNamedPhoneNumbers}
+                    className="w-full py-3 border border-dashed border-slate-300 rounded-xl text-xs font-black text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                >
+                    + Add Named Number
+                </button>
             </div>
         </div>
     );

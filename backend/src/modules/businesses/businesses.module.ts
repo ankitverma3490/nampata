@@ -24,6 +24,7 @@ import { ActivePlan } from '../../entities/active-plan.entity';
 import { DuplicateDetectionService } from './duplicate-detection.service';
 import { SearchCacheWarmService } from './search-cache-warm.service';
 import { GeocodingQueueService } from './geocoding-queue.service';
+import { BusinessConsentLog } from '../../entities/business-consent-log.entity';
 
 @Module({
     imports: [
@@ -38,6 +39,7 @@ import { GeocodingQueueService } from './geocoding-queue.service';
             ActivePlan,
             Subscription,
             SubscriptionPlan,
+            BusinessConsentLog,
         ]),
         NotificationsModule,
         SearchModule,

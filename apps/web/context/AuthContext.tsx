@@ -242,11 +242,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await api.auth.resendOtp(user.email);
     };
 
+    const content = (
+        <AuthContext.Provider value={{ user, loading, login, googleLogin, register, logout, updateUser, syncProfile, verifyEmail, resendOtp }}>
+            {children}
+        </AuthContext.Provider>
+    );
+
+    if (!GOOGLE_CLIENT_ID) {
+        return content;
+    }
+
     return (
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-            <AuthContext.Provider value={{ user, loading, login, googleLogin, register, logout, updateUser, syncProfile, verifyEmail, resendOtp }}>
-                {children}
-            </AuthContext.Provider>
+            {content}
         </GoogleOAuthProvider>
     );
 }

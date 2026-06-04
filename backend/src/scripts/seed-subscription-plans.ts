@@ -51,7 +51,12 @@ const PAID_FEATURES = {
     showBroadcast: true,
     showDemand: true,
     maxKeywords: 10,
-    maxListings: 999,
+    maxListings: 1,
+    maxFaqs: 10,
+    maxSubCategories: 3,
+    canCreateAlbums: true,
+    maxNamedPhoneNumbers: 5,
+    showCustomerNotes: true,
     canRespondBroadcast: true,
     canReplyReviews: true,
 };

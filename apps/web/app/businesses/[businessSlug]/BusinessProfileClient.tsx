@@ -20,8 +20,10 @@ interface BusinessProfile {
     slug: string;
     businessName: string;
     vendorName: string;
+    contactName?: string;
     businessEmail?: string;
     businessPhone?: string;
+    namedPhoneNumbers?: { label: string; number: string; }[];
     businessAddress?: string;
     isVerified: boolean;
     socialLinks: { platform: string; url: string; }[];
@@ -137,6 +139,7 @@ export default function BusinessProfileClient({ slugOrId, initialData }: { slugO
 
     const avatar = businessProfile.avatarUrl ? getImageUrl(businessProfile.avatarUrl) : null;
     const memberSince = businessProfile.createdAt ? new Date(businessProfile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently';
+    const additionalPhoneNumbers = (businessProfile.namedPhoneNumbers || []).filter((item) => item?.label && item?.number);
 
     return (
         <div className="min-h-screen bg-white">
@@ -153,7 +156,7 @@ export default function BusinessProfileClient({ slugOrId, initialData }: { slugO
                                 className="shadow-sm mb-6"
                             />
                             <h2 className="text-2xl font-black text-slate-900">{businessProfile.businessName}</h2>
-                            <p className="text-sm text-slate-500 font-bold mt-2">{businessProfile.vendorName}</p>
+                            <p className="text-sm text-slate-500 font-bold mt-2">{businessProfile.contactName || businessProfile.vendorName}</p>
 
                             <div className="grid grid-cols-3 gap-3 w-full mt-8">
                                 <div className="bg-white rounded-2xl p-4 border border-slate-100">
@@ -177,6 +180,12 @@ export default function BusinessProfileClient({ slugOrId, initialData }: { slugO
                                         <span className="text-sm font-bold text-slate-700">{businessProfile.businessPhone}</span>
                                     </a>
                                 )}
+                                {additionalPhoneNumbers.map((item, index) => (
+                                    <a key={`${item.label}-${item.number}-${index}`} href={`tel:${item.number}`} className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 border border-slate-100">
+                                        <Phone className="w-4 h-4 text-slate-400" />
+                                        <span className="text-sm font-bold text-slate-700">{item.label}: {item.number}</span>
+                                    </a>
+                                ))}
                                 {businessProfile.businessEmail && (
                                     <a href={`mailto:${businessProfile.businessEmail}`} className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 border border-slate-100">
                                         <Mail className="w-4 h-4 text-slate-400" />

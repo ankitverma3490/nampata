@@ -267,14 +267,20 @@ export const Step18Expansion = ({ formData, setFormData }: StepProps) => (
 );
 
 export const Step19Media = ({ formData, setFormData }: StepProps) => {
+    const [uploadingCover, setUploadingCover] = useState(false);
+    const [uploadingLogo, setUploadingLogo] = useState(false);
+
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         try {
+            setUploadingCover(true);
             const response = await api.listings.uploadImage(file);
             setFormData(prev => ({ ...prev, coverImageUrl: response.url }));
         } catch (err: any) {
             console.error('Failed to upload', err);
+        } finally {
+            setUploadingCover(false);
         }
     };
 
@@ -282,15 +288,28 @@ export const Step19Media = ({ formData, setFormData }: StepProps) => {
         const file = e.target.files?.[0];
         if (!file) return;
         try {
+            setUploadingLogo(true);
             const response = await api.listings.uploadImage(file);
             setFormData(prev => ({ ...prev, logoUrl: response.url }));
         } catch (err: any) {
             console.error('Failed to upload logo', err);
+        } finally {
+            setUploadingLogo(false);
         }
     };
 
     return (
         <div className="space-y-8">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="text-sm font-bold text-slate-700">Recommended sizes</p>
+                <p className="text-xs text-slate-500 mt-1">Logo: 400 x 400px square. Cover image: 1200 x 675px wide.</p>
+                <p className="text-xs text-slate-500 mt-1">Uploads are auto-optimized before publishing for better speed.</p>
+                {(uploadingLogo || uploadingCover) && (
+                    <p className="text-xs font-semibold text-orange-500 mt-2">
+                        {uploadingLogo ? 'Uploading logo...' : 'Uploading cover image...'}
+                    </p>
+                )}
+            </div>
             <div>
                 <label className={labelClass}>Business Logo</label>
                 <label className="block cursor-pointer group">

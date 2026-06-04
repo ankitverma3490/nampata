@@ -81,6 +81,9 @@ export class Listing {
     @Column({ nullable: true, length: 20 })
     whatsapp: string;
 
+    @Column({ name: 'named_phone_numbers', type: 'jsonb', default: '[]' })
+    namedPhoneNumbers: { label: string; number: string }[];
+
     @Column({ nullable: true })
     website: string;
 
@@ -129,6 +132,9 @@ export class Listing {
 
     @Column({ type: 'jsonb', default: '[]' })
     images: string[];
+
+    @Column({ name: 'image_captions', type: 'jsonb', default: '{}' })
+    imageCaptions: Record<string, string>;
 
     @Column({ type: 'jsonb', default: '[]' })
     videos: string[];

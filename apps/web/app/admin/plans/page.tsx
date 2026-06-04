@@ -29,10 +29,11 @@ export default function PlansPage() {
     const [formData, setFormData] = useState<any>({
         name: '',
         description: '',
+        planType: 'basic',
         price: 0,
         billingCycle: 'monthly',
         isActive: true,
-        isPopular: false,
+        isFeatured: false,
         dashboardFeatures: {}
     });
 
@@ -59,10 +60,11 @@ export default function PlansPage() {
             setFormData({
                 name: plan.name || '',
                 description: plan.description || '',
+                planType: plan.planType || 'basic',
                 price: plan.price || 0,
                 billingCycle: plan.billingCycle || 'monthly',
                 isActive: plan.isActive !== false,
-                isPopular: !!plan.isPopular,
+                isFeatured: !!plan.isFeatured,
                 dashboardFeatures: plan.dashboardFeatures || {}
             });
         } else {
@@ -70,10 +72,11 @@ export default function PlansPage() {
             setFormData({
                 name: '',
                 description: '',
+                planType: 'basic',
                 price: 0,
                 billingCycle: 'monthly',
                 isActive: true,
-                isPopular: false,
+                isFeatured: false,
                 dashboardFeatures: {}
             });
         }
@@ -165,10 +168,10 @@ export default function PlansPage() {
                     </div>
                 ) : (
                     plans.map(plan => (
-                        <div key={plan.id} className={`bg-white rounded-3xl border-2 p-6 shadow-sm transition-all relative overflow-hidden ${plan.isPopular ? 'border-amber-400 shadow-amber-500/10' : 'border-slate-100'}`}>
-                            {plan.isPopular && (
+                        <div key={plan.id} className={`bg-white rounded-3xl border-2 p-6 shadow-sm transition-all relative overflow-hidden ${plan.isFeatured ? 'border-amber-400 shadow-amber-500/10' : 'border-slate-100'}`}>
+                            {plan.isFeatured && (
                                 <div className="absolute top-4 right-4 bg-amber-100 text-amber-700 px-3 py-1 text-xs font-black rounded-lg uppercase tracking-wider">
-                                    Popular
+                                    Featured
                                 </div>
                             )}
                             <div className="mb-6">
@@ -257,6 +260,19 @@ export default function PlansPage() {
                                         />
                                     </div>
                                     <div>
+                                        <label className="block text-xs font-black text-slate-500 uppercase tracking-wider mb-2">Plan Type</label>
+                                        <select
+                                            value={formData.planType}
+                                            onChange={e => setFormData({ ...formData, planType: e.target.value })}
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                        >
+                                            <option value="free">Free</option>
+                                            <option value="basic">Basic</option>
+                                            <option value="premium">Premium</option>
+                                            <option value="enterprise">Enterprise</option>
+                                        </select>
+                                    </div>
+                                    <div>
                                         <label className="block text-xs font-black text-slate-500 uppercase tracking-wider mb-2">Description</label>
                                         <textarea
                                             value={formData.description}
@@ -297,11 +313,11 @@ export default function PlansPage() {
                                             <span className="text-sm font-bold text-slate-700 group-hover:text-slate-900">Active</span>
                                         </label>
                                         <label className="flex items-center gap-3 cursor-pointer group">
-                                            <div className={`w-12 h-6 rounded-full transition-colors relative ${formData.isPopular ? 'bg-amber-500' : 'bg-slate-200'}`}>
-                                                <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${formData.isPopular ? 'left-7' : 'left-1'}`} />
+                                            <div className={`w-12 h-6 rounded-full transition-colors relative ${formData.isFeatured ? 'bg-amber-500' : 'bg-slate-200'}`}>
+                                                <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${formData.isFeatured ? 'left-7' : 'left-1'}`} />
                                             </div>
-                                            <input type="checkbox" className="hidden" checked={formData.isPopular} onChange={() => setFormData({ ...formData, isPopular: !formData.isPopular })} />
-                                            <span className="text-sm font-bold text-slate-700 group-hover:text-slate-900">Popular</span>
+                                            <input type="checkbox" className="hidden" checked={formData.isFeatured} onChange={() => setFormData({ ...formData, isFeatured: !formData.isFeatured })} />
+                                            <span className="text-sm font-bold text-slate-700 group-hover:text-slate-900">Featured</span>
                                         </label>
                                     </div>
                                 </div>

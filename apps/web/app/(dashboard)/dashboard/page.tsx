@@ -48,6 +48,9 @@ export default function GenericDashboard() {
     const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
     const profileCompletion = useMemo(() => {
         if (!isVendor || !setupStatus) return null;
+        const backendPercent = typeof stats?.profileCompletion === 'number'
+            ? Math.max(0, Math.min(100, Math.round(stats.profileCompletion)))
+            : null;
         const answers = setupStatus.answers || {};
         const requiredChecks = [
             Boolean(user?.vendor?.businessName),
@@ -68,7 +71,7 @@ export default function GenericDashboard() {
         ];
         const completed = [...requiredChecks, ...optionalChecks].filter(Boolean).length;
         const total = requiredChecks.length + optionalChecks.length;
-        const percent = Math.round((completed / Math.max(total, 1)) * 100);
+        const derivedPercent = Math.round((completed / Math.max(total, 1)) * 100);
         const missing = [
             !answers['manualPinConfirmed']?.[0] ? 'Map Confirmation' : null,
             !answers['legalConsentAccepted']?.[0] ? 'Legal Consent' : null,
@@ -76,8 +79,8 @@ export default function GenericDashboard() {
             !answers['Amenities & Facilities']?.length ? 'Amenities & Facilities' : null,
             !answers['Keywords']?.length ? 'Keywords' : null,
         ].filter(Boolean) as string[];
-        return { percent, missing };
-    }, [isVendor, setupStatus, user?.vendor?.businessAddress, user?.vendor?.businessName, user?.vendor?.businessPhone]);
+        return { percent: backendPercent ?? derivedPercent, missing };
+    }, [isVendor, setupStatus, stats?.profileCompletion, user?.vendor?.businessAddress, user?.vendor?.businessName, user?.vendor?.businessPhone]);
 
     useEffect(() => {
         const fetchDashboardData = async () => {

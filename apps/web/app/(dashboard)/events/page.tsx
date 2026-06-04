@@ -714,13 +714,14 @@ export default function BusinessEventsPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={() => !saving && setShowModal(false)}
+                onMouseDown={() => !saving && setShowModal(false)}
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
               />
               <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                onMouseDown={(e) => e.stopPropagation()}
                 className="relative w-full max-w-4xl bg-white rounded-[40px] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
               >
                 {/* Modal Header */}
@@ -1035,13 +1036,14 @@ export default function BusinessEventsPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={() => !deleting && setDeleteId(null)}
+                onMouseDown={() => !deleting && setDeleteId(null)}
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
               />
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
+                onMouseDown={(e) => e.stopPropagation()}
                 className="relative bg-white rounded-[40px] p-8 max-w-sm w-full text-center shadow-2xl"
               >
                 <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-6">

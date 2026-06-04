@@ -676,22 +676,42 @@ export default function BusinessSetupWizard() {
             
             // Sync core details on step 1 & step 8 & step 10
             if (currentStep === 0) {
-                await api.businessProfiles.updateProfile({
-                    businessName: stepData.businessName,
-                });
+                const businessName = stepData.businessName.trim();
+                if (businessName.length >= 2) {
+                    await api.businessProfiles.updateProfile({
+                        businessName,
+                    });
+                }
             } else if (currentStep === 7) {
-                await api.businessProfiles.updateProfile({
-                    businessAddress: stepData.address
-                });
+                const businessAddress = stepData.address.trim();
+                if (businessAddress.length >= 5) {
+                    await api.businessProfiles.updateProfile({
+                        businessAddress,
+                    });
+                }
             } else if (currentStep === 9) {
-                await api.businessProfiles.updateProfile({
-                    businessPhone: `${stepData.phoneCode}${stepData.phoneNumber}`,
-                    businessEmail: stepData.businessEmail
-                });
+                const normalizedPhone = stepData.phoneNumber.replace(/[^\d]/g, '').replace(/^0+/, '');
+                const businessPhone = `${stepData.phoneCode}${normalizedPhone}`;
+                const businessEmail = stepData.businessEmail.trim();
+                const profileUpdate: Record<string, string> = {};
+
+                if (/^\+[1-9]\d{7,14}$/.test(businessPhone)) {
+                    profileUpdate.businessPhone = businessPhone;
+                }
+                if (businessEmail.includes('@')) {
+                    profileUpdate.businessEmail = businessEmail;
+                }
+
+                if (Object.keys(profileUpdate).length > 0) {
+                    await api.businessProfiles.updateProfile(profileUpdate);
+                }
             } else if (currentStep === 11) {
-                await api.businessProfiles.updateProfile({
-                    bio: stepData.bio
-                });
+                const bio = stepData.bio.trim();
+                if (bio.length >= 20) {
+                    await api.businessProfiles.updateProfile({
+                        bio,
+                    });
+                }
             }
 
             await api.businessSetup.saveAnswers(payload);
@@ -2492,18 +2512,20 @@ export default function BusinessSetupWizard() {
 
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Country</label>
-                                    <select
+                                    <input
+                                        list="business-setup-country-list"
                                         value={stepData.country}
                                         onChange={(e) => setStepData((prev) => ({ ...prev, country: e.target.value, city: '' }))}
                                         className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                    >
-                                        <option value="">Select a country</option>
+                                        placeholder="Type or select a country"
+                                    />
+                                    <datalist id="business-setup-country-list">
                                         {countryOptions.map((country) => (
                                             <option key={`${country.code}-${country.name}`} value={country.name}>
                                                 {country.name}
                                             </option>
                                         ))}
-                                    </select>
+                                    </datalist>
                                 </div>
 
                                 <div>
