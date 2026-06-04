@@ -6,34 +6,65 @@ import * as nodemailer from 'nodemailer';
 export class MailService {
     private readonly logger = new Logger(MailService.name);
     private transporter: nodemailer.Transporter;
+    private readonly isMailerConfigured: boolean;
+    private transportVerified = false;
+    private verifyPromise: Promise<void> | null = null;
 
     constructor(private readonly configService: ConfigService) {
         const host = this.configService.get<string>('MAIL_HOST', 'smtp.gmail.com');
         const port = this.configService.get<number>('MAIL_PORT', 587);
         const user = this.configService.get<string>('MAIL_USERNAME');
         const pass = this.configService.get<string>('MAIL_PASSWORD');
+        const encryption = (this.configService.get<string>('MAIL_ENCRYPTION', 'tls') || 'tls').toLowerCase();
 
-        if (!user || !pass) {
-            this.logger.warn('⚠️ SMTP mailer configuration is incomplete. Verification emails might fail.');
+        this.isMailerConfigured = Boolean(host && port && user && pass);
+
+        if (!this.isMailerConfigured) {
+            this.logger.warn('SMTP mailer configuration is incomplete. Verification emails will not be sent.');
         }
 
         this.transporter = nodemailer.createTransport({
             host,
             port,
-            secure: port === 465, // true for 465, false for other ports
+            secure: encryption === 'ssl' || encryption === 'tls/ssl' || port === 465,
+            requireTLS: encryption === 'tls',
             auth: {
                 user,
                 pass,
             },
+            connectionTimeout: 15000,
+            greetingTimeout: 15000,
+            socketTimeout: 20000,
             tls: {
                 rejectUnauthorized: false,
             },
         });
     }
 
-    /**
-     * Send an OTP verification email to the user
-     */
+    private async ensureTransportReady(): Promise<void> {
+        if (!this.isMailerConfigured) {
+            throw new Error('SMTP configuration missing');
+        }
+
+        if (this.transportVerified) {
+            return;
+        }
+
+        if (!this.verifyPromise) {
+            this.verifyPromise = this.transporter.verify()
+                .then(() => {
+                    this.transportVerified = true;
+                    this.logger.log('SMTP transport verified successfully.');
+                })
+                .catch((error) => {
+                    this.verifyPromise = null;
+                    throw error;
+                });
+        }
+
+        await this.verifyPromise;
+    }
+
     async sendOtpEmail(email: string, otp: string, fullName: string): Promise<boolean> {
         const fromAddress = this.configService.get<string>('MAIL_FROM_ADDRESS', 'no-reply@naampata.com');
         const fromName = this.configService.get<string>('MAIL_FROM_NAME', 'naampata');
@@ -124,13 +155,11 @@ export class MailService {
                 <div class="content">
                     <p>Hello <strong>${fullName}</strong>,</p>
                     <p>Thank you for signing up on naampata! Please verify your email address to unlock your account and begin listing your business or exploring the platform.</p>
-                    
                     <div class="otp-box">
                         <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8;">Your One-Time Password</p>
                         <h2 class="otp-code">${otp}</h2>
                     </div>
-
-                    <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">⚠️ This code is valid for <strong>15 minutes</strong>. If you did not request this verification, please ignore this email or contact support.</p>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">This code is valid for <strong>15 minutes</strong>. If you did not request this verification, please ignore this email or contact support.</p>
                 </div>
                 <div class="footer">
                     <p>&copy; ${new Date().getFullYear()} naampata. All rights reserved.</p>
@@ -142,23 +171,23 @@ export class MailService {
         `;
 
         try {
+            await this.ensureTransportReady();
             await this.transporter.sendMail({
                 from: `"${fromName}" <${fromAddress}>`,
                 to: email,
                 subject: 'Verify Your Email Address - naampata',
                 html: htmlContent,
             });
-            this.logger.log(`📧 OTP Email successfully sent to ${email}`);
+            this.logger.log(`OTP email successfully sent to ${email}`);
             return true;
-        } catch (error) {
-            this.logger.error(`❌ Failed to send OTP email to ${email}:`, error.stack);
+        } catch (error: any) {
+            this.transportVerified = false;
+            this.verifyPromise = null;
+            this.logger.error(`Failed to send OTP email to ${email}: ${error.message}`, error.stack);
             return false;
         }
     }
 
-    /**
-     * Simple connectivity test (admin scripts / manual verification).
-     */
     async sendTestEmail(to: string): Promise<boolean> {
         const fromAddress = this.configService.get<string>('MAIL_FROM_ADDRESS', 'no-reply@naampata.com');
         const fromName = this.configService.get<string>('MAIL_FROM_NAME', 'naampata');
@@ -166,30 +195,30 @@ export class MailService {
         <!DOCTYPE html>
         <html>
         <body style="font-family: Arial, sans-serif; padding: 24px; color: #333;">
-            <h2 style="color: #FF7A30;">NAAMPATA — SMTP test</h2>
+            <h2 style="color: #FF7A30;">NAAMPATA - SMTP test</h2>
             <p>If you received this email, outbound mail is configured correctly.</p>
             <p style="font-size: 12px; color: #888;">Sent at ${new Date().toISOString()}</p>
         </body>
         </html>`;
 
         try {
+            await this.ensureTransportReady();
             await this.transporter.sendMail({
                 from: `"${fromName}" <${fromAddress}>`,
                 to,
-                subject: 'NAAMPATA — test email (SMTP OK)',
+                subject: 'NAAMPATA - test email (SMTP OK)',
                 html: htmlContent,
             });
-            this.logger.log(`📧 Test email sent to ${to}`);
+            this.logger.log(`Test email sent to ${to}`);
             return true;
-        } catch (error) {
-            this.logger.error(`❌ Test email failed for ${to}:`, error.stack);
+        } catch (error: any) {
+            this.transportVerified = false;
+            this.verifyPromise = null;
+            this.logger.error(`Test email failed for ${to}: ${error.message}`, error.stack);
             return false;
         }
     }
 
-    /**
-     * Send a geocoding failure alert email to the admin
-     */
     async sendGeocodingFailureAlert(adminEmail: string, listingTitle: string, address: string): Promise<boolean> {
         const fromAddress = this.configService.get<string>('MAIL_FROM_ADDRESS', 'no-reply@naampata.com');
         const fromName = this.configService.get<string>('MAIL_FROM_NAME', 'naampata');
@@ -202,7 +231,7 @@ export class MailService {
             <title>Geocoding Failure Alert</title>
         </head>
         <body style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-            <h2 style="color: #d32f2f;">⚠️ Geocoding Queue Failure Alert</h2>
+            <h2 style="color: #d32f2f;">Geocoding Queue Failure Alert</h2>
             <p>The system failed to geocode the coordinates for a newly created or updated listing after 3 retry attempts.</p>
             <table border="0" cellpadding="8" cellspacing="0" style="background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px;">
                 <tr>
@@ -226,16 +255,19 @@ export class MailService {
         `;
 
         try {
+            await this.ensureTransportReady();
             await this.transporter.sendMail({
                 from: `"${fromName}" <${fromAddress}>`,
                 to: adminEmail,
-                subject: `⚠️ Alert: Geocoding Failed for "${listingTitle}" - naampata`,
+                subject: `Alert: Geocoding Failed for "${listingTitle}" - naampata`,
                 html: htmlContent,
             });
-            this.logger.log(`📧 Geocoding alert successfully sent to ${adminEmail}`);
+            this.logger.log(`Geocoding alert successfully sent to ${adminEmail}`);
             return true;
-        } catch (error) {
-            this.logger.error(`❌ Failed to send geocoding alert email to ${adminEmail}:`, error.stack);
+        } catch (error: any) {
+            this.transportVerified = false;
+            this.verifyPromise = null;
+            this.logger.error(`Failed to send geocoding alert email to ${adminEmail}: ${error.message}`, error.stack);
             return false;
         }
     }

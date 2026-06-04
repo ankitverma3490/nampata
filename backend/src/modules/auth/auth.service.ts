@@ -3,6 +3,7 @@ import {
     UnauthorizedException,
     ConflictException,
     BadRequestException,
+    ServiceUnavailableException,
     Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -131,9 +132,12 @@ export class AuthService {
 
             const savedUser = await this.userRepository.save(user);
 
-            // Send OTP verification email asynchronously
-            this.mailService.sendOtpEmail(savedUser.email, otpCode, savedUser.fullName)
-                .catch(err => this.logger.error(`Failed to send verification email for signup: ${err.message}`));
+            const otpSent = await this.mailService.sendOtpEmail(savedUser.email, otpCode, savedUser.fullName);
+            if (!otpSent) {
+                throw new ServiceUnavailableException(
+                    'Your account was created, but we could not send the verification code email right now. Please try the resend code option in a moment.',
+                );
+            }
 
             // Auto-create affiliate record for vendors
             if (savedUser.role === UserRole.VENDOR) {
@@ -654,9 +658,12 @@ export class AuthService {
         user.otpExpiresAt = otpExpiry;
         await this.userRepository.save(user);
 
-        // Send OTP verification email asynchronously
-        this.mailService.sendOtpEmail(user.email, otpCode, user.fullName)
-            .catch(err => this.logger.error(`Failed to send verification email for resend: ${err.message}`));
+        const otpSent = await this.mailService.sendOtpEmail(user.email, otpCode, user.fullName);
+        if (!otpSent) {
+            throw new ServiceUnavailableException(
+                'We could not resend the verification code right now. Please try again in a moment.',
+            );
+        }
 
         return { success: true, message: 'Verification code resent successfully' };
     }
