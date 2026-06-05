@@ -932,6 +932,46 @@ export class SubscriptionsService implements OnModuleInit {
         return this.normalizeSubOrActivePlan(result, isNewSystem);
     }
 
+    public normalizeModernPlanFeatures(features: Record<string, any> = {}, planName?: string) {
+        const maxCategories = Number(features.maxCategories ?? 0);
+        const derivedMaxSubCategories = maxCategories > 0 ? Math.max(0, maxCategories - 1) : 0;
+        const isPaidMembership = (planName || '').toLowerCase() !== 'free';
+
+        return {
+            showAnalytics: !!features.showAnalytics,
+            showLeads: features.showLeads !== undefined ? !!features.showLeads : true,
+            showOffers: !!features.showOffers || Number(features.maxOffers || 0) > 0 || Number(features.maxEvents || 0) > 0,
+            showDemand: !!features.showDemand,
+            showQueries: !!features.showQueries,
+            showReviews: features.showReviews !== undefined ? !!features.showReviews : !!features.replyToReviews,
+            showChat: features.showChat !== undefined ? !!features.showChat : (!!features.canChat || !!features.whatsappIntegration),
+            showBroadcast: features.showBroadcast !== undefined ? !!features.showBroadcast : !!features.respondToBroadcastLeads,
+            canRespondBroadcast:
+                features.canRespondBroadcast !== undefined
+                    ? !!features.canRespondBroadcast
+                    : !!features.respondToBroadcastLeads || isPaidMembership,
+            canReplyReviews:
+                features.canReplyReviews !== undefined
+                    ? !!features.canReplyReviews
+                    : !!features.replyToReviews || isPaidMembership,
+            showSaved: true,
+            showFollowing: true,
+            showListings: true,
+            canAddListing: Number(features.maxListings || 0) > 0,
+            maxListings:
+                isPaidMembership && Number(features.maxListings || 0) <= 1
+                    ? 999
+                    : Number(features.maxListings || 0),
+            maxSubCategories: Number(features.maxSubCategories ?? derivedMaxSubCategories ?? 0),
+            maxNamedPhoneNumbers: Number(features.maxNamedPhoneNumbers ?? features.maxAdditionalPhones ?? 0),
+            showCustomerNotes:
+                features.showCustomerNotes !== undefined
+                    ? !!features.showCustomerNotes
+                    : !!features.customerNotes,
+            ...features,
+        };
+    }
+
     /**
      * Internal helper to normalize either Subscription (old) or ActivePlan (new) 
      * into a consistent shape for the Sidebar and other frontend components.
@@ -948,29 +988,7 @@ export class SubscriptionsService implements OnModuleInit {
                 : result.plan.planType,
             // Harmonize features into dashboardFeatures
             dashboardFeatures: isNewSystem
-                ? {
-                    showAnalytics: !!result.plan.features?.showAnalytics,
-                    showLeads: !!result.plan.features?.showLeads,
-                    showOffers: !!result.plan.features?.maxOffers || !!result.plan.features?.maxEvents || !!result.plan.features?.showOffers,
-                    showDemand: !!result.plan.features?.showDemand,
-                    showQueries: !!result.plan.features?.showQueries,
-                    showReviews: !!result.plan.features?.showReviews,
-                    showChat: !!result.plan.features?.showChat,
-                    showBroadcast: !!result.plan.features?.showBroadcast,
-                    canRespondBroadcast:
-                        result.plan.features?.canRespondBroadcast !== undefined
-                            ? !!result.plan.features.canRespondBroadcast
-                            : result.plan.name?.toLowerCase() !== 'free',
-                    canReplyReviews:
-                        result.plan.features?.canReplyReviews !== undefined
-                            ? !!result.plan.features.canReplyReviews
-                            : result.plan.name?.toLowerCase() !== 'free',
-                    showSaved: true,
-                    showFollowing: true,
-                    showListings: true,
-                    canAddListing: (result.plan.features?.maxListings || 0) > 0,
-                    ...result.plan.features
-                }
+                ? this.normalizeModernPlanFeatures(result.plan.features || {}, result.plan.name)
                 : {
                     showAnalytics: !!result.plan.dashboardFeatures?.showAnalytics,
                     showLeads: !!result.plan.dashboardFeatures?.showLeads,

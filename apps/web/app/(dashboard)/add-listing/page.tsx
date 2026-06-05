@@ -160,7 +160,7 @@ export default function AddListingPage() {
     useEffect(() => { formDataRef.current = formData; }, [formData]);
 
     const { getFeatureValue, planName, isFree } = usePlanFeature();
-    const maxListings = Math.min(Number(getFeatureValue('maxListings') || 1), 1);
+    const maxListings = Math.max(1, Number(getFeatureValue('maxListings') || 1));
     const maxImages = isFree ? 3 : 999;
     const isVendor = user?.role === 'vendor';
     const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';

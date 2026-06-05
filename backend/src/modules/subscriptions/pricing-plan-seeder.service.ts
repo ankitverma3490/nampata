@@ -56,7 +56,7 @@ export class PricingPlanSeederService implements OnModuleInit {
                 duration: 1,
                 unit: PricingPlanUnit.MONTHS,
                 features: { 
-                    maxListings: 1, 
+                    maxListings: 999, 
                     maxCategories: 4, // 1 primary + 3 subcategories
                     maxPhotos: 999, // unlimited
                     canCreateAlbums: true,
@@ -82,7 +82,7 @@ export class PricingPlanSeederService implements OnModuleInit {
                 duration: 1,
                 unit: PricingPlanUnit.YEARS,
                 features: { 
-                    maxListings: 1, 
+                    maxListings: 999, 
                     maxCategories: 4, 
                     maxPhotos: 999, 
                     canCreateAlbums: true,
@@ -149,7 +149,15 @@ export class PricingPlanSeederService implements OnModuleInit {
                 const plan = this.pricingPlanRepo.create(planData);
                 await this.pricingPlanRepo.save(plan);
                 this.logger.log(`✅ Created plan: ${planData.name}`);
+                continue;
             }
+
+            existing.duration = planData.duration;
+            existing.unit = planData.unit;
+            existing.features = planData.features;
+            existing.isActive = planData.isActive;
+            await this.pricingPlanRepo.save(existing);
+            this.logger.log(`🔄 Updated plan features: ${planData.name}`);
         }
 
         this.logger.log('✅ Pricing plan seeding complete.');

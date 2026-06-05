@@ -126,6 +126,32 @@ export class BusinessSetupService implements OnModuleInit {
         }
     }
 
+    private normalizeModernPlanFeatures(features: Record<string, unknown> = {}) {
+        const raw = features as Record<string, any>;
+        const maxCategories = Number(raw.maxCategories ?? 0);
+        const derivedMaxSubCategories = maxCategories > 0 ? Math.max(0, maxCategories - 1) : 0;
+
+        return {
+            ...raw,
+            maxListings: Number(raw.maxListings || 0) <= 1 ? 999 : Number(raw.maxListings || 0),
+            maxSubCategories: Number(raw.maxSubCategories ?? derivedMaxSubCategories ?? 0),
+            maxNamedPhoneNumbers: Number(raw.maxNamedPhoneNumbers ?? raw.maxAdditionalPhones ?? 0),
+            showCustomerNotes:
+                raw.showCustomerNotes !== undefined
+                    ? !!raw.showCustomerNotes
+                    : !!raw.customerNotes,
+            canReplyReviews:
+                raw.canReplyReviews !== undefined
+                    ? !!raw.canReplyReviews
+                    : !!raw.replyToReviews,
+            canRespondBroadcast:
+                raw.canRespondBroadcast !== undefined
+                    ? !!raw.canRespondBroadcast
+                    : !!raw.respondToBroadcastLeads,
+            showChat: raw.showChat !== undefined ? !!raw.showChat : (!!raw.canChat || !!raw.whatsappIntegration),
+        };
+    }
+
     private async resolvePlanFeatures(vendorId: string) {
         const [activeSub, activeNewPlan] = await Promise.all([
             this.subscriptionRepository.findOne({
@@ -138,7 +164,7 @@ export class BusinessSetupService implements OnModuleInit {
             }),
         ]);
         const legacy = activeSub?.plan?.dashboardFeatures || {};
-        const modern = (activeNewPlan?.plan?.features as Record<string, unknown>) || {};
+        const modern = this.normalizeModernPlanFeatures((activeNewPlan?.plan?.features as Record<string, unknown>) || {});
         return { ...legacy, ...modern };
     }
 

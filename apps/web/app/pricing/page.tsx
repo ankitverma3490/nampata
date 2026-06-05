@@ -48,6 +48,7 @@ const PLAN_FEATURES = {
         tagline: "Everything you need to grow",
         features: [
             { label: "Everything in Free Plan", included: true, icon: CheckCircle },
+            { label: "Multiple Business Listings", included: true, icon: Building2 },
             { label: "Up to 3 Subcategories", included: true, icon: Tag },
             { label: "Album Creation (Unlimited Photos)", included: true, icon: Users },
             { label: "In-App Chat & WhatsApp", included: true, icon: MessageSquare },
@@ -82,7 +83,7 @@ const FAQS = [
     },
     {
         q: "Can I list multiple businesses on one account?",
-        a: "No — each business needs its own business account. The Free and Basic plans allow for 1 comprehensive business listing per account.",
+        a: "The Free plan includes 1 business listing. The Basic plan supports multiple business listings on the same account, along with premium profile tools.",
     },
     {
         q: "How is payment processed?",
@@ -386,3 +387,4 @@ export default function PricingPage() {
         </>
     );
 }
+

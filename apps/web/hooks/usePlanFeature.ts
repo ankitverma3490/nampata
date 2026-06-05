@@ -65,6 +65,7 @@ export const usePlanFeature = () => {
     };
 
     const features: DashboardFeatures = activeSub?.plan?.dashboardFeatures || defaultFeatures;
+    const isPaidPlan = !!activeSub && !(activeSub.plan?.planType?.toLowerCase() === 'free' || activeSub.plan?.name?.toLowerCase().includes('free'));
 
     const hasFeature = (featureName: keyof DashboardFeatures): boolean => {
         // Admins/Superadmins bypass all gating
@@ -84,10 +85,23 @@ export const usePlanFeature = () => {
             if (featureName.startsWith('max')) return 999999;
             return true;
         }
-        if (featureName === 'maxListings') {
-            return Math.min(Number(features[featureName] ?? 1), 1);
+        const value = features[featureName];
+        if (featureName.startsWith('max')) {
+            if (featureName === 'maxListings') {
+                const numeric = Number(value ?? 0);
+                return isPaidPlan && numeric <= 1 ? 999 : numeric;
+            }
+            if (featureName === 'maxSubCategories') {
+                const numeric = Number(value ?? 0);
+                const fallbackFromCategories = Number((features as any).maxCategories ?? 0);
+                return numeric > 0 ? numeric : Math.max(0, fallbackFromCategories - 1);
+            }
+            if (featureName === 'maxNamedPhoneNumbers') {
+                return Number(value ?? (features as any).maxAdditionalPhones ?? 0);
+            }
+            return Number(value ?? 0);
         }
-        return features[featureName];
+        return value;
     };
 
     return {
@@ -95,7 +109,7 @@ export const usePlanFeature = () => {
         getFeatureValue,
         features,
         planName: activeSub?.plan?.name || 'Free',
-        isFree: !activeSub || activeSub.plan?.planType?.toLowerCase() === 'free' || activeSub.plan?.name?.toLowerCase().includes('free'),
+        isFree: !isPaidPlan,
         loading: !user,
     };
 };

@@ -34,7 +34,7 @@ const FREE_FEATURES = {
     showBroadcast: false,
     showDemand: false,
     maxKeywords: 0,
-    maxListings: 1,
+    maxListings: 999,
 };
 
 const PAID_FEATURES = {
@@ -51,7 +51,7 @@ const PAID_FEATURES = {
     showBroadcast: true,
     showDemand: true,
     maxKeywords: 10,
-    maxListings: 1,
+    maxListings: 999,
     maxFaqs: 10,
     maxSubCategories: 3,
     canCreateAlbums: true,
