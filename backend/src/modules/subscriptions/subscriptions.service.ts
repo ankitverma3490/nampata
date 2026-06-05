@@ -979,6 +979,15 @@ export class SubscriptionsService implements OnModuleInit {
     public normalizeSubOrActivePlan(result: any, isNewSystem: boolean) {
         if (!result) return null;
 
+        const legacyIsPaid =
+            !isNewSystem &&
+            result.plan &&
+            result.plan.planType !== 'free' &&
+            Number(result.plan.price || 0) > 0;
+        const legacyFeatures = (result.plan?.dashboardFeatures || {}) as Record<string, any>;
+        const legacyMaxCategories = Number(legacyFeatures.maxCategories ?? 0);
+        const legacyDerivedMaxSubCategories = legacyMaxCategories > 0 ? Math.max(0, legacyMaxCategories - 1) : 0;
+
         const plan = result.plan ? {
             ...result.plan,
             planType: isNewSystem
@@ -1006,10 +1015,22 @@ export class SubscriptionsService implements OnModuleInit {
                         result.plan.dashboardFeatures?.canReplyReviews !== undefined
                             ? !!result.plan.dashboardFeatures.canReplyReviews
                             : result.plan.planType !== 'free' && Number(result.plan.price) > 0,
+                    showCustomerNotes:
+                        legacyFeatures.showCustomerNotes !== undefined
+                            ? !!legacyFeatures.showCustomerNotes
+                            : legacyFeatures.customerNotes !== undefined
+                                ? !!legacyFeatures.customerNotes
+                                : legacyIsPaid,
                     showSaved: true,
                     showFollowing: true,
                     showListings: true,
                     canAddListing: true,
+                    maxListings:
+                        legacyIsPaid && Number(legacyFeatures.maxListings ?? 0) <= 1
+                            ? 999
+                            : Number(legacyFeatures.maxListings ?? 0),
+                    maxSubCategories: Number(legacyFeatures.maxSubCategories ?? legacyDerivedMaxSubCategories ?? 0),
+                    maxNamedPhoneNumbers: Number(legacyFeatures.maxNamedPhoneNumbers ?? legacyFeatures.maxAdditionalPhones ?? 0),
                     ...(result.plan.dashboardFeatures || {})
                 }
         } : null;

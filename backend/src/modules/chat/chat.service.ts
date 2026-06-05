@@ -245,8 +245,18 @@ export class ChatService implements OnModuleInit {
                 }),
             ]);
             const features = (activePlan?.plan?.features as any) || activeSub?.plan?.dashboardFeatures || {};
+            const hasPaidLegacySubscription =
+                !!activeSub?.plan &&
+                activeSub.plan.planType !== 'free' &&
+                Number(activeSub.plan.price || 0) > 0;
+            const hasPaidModernPlan =
+                !!activePlan?.plan &&
+                Number(activePlan.amountPaid ?? (activePlan.plan as any)?.price ?? 0) > 0;
             const canUseNotes =
-                features.showCustomerNotes === true || features.customerNotes === true;
+                features.showCustomerNotes === true ||
+                features.customerNotes === true ||
+                hasPaidLegacySubscription ||
+                hasPaidModernPlan;
             if (!canUseNotes) {
                 throw new ForbiddenException('Customer notes are available on paid plans only. Please upgrade to continue.');
             }
