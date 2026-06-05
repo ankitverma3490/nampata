@@ -573,6 +573,7 @@ export const api = {
         getStats: () => fetcher<any>('/admin/stats'),
         getUsers: (page = 1, limit = 10) => fetcher<any>(`/admin/users?page=${page}&limit=${limit}`),
         getUserDetails: (id: string) => fetcher<any>(`/admin/users/${id}`),
+        getUserConversations: (id: string) => fetcher<any>(`/admin/users/${id}/conversations`),
         updateUserRole: (id: string, role: string) => fetcher<any>(`/admin/users/${id}/role`, {
             method: 'PATCH',
             body: JSON.stringify({ role }),

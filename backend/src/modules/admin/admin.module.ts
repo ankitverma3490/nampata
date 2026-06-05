@@ -25,6 +25,7 @@ import { City } from '../../entities/city.entity';
 import { VendorAttribute } from '../../entities/vendor-attribute.entity';
 import { BusinessQuestion } from '../../entities/business-question.entity';
 import { LocationModule } from '../location/location.module';
+import { ChatConversation } from '../../entities/chat-conversation.entity';
 
 @Module({
     imports: [
@@ -48,6 +49,7 @@ import { LocationModule } from '../location/location.module';
             City,
             VendorAttribute,
             BusinessQuestion,
+            ChatConversation,
         ]),
         SearchModule,
         LocationModule,

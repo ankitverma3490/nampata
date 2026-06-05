@@ -73,11 +73,19 @@ export class AdminController {
     }
 
     @Get('users/:id')
-    @Roles(UserRole.SUPERADMIN)
+    @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
     @ApiOperation({ summary: 'Get complete user details for superadmin' })
     @ApiResponse({ status: 200, description: 'User details retrieved' })
     getUserDetails(@Param('id', ParseUuidPipe) id: string) {
         return this.adminService.getUserDetails(id);
+    }
+
+    @Get('users/:id/conversations')
+    @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+    @ApiOperation({ summary: 'Get customer and business conversations for a user' })
+    @ApiResponse({ status: 200, description: 'User conversations retrieved' })
+    getUserConversations(@Param('id', ParseUuidPipe) id: string) {
+        return this.adminService.getUserConversations(id);
     }
 
     @Patch('users/:id/role')

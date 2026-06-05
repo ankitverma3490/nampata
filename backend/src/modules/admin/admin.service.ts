@@ -23,6 +23,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { VendorAttribute } from '../../entities/vendor-attribute.entity';
 import { BusinessQuestion } from '../../entities/business-question.entity';
 import { SearchLocationService } from '../location/search-location.service';
+import { ChatConversation } from '../../entities/chat-conversation.entity';
 
 @Injectable()
 export class AdminService {
@@ -61,6 +62,8 @@ export class AdminService {
         private attributeRepository: Repository<VendorAttribute>,
         @InjectRepository(BusinessQuestion)
         private questionRepository: Repository<BusinessQuestion>,
+        @InjectRepository(ChatConversation)
+        private conversationRepository: Repository<ChatConversation>,
         private searchService: SearchService,
         private notificationsService: NotificationsService,
         private searchLocationService: SearchLocationService,
@@ -420,6 +423,37 @@ export class AdminService {
                 favoriteCount: user.savedListings?.length || 0
             },
             setupData
+        };
+    }
+
+    async getUserConversations(userId: string) {
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+            relations: ['vendor'],
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        const [customerConversations, businessConversations] = await Promise.all([
+            this.conversationRepository.find({
+                where: { userId },
+                relations: ['business', 'vendor'],
+                order: { lastMessageAt: 'DESC', createdAt: 'DESC' },
+            }),
+            user.vendor
+                ? this.conversationRepository.find({
+                    where: { vendorId: user.vendor.id },
+                    relations: ['user', 'business'],
+                    order: { lastMessageAt: 'DESC', createdAt: 'DESC' },
+                })
+                : Promise.resolve([]),
+        ]);
+
+        return {
+            customerConversations,
+            businessConversations,
         };
     }
 
