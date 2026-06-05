@@ -58,7 +58,7 @@ export class MailService {
                 })
                 .catch((error) => {
                     this.verifyPromise = null;
-                    throw error;
+                    this.logger.warn(`SMTP transport verification failed: ${error.message}. Proceeding to direct send attempt.`);
                 });
         }
 
