@@ -15,11 +15,18 @@ export class AddressConfigController {
     }
 
     @Public()
+    @Get('supported')
+    getSupportedConfigs() {
+        return this.addressConfigService.getSupportedConfigs();
+    }
+
+    @Public()
     @Get(':countryCode')
     async getConfig(@Param('countryCode') countryCode: string) {
         return this.addressConfigService.getConfig(countryCode);
     }
 
+    @Public()
     @Get(':countryCode/validate-postal-code')
     async validatePostalCode(
         @Param('countryCode') countryCode: string,
