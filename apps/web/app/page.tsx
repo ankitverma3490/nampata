@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   Search,
   MapPin,
@@ -41,9 +42,12 @@ import Link from "next/link";
 import { Category, Business, City } from "../types/api";
 import Slider from "react-slick";
 import CitySearchSelect from "../components/CitySearchSelect";
+import { useAuth } from "../context/AuthContext";
 // Script is removed to avoid multiple loads (already in layout.tsx)
 
 export default function HomePage() {
+  const router = useRouter();
+  const { user } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [featuredBusinesses, setFeaturedBusinesses] = useState<Business[]>([]);
   const [paginationMetadata, setPaginationMetadata] = useState({
@@ -69,6 +73,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [businessesLoading, setBusinessesLoading] = useState(false);
   const [statsComments, setStatsComments] = useState<any[]>([]);
+  const [showUsersOnlyModal, setShowUsersOnlyModal] = useState(false);
+  const featuredSectionRef = useRef<HTMLDivElement>(null);
   // heroImages slider removed in favor of clean design
   const badgeText = "Your Local. Your Choice.";
   const highlights = [
@@ -207,7 +213,11 @@ export default function HomePage() {
   // Skip the very first mount since initial data is already loaded above
   useEffect(() => {
     if (isInitialMount.current) return;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const scrollTarget = featuredSectionRef.current;
+    if (scrollTarget && typeof window !== "undefined") {
+      const targetTop = scrollTarget.getBoundingClientRect().top + window.scrollY - 120;
+      window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    }
     const fetchBusinessesPage = async () => {
       try {
         setBusinessesLoading(true);
@@ -247,6 +257,17 @@ export default function HomePage() {
       params.append("longitude", String(userLocation.lng));
     }
     window.location.href = `/search?${params.toString()}`;
+  };
+
+  const handleBroadcastClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (user?.role === "vendor") {
+      setShowUsersOnlyModal(true);
+      return;
+    }
+
+    router.push("/broadcast-request");
   };
 
   // Debounced search logging for "Live Search" heatmap
@@ -420,6 +441,7 @@ export default function HomePage() {
             {/* Get Expert Quotes */}
             <Link
               href="/broadcast-request"
+              onClick={handleBroadcastClick}
               className="bg-white rounded-[28px] border border-gray-50 shadow-[0_15px_45px_rgba(0,0,0,0.04)] p-8 flex items-center gap-6 hover:shadow-xl hover:-translate-y-1 transition-all group"
             >
               <div className="w-16 h-16 rounded-[22px] bg-blue-50 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform shrink-0">
@@ -431,6 +453,41 @@ export default function HomePage() {
               </div>
             </Link>
           </div>
+
+          <AnimatePresence>
+            {showUsersOnlyModal && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[120] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4"
+                onClick={() => setShowUsersOnlyModal(false)}
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 16, scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
+                  className="w-full max-w-md rounded-[28px] bg-white p-8 shadow-2xl border border-slate-100 text-left"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF7A30] mb-5">
+                    <Megaphone className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900 mb-3">Users Only Feature</h3>
+                  <p className="text-sm leading-7 text-slate-500 font-medium mb-6">
+                    This feature is available just for users. Business accounts can receive and respond to quotes, but they cannot create broadcast requests.
+                  </p>
+                  <button
+                    onClick={() => setShowUsersOnlyModal(false)}
+                    className="w-full rounded-2xl bg-[#FF7A30] px-5 py-3.5 text-sm font-black text-white hover:bg-[#E86920] transition-colors"
+                  >
+                    Got it
+                  </button>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Feature Highlights Bar - Matching the image */}
           <div className="max-w-6xl mx-auto bg-white/50 backdrop-blur-sm rounded-[32px] border border-gray-100 shadow-sm p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
@@ -453,7 +510,7 @@ export default function HomePage() {
 
       {/* Popular Categories */}
       <section className="py-24 bg-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4">
+        <div ref={featuredSectionRef} className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col items-center justify-center mb-16 text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-[#202124] tracking-tight relative pb-4">
               Popular Categories

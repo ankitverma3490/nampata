@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Menu, ChevronDown, LogOut, X, Search, Building2, Globe, Bell, Check, Trash2, BellRing, Megaphone, MessageSquare, Filter, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +13,7 @@ import { Category, City } from '../types/api';
 import { usePushNotifications } from '../lib/usePushNotifications';
 
 export default function Navbar() {
+    const router = useRouter();
     const { user, logout } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mobileDropdown, setMobileDropdown] = useState<string | null>(null);
@@ -20,6 +22,7 @@ export default function Navbar() {
     const [cities, setCities] = useState<City[]>([]);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [showBell, setShowBell] = useState(false);
+    const [showUsersOnlyModal, setShowUsersOnlyModal] = useState(false);
     const [activeSub, setActiveSub] = useState<any>(null);
     const [loadingSub, setLoadingSub] = useState(true);
     const bellRef = useRef<HTMLDivElement>(null);
@@ -129,6 +132,20 @@ export default function Navbar() {
         setActiveDropdown(activeDropdown === name ? null : name);
     };
 
+    const openBroadcastRequest = (e: React.MouseEvent) => {
+        e.preventDefault();
+        setActiveDropdown(null);
+        setIsMobileMenuOpen(false);
+        setMobileDropdown(null);
+
+        if (user?.role === 'vendor') {
+            setShowUsersOnlyModal(true);
+            return;
+        }
+
+        router.push('/broadcast-request');
+    };
+
     return (
         <nav className="sticky top-0 z-[100] bg-white border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -224,27 +241,25 @@ export default function Navbar() {
                                                         <span className="text-[10px] text-slate-400 font-medium italic">Fresh arrivals this week</span>
                                                     </div>
                                                 </Link>
-                                                {user?.role !== 'vendor' && (
-                                                    <Link
-                                                        href="/broadcast-request"
-                                                        onClick={() => setActiveDropdown(null)}
-                                                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-all group/item"
-                                                    >
-                                                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-                                                            <Megaphone className="w-4 h-4" />
-                                                        </div>
+                                                <Link
+                                                    href="/broadcast-request"
+                                                    onClick={openBroadcastRequest}
+                                                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-all group/item"
+                                                >
+                                                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                                        <Megaphone className="w-4 h-4" />
+                                                    </div>
 
-                                                        <div className="flex flex-col">
-                                                            <span className="text-sm font-bold text-slate-900">
-                                                                Business Broadcast
-                                                            </span>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-bold text-slate-900">
+                                                            Business Broadcast
+                                                        </span>
 
-                                                            <span className="text-[10px] text-slate-400 font-medium italic">
-                                                                Post your requirement instantly
-                                                            </span>
-                                                        </div>
-                                                    </Link>
-                                                )}
+                                                        <span className="text-[10px] text-slate-400 font-medium italic">
+                                                            Post your requirement instantly
+                                                        </span>
+                                                    </div>
+                                                </Link>
 
                                                 <Link href="/offers-events" onClick={() => setActiveDropdown(null)} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-all group/item">
                                                     <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500">
@@ -483,7 +498,7 @@ export default function Navbar() {
                                                 </div>
                                                 <span className="text-sm font-semibold text-slate-700">New Listings</span>
                                             </Link>
-                                            <Link href="/broadcast-request" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white transition-all">
+                                            <Link href="/broadcast-request" onClick={openBroadcastRequest} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white transition-all">
                                                 <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
                                                     <Megaphone className="w-4 h-4" />
                                                 </div>
@@ -558,6 +573,41 @@ export default function Navbar() {
                                 </button>
                             )}
                         </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {showUsersOnlyModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[120] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4"
+                        onClick={() => setShowUsersOnlyModal(false)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 16, scale: 0.98 }}
+                            transition={{ duration: 0.2 }}
+                            className="w-full max-w-md rounded-[28px] bg-white p-8 shadow-2xl border border-slate-100"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF7A30] mb-5">
+                                <Megaphone className="w-7 h-7" />
+                            </div>
+                            <h3 className="text-2xl font-black text-slate-900 mb-3">Users Only Feature</h3>
+                            <p className="text-sm leading-7 text-slate-500 font-medium mb-6">
+                                This feature is available just for users. Business accounts can receive and respond to quotes, but they cannot create broadcast requests.
+                            </p>
+                            <button
+                                onClick={() => setShowUsersOnlyModal(false)}
+                                className="w-full rounded-2xl bg-[#FF7A30] px-5 py-3.5 text-sm font-black text-white hover:bg-[#E86920] transition-colors"
+                            >
+                                Got it
+                            </button>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>

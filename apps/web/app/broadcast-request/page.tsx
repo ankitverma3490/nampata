@@ -87,8 +87,13 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useAuth } from '../../context/AuthContext';
 
 export default function BroadcastsPage() {
+    const { user } = useAuth();
+
+    const isBlockedBusinessAccount = user?.role === 'vendor';
+
     return (
         <main className="min-h-screen bg-[#fcfcfd] overflow-hidden">
             <Navbar />
@@ -210,7 +215,27 @@ export default function BroadcastsPage() {
                             className="relative"
                         >
                             <div className="bg-white rounded-[28px] border border-slate-100 p-4 md:p-6">
-                                <BroadcastRequestForm />
+                                {isBlockedBusinessAccount ? (
+                                    <div className="rounded-[24px] border border-orange-100 bg-orange-50/60 p-8 md:p-10">
+                                        <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-[#ff7a29] mb-5 shadow-sm border border-orange-100">
+                                            <Users className="w-7 h-7" />
+                                        </div>
+                                        <h2 className="text-2xl font-black text-[#0f2747] mb-3">
+                                            This feature is available just for users
+                                        </h2>
+                                        <p className="text-sm md:text-base text-slate-500 leading-7 font-medium mb-6">
+                                            Business accounts can receive and respond to customer requests, but creating a broadcast request is only available for user accounts.
+                                        </p>
+                                        <Link
+                                            href="/dashboard"
+                                            className="inline-flex items-center justify-center rounded-2xl bg-[#ff7a29] px-6 py-3.5 text-sm font-black text-white hover:bg-[#e96e22] transition-colors"
+                                        >
+                                            Go to Dashboard
+                                        </Link>
+                                    </div>
+                                ) : (
+                                    <BroadcastRequestForm />
+                                )}
                             </div>
                         </motion.div>
 
