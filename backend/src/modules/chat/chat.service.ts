@@ -233,34 +233,6 @@ export class ChatService implements OnModuleInit {
         if (!cleanContent) throw new BadRequestException('Note content is required');
 
         const conversation = await this.assertBusinessOrAdminAccess(conversationId, user);
-        if (user.role !== 'admin' && user.role !== 'superadmin') {
-            const [activeSub, activePlan] = await Promise.all([
-                this.subscriptionRepository.findOne({
-                    where: { vendorId: conversation.vendorId, status: SubscriptionStatus.ACTIVE, endDate: MoreThan(new Date()) },
-                    relations: ['plan'],
-                }),
-                this.activePlanRepository.findOne({
-                    where: { vendorId: conversation.vendorId, status: ActivePlanStatus.ACTIVE, endDate: MoreThan(new Date()) },
-                    relations: ['plan'],
-                }),
-            ]);
-            const features = (activePlan?.plan?.features as any) || activeSub?.plan?.dashboardFeatures || {};
-            const hasPaidLegacySubscription =
-                !!activeSub?.plan &&
-                activeSub.plan.planType !== 'free' &&
-                Number(activeSub.plan.price || 0) > 0;
-            const hasPaidModernPlan =
-                !!activePlan?.plan &&
-                Number(activePlan.amountPaid ?? (activePlan.plan as any)?.price ?? 0) > 0;
-            const canUseNotes =
-                features.showCustomerNotes === true ||
-                features.customerNotes === true ||
-                hasPaidLegacySubscription ||
-                hasPaidModernPlan;
-            if (!canUseNotes) {
-                throw new ForbiddenException('Customer notes are available on paid plans only. Please upgrade to continue.');
-            }
-        }
         const note = this.noteRepository.create({
             conversationId,
             vendorId: conversation.vendorId,
@@ -272,3 +244,4 @@ export class ChatService implements OnModuleInit {
         return this.noteRepository.save(note);
     }
 }
+
