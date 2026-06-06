@@ -43,11 +43,13 @@ export default function AddressPlacesAutocomplete({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [open, setOpen] = useState(false);
+    const trimmedValue = value.trim();
 
     useEffect(() => {
         if (disabled || !value || value.trim().length < 3) {
             setSuggestions([]);
             setLoading(false);
+            setOpen(false);
             setError('');
             return;
         }
@@ -61,11 +63,21 @@ export default function AddressPlacesAutocomplete({
                     sessionToken: sessionRef.current,
                     countryCode,
                 });
-                setSuggestions(Array.isArray(results) ? results : []);
-                setOpen(true);
+                const safeResults = Array.isArray(results) ? results : [];
+                setSuggestions(safeResults);
+                setOpen(safeResults.length > 0);
+
+                if (safeResults.length === 0) {
+                    setError(
+                        countryCode
+                            ? 'No address matches found. Type your street/building address.'
+                            : 'Select a country first, then type your street/building address.',
+                    );
+                }
             } catch {
                 setSuggestions([]);
-                setError('Address suggestions unavailable — enter manually.');
+                setOpen(false);
+                setError('Address suggestions unavailable. Enter a full street/building address or try again.');
             } finally {
                 setLoading(false);
             }
@@ -116,6 +128,7 @@ export default function AddressPlacesAutocomplete({
                 required={required}
                 onChange={(e) => {
                     resetPlacesSessionToken(sessionRef);
+                    if (error) setError('');
                     onChange(e.target.value);
                 }}
                 onFocus={() => suggestions.length > 0 && setOpen(true)}
@@ -123,6 +136,9 @@ export default function AddressPlacesAutocomplete({
                 className={className}
                 autoComplete="off"
             />
+            {!disabled && !!countryCode && trimmedValue.length > 0 && trimmedValue.length < 3 && (
+                <p className="text-[10px] text-slate-500 font-bold mt-1">Type at least 3 characters of your street/building address.</p>
+            )}
             {loading ? (
                 <Loader2 className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 animate-spin pointer-events-none" />
             ) : (

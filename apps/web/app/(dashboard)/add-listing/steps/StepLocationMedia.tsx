@@ -19,6 +19,20 @@ export const Step7Address = ({ formData, setFormData }: StepProps) => {
     const [countryCities, setCountryCities] = useState<City[]>([]);
     const [countries, setCountries] = useState<{ code: string; name: string }[]>([]);
 
+    const selectedCountryCode = useMemo(() => {
+        const rawCountry = (formData.country || '').trim();
+        if (!rawCountry) return '';
+
+        const matchedCountry = countries.find((country) => {
+            return (
+                country.name.toLowerCase() === rawCountry.toLowerCase() ||
+                country.code.toLowerCase() === rawCountry.toLowerCase()
+            );
+        });
+
+        return matchedCountry?.code || (rawCountry.length === 2 ? rawCountry.toUpperCase() : '');
+    }, [countries, formData.country]);
+
     useEffect(() => {
         let cancelled = false;
 
@@ -143,8 +157,10 @@ export const Step7Address = ({ formData, setFormData }: StepProps) => {
                     value={formData.address}
                     onChange={(val: string) => setFormData(p => ({ ...p, address: val }))}
                     onPlaceSelected={handlePlaceSelected}
-                    placeholder="Start typing your address..."
+                    countryCode={selectedCountryCode || undefined}
+                    placeholder={selectedCountryCode ? "Start typing your street address..." : "Select country first, then type street address"}
                     className={inputClass}
+                    disabled={!selectedCountryCode}
                     required
                 />
             </div>
