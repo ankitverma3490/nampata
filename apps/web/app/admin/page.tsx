@@ -4,16 +4,13 @@ import React, { useState, useEffect } from 'react';
 import {
     Users,
     ListTree,
-    Star,
-    CheckCircle,
-    Trash2,
-    ShieldAlert,
     TrendingUp,
     Briefcase,
     MessageSquare,
+    ShieldAlert,
     ChevronRight,
-    Check,
-    X
+    Eye,
+    Store
 } from 'lucide-react';
 import { api } from '../../lib/api';
 import StatsGrid from '../../components/business/StatsGrid';
@@ -24,13 +21,12 @@ export default function AdminDashboard() {
     const [stats, setStats] = useState<any>(null);
     const [recentBusinesses, setRecentBusinesses] = useState<Business[]>([]);
     const [loading, setLoading] = useState(true);
-    const [actionId, setActionId] = useState<string | null>(null);
 
     const fetchData = async () => {
         try {
             const [statsData, businessesData] = await Promise.all([
                 api.admin.getStats(),
-                api.admin.getBusinesses(1, 10, 'pending') // Focus on pending listing approvals
+                api.admin.getBusinesses(1, 10, 'approved')
             ]);
             setStats(statsData);
             setRecentBusinesses(businessesData.data || []);
@@ -44,23 +40,6 @@ export default function AdminDashboard() {
     useEffect(() => {
         fetchData();
     }, []);
-
-    const handleModerate = async (id: string, status: 'approved' | 'rejected') => {
-        const action = status === 'approved' ? 'approve' : 'reject';
-        if (!confirm(`Are you sure you want to ${action} this business?`)) return;
-
-        setActionId(id);
-        try {
-            await api.admin.moderateBusiness(id, status);
-            // Refresh data after moderation
-            await fetchData();
-        } catch (err) {
-            console.error(`Failed to ${action} business:`, err);
-            alert(`Failed to ${action} business. Please try again.`);
-        } finally {
-            setActionId(null);
-        }
-    };
 
     const mappedStats = [
         {
@@ -85,9 +64,9 @@ export default function AdminDashboard() {
             shadow: 'shadow-emerald-500/20'
         },
         {
-            label: 'Pending Verification',
-            value: stats?.pendingBusinesses || '0',
-            icon: ShieldAlert,
+            label: 'Active Subscriptions',
+            value: stats?.activeSubscriptions || '0',
+            icon: TrendingUp,
             color: 'bg-gradient-to-br from-[#FFAA33] to-[#FF8811]',
             shadow: 'shadow-orange-500/20'
         },
@@ -107,14 +86,14 @@ export default function AdminDashboard() {
             <StatsGrid stats={mappedStats} />
 
             <div className="grid lg:grid-cols-2 gap-8">
-                {/* Recent Businesses / Listing Approvals */}
+                {/* Recent Businesses */}
                 <div className="bg-white rounded-[16px] p-8 border border-slate-100 shadow-sm">
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Listing Approvals</h3>
-                            <p className="text-xs text-slate-400 font-bold">Awaiting your approval</p>
+                            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Recently Approved Listings</h3>
+                            <p className="text-xs text-slate-400 font-bold">Auto-approved listings now go live without manual review</p>
                         </div>
-                        <Link href="/admin/businesses?status=pending" className="text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-red-600 transition-colors flex items-center gap-2">
+                        <Link href="/admin/businesses?status=approved" className="text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-red-600 transition-colors flex items-center gap-2">
                             Manage All <ChevronRight className="w-4 h-4" />
                         </Link>
                     </div>
@@ -141,36 +120,23 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => handleModerate(business.id, 'approved')}
-                                            disabled={!!actionId}
-                                            className="p-3 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 transition-all active:scale-90 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
-                                            title="Approve Business"
+                                        <Link
+                                            href="/admin/businesses?status=approved"
+                                            className="p-3 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-90 shadow-lg shadow-slate-900/20"
+                                            title="Open Business Management"
                                         >
-                                            {actionId === business.id ? (
-                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            ) : (
-                                                <Check className="w-4 h-4" />
-                                            )}
-                                        </button>
-                                        <button
-                                            onClick={() => handleModerate(business.id, 'rejected')}
-                                            disabled={!!actionId}
-                                            className="p-3 bg-red-500 text-white rounded-2xl hover:bg-red-600 transition-all active:scale-90 disabled:opacity-50 shadow-lg shadow-red-500/20"
-                                            title="Reject Business"
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </button>
+                                            <Eye className="w-4 h-4" />
+                                        </Link>
                                     </div>
                                 </div>
                             ))
                         ) : (
                             <div className="py-12 text-center">
                                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                                    <Check className="w-8 h-8 text-slate-200" />
+                                    <Store className="w-8 h-8 text-slate-200" />
                                 </div>
-                                <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Inbox Zero</p>
-                                <p className="text-slate-300 text-xs mt-1">No pending listing approvals at the moment.</p>
+                                <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Listings Auto-Live</p>
+                                <p className="text-slate-300 text-xs mt-1">New approved listings will appear here after automatic approval.</p>
                             </div>
                         )}
                     </div>

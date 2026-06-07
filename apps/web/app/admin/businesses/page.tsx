@@ -15,7 +15,7 @@ import { useAuth } from '../../../context/AuthContext';
 type BusinessStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
 
 const STATUS_CONFIG: Record<BusinessStatus, { label: string; cls: string; Icon: any }> = {
-    pending: { label: 'Pending', cls: 'bg-amber-50/50 text-amber-600 border-amber-100', Icon: Clock },
+    pending: { label: 'Legacy Pending', cls: 'bg-amber-50/50 text-amber-600 border-amber-100', Icon: Clock },
     approved: { label: 'Approved', cls: 'bg-emerald-50/50 text-emerald-600 border-emerald-100', Icon: CheckCircle2 },
     rejected: { label: 'Rejected', cls: 'bg-rose-50/50 text-rose-600 border-rose-100', Icon: XCircle },
     suspended: { label: 'Suspended', cls: 'bg-slate-50 text-slate-500 border-slate-200', Icon: AlertCircle },
@@ -142,7 +142,7 @@ export default function AdminBusinessesPage() {
                     />
                 </div>
                 <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
-                    {(['all', 'pending', 'approved', 'rejected', 'suspended'] as const).map(s => (
+                    {(['all', 'approved', 'rejected', 'suspended', 'pending'] as const).map(s => (
                         <button
                             key={s}
                             onClick={() => setStatusFilter(s)}
@@ -151,7 +151,7 @@ export default function AdminBusinessesPage() {
                                 : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
                                 }`}
                         >
-                            {s === 'all' ? 'All Listings' : s.charAt(0).toUpperCase() + s.slice(1)}
+                            {s === 'all' ? 'All Listings' : s === 'pending' ? 'Legacy Pending' : s.charAt(0).toUpperCase() + s.slice(1)}
                         </button>
                     ))}
                 </div>
@@ -507,12 +507,12 @@ export default function AdminBusinessesPage() {
 
                                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 px-6 pt-3 pb-1.5 focus:outline-none">Moderation</p>
 
-                                {b.status !== 'approved' && (
+                                {b.status === 'rejected' && (
                                     <button
                                         onClick={() => handleModerate(b.id, 'approved')}
                                         className="flex items-center gap-3 w-full px-6 py-3 text-xs font-black text-emerald-600 hover:bg-emerald-50 transition-all text-left uppercase tracking-wider group"
                                     >
-                                        <CheckCircle2 className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" /> Approve Listing
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" /> Restore Listing
                                     </button>
                                 )}
 

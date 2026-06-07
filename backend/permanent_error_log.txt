@@ -2569,3 +2569,177 @@ Details: {"query":"SELECT DISTINCT \"distinctAlias\".\"listing_id\" AS \"ids_lis
 [2026-06-03T15:29:47.987Z] NotificationsService Constructor Called
 [2026-06-03T15:32:14.388Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
 [2026-06-03T15:32:17.977Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:17:43.344Z] NotificationsService Constructor Called
+[2026-06-03T18:18:58.606Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:19:00.450Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:20:53.891Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:20:54.697Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:20:55.022Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:23:22.714Z] findAllForUser FALLBACK for user 9f839b39-bbb0-4208-a8ec-4aac2c048a14: column Notification.priority does not exist
+[2026-06-03T18:23:23.635Z] findAllForUser FALLBACK for user 9f839b39-bbb0-4208-a8ec-4aac2c048a14: column Notification.priority does not exist
+[2026-06-03T18:23:57.342Z] findAllForUser FALLBACK for user 7b725515-faf1-4670-bb5b-8e3b19140465: column Notification.priority does not exist
+[2026-06-03T18:23:57.641Z] findAllForUser FALLBACK for user 7b725515-faf1-4670-bb5b-8e3b19140465: column Notification.priority does not exist
+[2026-06-03T18:24:38.556Z] findAllForUser FALLBACK for user 7b725515-faf1-4670-bb5b-8e3b19140465: column Notification.priority does not exist
+[2026-06-03T18:25:25.747Z] findAllForUser FALLBACK for user 7b725515-faf1-4670-bb5b-8e3b19140465: column Notification.priority does not exist
+[2026-06-03T18:27:09.883Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:27:11.913Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:27:12.644Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:30:49.418Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:30:50.659Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:30:51.221Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:30:51.520Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:32:59.041Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:00.654Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:00.989Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:01.305Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:12.036Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:13.146Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:13.776Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:14.477Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:50.643Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:51.093Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:51.834Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:52.952Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:53.369Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:53.807Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:54.347Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:54.645Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:54.918Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:33:55.213Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:34:18.305Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:34:18.862Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:34:19.644Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:34:20.121Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:34:20.632Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:35:16.767Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:35:17.034Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:35:17.298Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:35:17.580Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:35:17.869Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:35:18.307Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:35:18.691Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:35:19.057Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:14.050Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:15.007Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:15.566Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:15.987Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:16.260Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:16.523Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:43.095Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:44.615Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:44.944Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:45.481Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:45.766Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:46.055Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:37:46.371Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:38:59.067Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:39:00.013Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:39:00.406Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:39:00.775Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:39:01.064Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:39:01.885Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:39:02.194Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:39:02.466Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:40:37.384Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:40:38.240Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:40:38.763Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:40:39.097Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:40:39.389Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:40:39.704Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:40:40.116Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:40:40.389Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:40:40.650Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:19.065Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:19.663Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:19.938Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:20.387Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:20.731Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:21.177Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:21.746Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:23.184Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:23.851Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:24.365Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:24.711Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:25.049Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:25.455Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:25.761Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:26.391Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:26.711Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:27.086Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:27.458Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:27.788Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:28.458Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:29.188Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:29.575Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:30.079Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:30.471Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:30.782Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:31.052Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:31.342Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:31.739Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:32.067Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:32.400Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:32.868Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:33.318Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:33.639Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:33.934Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:34.208Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:34.460Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:34.728Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:35.002Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:35.264Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:35.533Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:35.791Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:36.054Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:36.352Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:36.618Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:36.879Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:37.238Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:37.525Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:42:37.780Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:18.032Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:18.500Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:18.817Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:19.132Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:19.609Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:19.949Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:20.494Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:20.916Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:21.187Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:21.579Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:21.850Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:22.145Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:22.435Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:22.888Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:23.416Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:43:23.838Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:44:22.236Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:44:22.597Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:44:23.228Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:44:23.503Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:44:23.772Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:44:24.049Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:44:24.317Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:44:24.656Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:44:24.960Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-03T18:44:25.275Z] findAllForUser FALLBACK for user e303c1ce-ac61-48f0-a886-07fb8530d877: column Notification.priority does not exist
+[2026-06-05T05:06:29.744Z] NotificationsService Constructor Called
+[2026-06-05T05:06:40.667Z] NotificationsService Constructor Called
+[2026-06-05T06:17:06.863Z] NotificationsService Constructor Called
+[2026-06-05T06:17:23.690Z] NotificationsService Constructor Called
+[2026-06-05T07:39:02.929Z] NotificationsService Constructor Called
+[2026-06-05T18:14:28.604Z] NotificationsService Constructor Called
+[2026-06-05T18:35:28.740Z] NotificationsService Constructor Called
+[2026-06-05T18:36:04.288Z] NotificationsService Constructor Called
+[2026-06-05T21:03:20.221Z] NotificationsService Constructor Called
+[2026-06-05T21:10:13.717Z] NotificationsService Constructor Called
+[2026-06-05T21:10:44.397Z] NotificationsService Constructor Called
+[2026-06-05T21:34:12.433Z] NotificationsService Constructor Called
+[2026-06-05T21:34:47.219Z] NotificationsService Constructor Called
+[2026-06-05T21:35:18.276Z] NotificationsService Constructor Called
+[2026-06-05T21:42:45.271Z] NotificationsService Constructor Called
+[2026-06-05T21:48:23.591Z] NotificationsService Constructor Called
+[2026-06-05T21:49:21.865Z] NotificationsService Constructor Called
+[2026-06-05T22:03:19.523Z] NotificationsService Constructor Called
+[2026-06-05T22:04:00.255Z] NotificationsService Constructor Called
+[2026-06-05T22:11:12.374Z] NotificationsService Constructor Called

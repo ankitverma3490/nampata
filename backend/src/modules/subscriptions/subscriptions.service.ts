@@ -939,8 +939,22 @@ export class SubscriptionsService implements OnModuleInit {
         const normalizedMaxSubCategories = Number(features.maxSubCategories ?? derivedMaxSubCategories ?? 0);
         const paidFallbackSubCategories =
             isPaidMembership && normalizedMaxSubCategories <= 0 && maxCategories <= 0 ? 3 : normalizedMaxSubCategories;
+        const normalizedMaxListings =
+            isPaidMembership && Number(features.maxListings || 0) <= 1
+                ? 999
+                : Number(features.maxListings || 0);
+        const normalizedMaxKeywords =
+            isPaidMembership && Number(features.maxKeywords || 0) <= 0
+                ? 10
+                : Number(features.maxKeywords || 0);
+        const normalizedMaxFaqs =
+            isPaidMembership && Number(features.maxFaqs || 0) <= 0
+                ? 10
+                : Number(features.maxFaqs || 0);
+        const normalizedNamedPhones = Number(features.maxNamedPhoneNumbers ?? features.maxAdditionalPhones ?? 0);
 
         return {
+            ...features,
             showAnalytics: !!features.showAnalytics,
             showLeads: features.showLeads !== undefined ? !!features.showLeads : true,
             showOffers: !!features.showOffers || Number(features.maxOffers || 0) > 0 || Number(features.maxEvents || 0) > 0,
@@ -960,18 +974,16 @@ export class SubscriptionsService implements OnModuleInit {
             showSaved: true,
             showFollowing: true,
             showListings: true,
-            canAddListing: Number(features.maxListings || 0) > 0,
-            maxListings:
-                isPaidMembership && Number(features.maxListings || 0) <= 1
-                    ? 999
-                    : Number(features.maxListings || 0),
+            canAddListing: normalizedMaxListings > 0,
+            maxListings: normalizedMaxListings,
+            maxKeywords: normalizedMaxKeywords,
+            maxFaqs: normalizedMaxFaqs,
             maxSubCategories: paidFallbackSubCategories,
-            maxNamedPhoneNumbers: Number(features.maxNamedPhoneNumbers ?? features.maxAdditionalPhones ?? 0),
+            maxNamedPhoneNumbers: normalizedNamedPhones,
             showCustomerNotes:
                 features.showCustomerNotes !== undefined
                     ? !!features.showCustomerNotes
                     : !!features.customerNotes,
-            ...features,
         };
     }
 
@@ -1034,6 +1046,14 @@ export class SubscriptionsService implements OnModuleInit {
                         legacyIsPaid && Number(legacyFeatures.maxListings ?? 0) <= 1
                             ? 999
                             : Number(legacyFeatures.maxListings ?? 0),
+                    maxKeywords:
+                        legacyIsPaid && Number(legacyFeatures.maxKeywords ?? 0) <= 0
+                            ? 10
+                            : Number(legacyFeatures.maxKeywords ?? 0),
+                    maxFaqs:
+                        legacyIsPaid && Number(legacyFeatures.maxFaqs ?? 0) <= 0
+                            ? 10
+                            : Number(legacyFeatures.maxFaqs ?? 0),
                     maxSubCategories:
                         legacyIsPaid && legacyResolvedMaxSubCategories <= 0 && legacyMaxCategories <= 0
                             ? 3

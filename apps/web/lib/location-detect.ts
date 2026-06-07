@@ -2,7 +2,7 @@ import { City } from '../types/api';
 
 export type GeoCoords = { latitude: number; longitude: number };
 
-/** Device GPS only — consistent across all location pickers (no IP fallback). */
+/** Device GPS only - consistent across all location pickers (no IP fallback). */
 export function detectDeviceLocation(): Promise<GeoCoords> {
     return new Promise((resolve, reject) => {
         if (typeof navigator === 'undefined' || !navigator.geolocation) {
@@ -27,10 +27,38 @@ export type GpsDetectResult =
     | { ok: true; coords: GeoCoords }
     | { ok: false; reason: 'unsupported' | 'denied' | 'timeout' | 'error'; message: string };
 
-/** GPS with structured failure — use for manual city fallback when denied. */
+export async function getGeolocationPermissionState(): Promise<PermissionState | 'unsupported'> {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+        return 'unsupported';
+    }
+
+    if (!('permissions' in navigator) || typeof navigator.permissions?.query !== 'function') {
+        return 'unsupported';
+    }
+
+    try {
+        const result = await navigator.permissions.query({
+            name: 'geolocation' as PermissionName,
+        });
+        return result.state;
+    } catch {
+        return 'unsupported';
+    }
+}
+
+/** GPS with structured failure - use for manual city fallback when denied. */
 export async function tryDetectDeviceLocation(): Promise<GpsDetectResult> {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
         return { ok: false, reason: 'unsupported', message: 'Geolocation is not supported by your browser.' };
+    }
+
+    const permissionState = await getGeolocationPermissionState();
+    if (permissionState === 'denied') {
+        return {
+            ok: false,
+            reason: 'denied',
+            message: 'Location access is blocked in your browser. Enable location permission for this site, then try again.',
+        };
     }
 
     return new Promise((resolve) => {
@@ -50,8 +78,10 @@ export async function tryDetectDeviceLocation(): Promise<GpsDetectResult> {
                     ok: false,
                     reason: denied ? 'denied' : error.code === error.TIMEOUT ? 'timeout' : 'error',
                     message: denied
-                        ? 'Location permission denied. Please select your city manually.'
-                        : 'Unable to detect GPS location. Please select your city manually.',
+                        ? 'Location permission denied. Enable location access for this site and try again.'
+                        : error.code === error.TIMEOUT
+                            ? 'Location lookup timed out. Please try again or select your city manually.'
+                            : 'Unable to detect GPS location. Please try again or select your city manually.',
                 });
             },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
@@ -67,7 +97,7 @@ export function getBrowserTimezone(): string {
     }
 }
 
-/** GPS with user-facing alert on failure — use on all location pickers. */
+/** GPS with user-facing alert on failure - use on all location pickers. */
 export async function detectLocationForUi(): Promise<GeoCoords | null> {
     const result = await tryDetectDeviceLocation();
     if (!result.ok) {

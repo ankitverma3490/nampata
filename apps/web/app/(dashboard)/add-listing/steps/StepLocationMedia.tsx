@@ -81,12 +81,20 @@ export const Step7Address = ({ formData, setFormData }: StepProps) => {
 
     const countryMatches = useMemo(() => {
         const query = (formData.country || '').trim().toLowerCase();
-        const matches = query
-            ? countries.filter((country) =>
+        let matches = countries;
+        
+        if (query) {
+            matches = countries.filter((country) =>
                 country.name.toLowerCase().includes(query) ||
-                country.code.toLowerCase().includes(query),
-            )
-            : countries;
+                country.code.toLowerCase().includes(query)
+            ).sort((a, b) => {
+                const aStarts = a.name.toLowerCase().startsWith(query) || a.code.toLowerCase().startsWith(query);
+                const bStarts = b.name.toLowerCase().startsWith(query) || b.code.toLowerCase().startsWith(query);
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+                return a.name.localeCompare(b.name);
+            });
+        }
 
         return matches.slice(0, 12);
     }, [countries, formData.country]);

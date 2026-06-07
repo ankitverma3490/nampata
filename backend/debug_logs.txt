@@ -2052,3 +2052,27 @@ NotFoundException: Listing not found
 NotFoundException: Listing not found
     at BusinessesService.findBySlug (C:\Users\Ahmed Bilal Khan\Desktop\business-directory\backend\dist\modules\businesses\businesses.service.js:680:23)
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-06-03T18:38:25.925Z] findBySlug: karachi-auto-care-workshop-mmgs0upa (User: Public)
+[2026-06-03T18:38:25.946Z] findBySlug: karachi-auto-care-workshop-mmgs0upa (User: Public)
+[2026-06-03T18:38:25.994Z] findBySlug: karachi-auto-care-workshop-mmgs0upa (User: Public)
+[2026-06-03T18:38:26.010Z] findBySlug: karachi-auto-care-workshop-mmgs0upa (User: Public)
+[2026-06-03T18:38:26.168Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - Found in DB. Status: approved
+[2026-06-03T18:38:26.212Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - Found in DB. Status: approved
+[2026-06-03T18:38:26.275Z] findBySlug: karachi-auto-care-workshop-mmgs0upa (User: Public)
+[2026-06-03T18:38:26.278Z] findBySlug: karachi-auto-care-workshop-mmgs0upa (User: Public)
+[2026-06-03T18:38:26.287Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - SUCCESS
+[2026-06-03T18:38:26.301Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - SUCCESS
+[2026-06-03T18:38:26.357Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - Found in DB. Status: approved
+[2026-06-03T18:38:26.362Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - Found in DB. Status: approved
+[2026-06-03T18:38:26.448Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - SUCCESS
+[2026-06-03T18:38:26.449Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - SUCCESS
+[2026-06-03T18:38:27.448Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - Found in DB. Status: approved
+[2026-06-03T18:38:27.462Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - Found in DB. Status: approved
+[2026-06-03T18:38:27.528Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - SUCCESS
+[2026-06-03T18:38:27.560Z] findBySlug: karachi-auto-care-workshop-mmgs0upa - SUCCESS
+[2026-06-03T18:44:36.239Z] findBySlug: codex-mpye8hgx (User: Public)
+[2026-06-03T18:44:36.252Z] findBySlug: codex-mpye8hgx (User: Public)
+[2026-06-03T18:44:36.458Z] findBySlug: codex-mpye8hgx - Found in DB. Status: approved
+[2026-06-03T18:44:36.541Z] findBySlug: codex-mpye8hgx - SUCCESS
+[2026-06-03T18:44:36.550Z] findBySlug: codex-mpye8hgx - Found in DB. Status: approved
+[2026-06-03T18:44:36.630Z] findBySlug: codex-mpye8hgx - SUCCESS

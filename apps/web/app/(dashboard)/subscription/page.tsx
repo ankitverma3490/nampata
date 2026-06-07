@@ -379,7 +379,107 @@ function PlanCard({ plan, isActive, status, hasActivePaidPlan, onSelect, loading
 }
 
 
-/* ─── Main Page ─────────────────────────────────────────────────────────── */
+function ConsentModal({
+    plan,
+    agreed,
+    onAgreeChange,
+    onClose,
+    onContinue,
+    loading,
+}: {
+    plan: Plan;
+    agreed: boolean;
+    onAgreeChange: (value: boolean) => void;
+    onClose: () => void;
+    onContinue: () => void;
+    loading: boolean;
+}) {
+    const planPrice = Number(plan.price);
+    const cycleLabel = plan.billingCycle?.toLowerCase() === 'yearly' ? 'yearly' : 'monthly';
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ scale: 0.96, y: 16, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.96, y: 16, opacity: 0 }}
+                className="w-full max-w-lg rounded-3xl bg-white shadow-2xl overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+                    <div>
+                        <h2 className="text-xl font-black text-slate-900">Confirm Your Plan</h2>
+                        <p className="text-sm font-bold text-slate-400 mt-1">Review and accept before continuing to payment.</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-400 transition-colors"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div className="px-6 py-6 space-y-5">
+                    <div className="rounded-2xl border border-orange-100 bg-orange-50/50 p-4">
+                        <p className="text-[11px] font-black uppercase tracking-widest text-orange-500 mb-2">Selected Plan</p>
+                        <div className="flex items-end justify-between gap-4">
+                            <div>
+                                <h3 className="text-lg font-black text-slate-900">{plan.name}</h3>
+                                <p className="text-sm font-bold text-slate-500 mt-1">{plan.description || 'Grow your business visibility.'}</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-2xl font-black text-slate-900">PKR {planPrice.toLocaleString()}</p>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{cycleLabel}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <label className="flex items-start gap-3 cursor-pointer group">
+                        <div className="relative flex items-center justify-center mt-0.5">
+                            <input
+                                type="checkbox"
+                                checked={agreed}
+                                onChange={(e) => onAgreeChange(e.target.checked)}
+                                className="w-5 h-5 appearance-none border-2 border-slate-300 rounded-lg checked:border-orange-500 checked:bg-orange-500 transition-colors cursor-pointer peer"
+                            />
+                            <svg className="w-3.5 h-3.5 text-white absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors text-left">
+                            I agree to the <a href="/terms" target="_blank" className="text-orange-500 font-bold hover:underline">Terms & Conditions</a> and <a href="/privacy" target="_blank" className="text-orange-500 font-bold hover:underline">Privacy Policy</a>, and acknowledge that subscribing to a plan constitutes a legal obligation.
+                        </span>
+                    </label>
+                </div>
+
+                <div className="px-6 py-5 border-t border-slate-100 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="px-5 py-3 rounded-xl border border-slate-200 text-slate-600 font-black hover:bg-slate-50 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onContinue}
+                        disabled={!agreed || loading}
+                        className="px-5 py-3 rounded-xl bg-slate-900 hover:bg-black text-white font-black flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+                    >
+                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                        Continue to Payment
+                    </button>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
+/* Main Page */
 export default function BusinessSubscriptionPage() {
     const { user, loading: authLoading, syncProfile } = useAuth();
     const router = useRouter();
@@ -392,6 +492,7 @@ export default function BusinessSubscriptionPage() {
     const [tab, setTab] = useState<'plan' | 'invoices'>('plan');
     const [successMsg, setSuccessMsg] = useState('');
     const [agreed, setAgreed] = useState(false);
+    const [pendingPlan, setPendingPlan] = useState<Plan | null>(null);
     const [billingCycleFilter, setBillingCycleFilter] = useState<'Monthly' | 'Yearly'>('Monthly');
 
     // Safety-net guard: only businesses can access this page
@@ -799,3 +900,4 @@ export default function BusinessSubscriptionPage() {
         </div>
     );
 }
+

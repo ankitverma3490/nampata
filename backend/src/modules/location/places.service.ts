@@ -59,7 +59,6 @@ export class PlacesService {
             input: trimmed,
             sessiontoken: sessionToken,
             key: apiKey,
-            types: 'address',
         });
 
         const cc = (countryCode || '').trim().toUpperCase();
