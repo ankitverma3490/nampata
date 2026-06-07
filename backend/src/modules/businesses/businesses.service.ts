@@ -125,6 +125,7 @@ export class BusinessesService implements OnModuleInit {
                     ? !!raw.canRespondBroadcast
                     : !!raw.respondToBroadcastLeads,
             showChat: raw.showChat !== undefined ? !!raw.showChat : (!!raw.canChat || !!raw.whatsappIntegration),
+            canCreateAlbums: !!raw.canCreateAlbums,
         };
     }
 
