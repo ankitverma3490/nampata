@@ -102,7 +102,7 @@ export default function BusinessDealsPage() {
   const pathname = usePathname();
   
   const featureName = "Deals";
-  const { features } = usePlanFeature();
+  const { features, getFeatureValue } = usePlanFeature();
   const [offers, setOffers] = useState<OfferItem[]>([]);
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -325,8 +325,8 @@ export default function BusinessDealsPage() {
     }
 
     const isAdmin = user?.role === "admin" || user?.role === "superadmin";
-    if (!editingId && offers.length >= (features.maxOffers || 0) && !isAdmin) {
-      setError(`You have reached the limit of ${features.maxOffers} free deal(s). Upgrade your plan or extend visibility dates to publish more.`);
+    if (!editingId && offers.length >= getFeatureValue('maxOffers') && !isAdmin) {
+      setError(`You have reached the limit of ${getFeatureValue('maxOffers')} free deal(s). Upgrade your plan or extend visibility dates to publish more.`);
       setSaving(false);
       return;
     }

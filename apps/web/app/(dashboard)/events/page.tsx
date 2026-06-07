@@ -104,7 +104,7 @@ export default function BusinessEventsPage() {
   const pathname = usePathname();
   
   const featureName = "Events";
-  const { features } = usePlanFeature();
+  const { features, getFeatureValue } = usePlanFeature();
   const [offers, setOffers] = useState<OfferItem[]>([]);
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -327,8 +327,8 @@ export default function BusinessEventsPage() {
     }
 
     const isAdmin = user?.role === "admin" || user?.role === "superadmin";
-    if (!editingId && offers.length >= (features.maxEvents || 0) && !isAdmin) {
-      setError(`You have reached the limit of ${features.maxEvents} free event(s). Upgrade your plan or extend visibility dates to publish more.`);
+    if (!editingId && offers.length >= getFeatureValue('maxEvents') && !isAdmin) {
+      setError(`You have reached the limit of ${getFeatureValue('maxEvents')} free event(s). Upgrade your plan or extend visibility dates to publish more.`);
       setSaving(false);
       return;
     }
