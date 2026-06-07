@@ -291,7 +291,7 @@ export default function BusinessSetupWizard() {
                     return;
                 }
                 const [cats, citiesData, countriesData, questionsData] = await Promise.all([
-                    api.categories.getAll(),
+                    api.categories.getAll({ includeSubcategories: true }),
                     api.cities.getAll(),
                     api.addressConfig.getCountries({ silent: true }).catch(() => []),
                     api.businessSetup.getQuestions().catch(() => []),
@@ -2763,3 +2763,4 @@ export default function BusinessSetupWizard() {
         </div>
     );
 }
+

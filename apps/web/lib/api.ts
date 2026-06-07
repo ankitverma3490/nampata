@@ -194,7 +194,7 @@ export const api = {
     delete: <T>(endpoint: string, options?: FetcherOptions) => fetcher<T>(endpoint, { ...options, method: 'DELETE' }),
 
     categories: {
-        getAll: (options?: FetcherOptions) => fetcher<Category[]>('/categories', options),
+        getAll: (options?: FetcherOptions & { includeSubcategories?: boolean }) => { const query = options?.includeSubcategories ? '?includeSubcategories=true' : ''; return fetcher<Category[]>('/categories' + query, options); },
         getPopular: (limit = 8, options?: FetcherOptions) => fetcher<Category[]>(`/categories/popular?limit=${limit}`, options),
         getTree: (options?: FetcherOptions) => fetcher<Category[]>('/categories/tree', options),
         getBySlug: (slug: string, options?: FetcherOptions) => fetcher<Category>(`/categories/slug/${slug}`, options),
@@ -1011,4 +1011,5 @@ export const api = {
             fetcher<any>(`/qa/admin/answers/${id}/moderate`, { method: 'PATCH', body: JSON.stringify(data) }),
     },
 };
+
 

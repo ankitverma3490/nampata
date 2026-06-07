@@ -214,7 +214,7 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, business 
         const fetchInitialData = async () => {
             try {
                 const [cats, cityList, countryList, amenityList, vendorProfile, businessesRes] = await Promise.all([
-                    api.categories.getAll(),
+                    api.categories.getAll({ includeSubcategories: true }),
                     api.cities.getAll(),
                     api.cities.getCountries().catch(() => []),
                     api.listings.getAmenities(),
@@ -1235,3 +1235,4 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, business 
         </>
     );
 }
+

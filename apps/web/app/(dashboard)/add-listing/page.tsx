@@ -171,7 +171,7 @@ export default function AddListingPage() {
             setCatsLoading(true);
             try {
                 const [cats, myListings] = await Promise.all([
-                    api.categories.getAll(),
+                    api.categories.getAll({ includeSubcategories: true }),
                     api.listings.getMyListings({ limit: 1 }).catch(() => ({ meta: { total: 0 } }))
                 ]);
                 const catArray = Array.isArray(cats) ? cats : (cats as any)?.data ?? [];
@@ -461,3 +461,4 @@ export default function AddListingPage() {
         </div>
     );
 }
+
