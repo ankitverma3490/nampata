@@ -155,13 +155,15 @@ export class DealsService {
         };
 
         const rawLimit = mergedFeatures.maxOffers;
+        const numericLimit =
+            rawLimit === undefined || rawLimit === null ? null : Number(rawLimit);
 
-        if (rawLimit !== undefined && rawLimit !== null) {
-            return Number(rawLimit);
+        if (mergedFeatures.showOffers === true && (numericLimit === null || Number.isNaN(numericLimit) || numericLimit <= 1)) {
+            return Number.POSITIVE_INFINITY;
         }
 
-        if (mergedFeatures.showOffers === true) {
-            return Number.POSITIVE_INFINITY;
+        if (numericLimit !== null && !Number.isNaN(numericLimit)) {
+            return numericLimit;
         }
 
         if (activeSub?.plan?.planType === SubscriptionPlanType.FREE || activeSub?.plan?.name?.toLowerCase() === 'free') {

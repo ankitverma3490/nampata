@@ -80,7 +80,9 @@ export const usePlanFeature = () => {
             }
             if (featureName === 'maxOffers' || featureName === 'maxEvents') {
                 const numeric = Number(value ?? 0);
-                return isPaidPlan && numeric <= 0 ? 999 : numeric;
+                const hasOffersAccess = features.showOffers === true;
+                if (hasOffersAccess && numeric <= 1) return 999;
+                return numeric;
             }
             if (featureName === 'maxKeywords') {
                 const numeric = Number(value ?? 0);

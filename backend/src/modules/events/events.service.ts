@@ -154,13 +154,15 @@ export class EventsService {
         };
 
         const rawLimit = mergedFeatures.maxEvents;
+        const numericLimit =
+            rawLimit === undefined || rawLimit === null ? null : Number(rawLimit);
 
-        if (rawLimit !== undefined && rawLimit !== null) {
-            return Number(rawLimit);
+        if (mergedFeatures.showOffers === true && (numericLimit === null || Number.isNaN(numericLimit) || numericLimit <= 1)) {
+            return Number.POSITIVE_INFINITY;
         }
 
-        if (mergedFeatures.showOffers === true) {
-            return Number.POSITIVE_INFINITY;
+        if (numericLimit !== null && !Number.isNaN(numericLimit)) {
+            return numericLimit;
         }
 
         return 0;

@@ -328,7 +328,7 @@ export default function BusinessEventsPage() {
 
     const isAdmin = user?.role === "admin" || user?.role === "superadmin";
     if (!editingId && offers.length >= getFeatureValue('maxEvents') && !isAdmin) {
-      setError(`You have reached the limit of ${getFeatureValue('maxEvents')} free event(s). Upgrade your plan or extend visibility dates to publish more.`);
+      setError(`You have reached the limit of ${getFeatureValue('maxEvents')} event(s). Upgrade your plan or extend visibility dates to publish more.`);
       setSaving(false);
       return;
     }
