@@ -77,19 +77,39 @@ export class BusinessesService implements OnModuleInit {
         }
     }
 
-    private normalizeModernPlanFeatures(features: Record<string, unknown> = {}) {
+    private normalizeModernPlanFeatures(features: Record<string, unknown> = {}, planName?: string) {
         const raw = features as Record<string, any>;
         const maxCategories = Number(raw.maxCategories ?? 0);
         const derivedMaxSubCategories = maxCategories > 0 ? Math.max(0, maxCategories - 1) : 0;
         const normalizedMaxSubCategories = Number(raw.maxSubCategories ?? derivedMaxSubCategories ?? 0);
+        
+        const isPaidMembership = (planName || '').toLowerCase() !== 'free' || Number(raw.maxListings || 0) > 1 || raw.isPaid === true || raw.planType !== 'free';
+
         const paidFallbackSubCategories =
-            Number(raw.maxListings || 0) > 1 && normalizedMaxSubCategories <= 0 && maxCategories <= 0
+            isPaidMembership && normalizedMaxSubCategories <= 0 && maxCategories <= 0
                 ? 3
                 : normalizedMaxSubCategories;
 
+        const normalizedMaxListings =
+            isPaidMembership && Number(raw.maxListings || 0) <= 1
+                ? 999
+                : Number(raw.maxListings || 0);
+
+        const normalizedMaxKeywords =
+            isPaidMembership && Number(raw.maxKeywords || 0) <= 0
+                ? 10
+                : Number(raw.maxKeywords || 0);
+
+        const normalizedMaxFaqs =
+            isPaidMembership && Number(raw.maxFaqs || 0) <= 0
+                ? 10
+                : Number(raw.maxFaqs || 0);
+
         return {
             ...raw,
-            maxListings: Number(raw.maxListings || 0) <= 1 ? 999 : Number(raw.maxListings || 0),
+            maxListings: normalizedMaxListings,
+            maxKeywords: normalizedMaxKeywords,
+            maxFaqs: normalizedMaxFaqs,
             maxSubCategories: paidFallbackSubCategories,
             maxNamedPhoneNumbers: Number(raw.maxNamedPhoneNumbers ?? raw.maxAdditionalPhones ?? 0),
             showCustomerNotes:
@@ -196,9 +216,10 @@ export class BusinessesService implements OnModuleInit {
             }),
         ]);
 
-        const legacy = activeSub?.plan?.dashboardFeatures || {};
-        const modern = this.normalizeModernPlanFeatures((activeNewPlan?.plan?.features as Record<string, unknown>) || {});
-        return { ...legacy, ...modern };
+        const rawFeatures = activeNewPlan?.plan?.features || activeSub?.plan?.dashboardFeatures || {};
+        const planName = activeNewPlan?.plan?.name || activeSub?.plan?.name || 'free';
+        const modern = this.normalizeModernPlanFeatures((rawFeatures as Record<string, unknown>), planName);
+        return modern;
     }
 
     private enforcePremiumContentLimits(
@@ -480,7 +501,8 @@ export class BusinessesService implements OnModuleInit {
             (activeNewPlan?.plan?.features as any) ||
             activeSub?.plan?.dashboardFeatures ||
             { maxListings: 1, maxSubCategories: 0 };
-        const planFeatures = this.normalizeModernPlanFeatures(planFeaturesRaw);
+        const planName = activeNewPlan?.plan?.name || activeSub?.plan?.name || 'free';
+        const planFeatures = this.normalizeModernPlanFeatures(planFeaturesRaw, planName);
 
         // --- Limit Enforcement ---
         // Enforce listing capacity from the resolved plan instead of a hard one-listing cap.
