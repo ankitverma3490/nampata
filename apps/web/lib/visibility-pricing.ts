@@ -43,8 +43,12 @@ export async function checkoutVisibilityPayment(params: {
     eventId?: string;
     startTime: string;
     endTime: string;
+    placements?: string[];
 }): Promise<{ paid: boolean; checkoutUrl?: string }> {
-    const placements = params.dealId ? ['offer'] : ['event'];
+    const placements = params.placements && params.placements.length > 0 
+        ? params.placements 
+        : (params.dealId ? ['offer'] : ['event']);
+        
     const res = await api.promotions.book({
         ...params,
         placements,

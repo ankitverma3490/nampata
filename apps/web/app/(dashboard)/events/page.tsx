@@ -36,6 +36,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FeatureGate } from '../../../components/business/FeatureGate';
 import { usePlanFeature } from "../../../hooks/usePlanFeature";
+import { PlacementPaymentModal } from "../../../components/business/PlacementPaymentModal";
 
 type OfferType = "offer" | "event";
 type OfferStatus = "active" | "scheduled" | "expired";
@@ -141,6 +142,7 @@ export default function BusinessEventsPage() {
   const [page, setPage] = useState(1);
   const [agreed, setAgreed] = useState(false);
   const [meta, setMeta] = useState<any>(null);
+  const [paymentModalOffer, setPaymentModalOffer] = useState<OfferItem | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const priceRequestRef = useRef(0);
 
@@ -411,6 +413,12 @@ export default function BusinessEventsPage() {
   };
 
   const handlePublish = async (offer: OfferItem) => {
+    // Check if the event is unpaid draft
+    if (offer.isActive === false) {
+        setPaymentModalOffer(offer);
+        return;
+    }
+
     setPublishingId(offer.id);
     setError(null);
     try {
@@ -419,23 +427,7 @@ export default function BusinessEventsPage() {
       await loadOffers(page);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
-      if (err.message && err.message.toLowerCase().includes('payment')) {
-        try {
-          const checkout = await checkoutVisibilityPayment({
-            eventId: offer.id,
-            startTime: offer.startDate!,
-            endTime: offer.endDate!,
-          });
-          if (checkout.checkoutUrl) {
-            window.location.href = checkout.checkoutUrl;
-            return;
-          }
-        } catch (checkoutErr: any) {
-          setError(checkoutErr.message || "Failed to initiate payment");
-        }
-      } else {
-        setError(err.message || "Publish failed. Please complete required add-on payment first.");
-      }
+      setError(err.message || "Publish failed. Please complete required add-on payment first.");
     } finally {
       setPublishingId(null);
     }
@@ -1100,6 +1092,17 @@ export default function BusinessEventsPage() {
           )}
         </AnimatePresence>
       </div>
+
+      {paymentModalOffer && (
+        <PlacementPaymentModal
+          offerItem={paymentModalOffer}
+          onClose={() => setPaymentModalOffer(null)}
+          onSuccess={() => {
+            setPaymentModalOffer(null);
+            loadOffers(page);
+          }}
+        />
+      )}
     </FeatureGate>
   );
 }
