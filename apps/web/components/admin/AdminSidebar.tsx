@@ -32,7 +32,7 @@ const menuItems = [
     { name: 'Cities', icon: MapPin, href: '/admin/cities', badge: null },
     { name: 'Businesses', icon: ListTree, href: '/admin/businesses', badge: null },
     { name: 'Moderation Hub', icon: ShieldAlert, href: '/admin/reports', badge: 'New' },
-    { name: 'Listings Approval', icon: ShieldAlert, href: '/admin/listings', badge: null },
+    // { name: 'Listings Approval', icon: ShieldAlert, href: '/admin/listings', badge: null },
     { name: 'Plans', icon: CreditCard, href: '/admin/plans', badge: null },
     { name: 'Subscriptions', icon: Receipt, href: '/admin/subscriptions', badge: null },
     { name: 'Demand Insights', icon: Activity, href: '/admin/demand', badge: null },
