@@ -38,6 +38,7 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { api } from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
+import { usePlanFeature } from '../../hooks/usePlanFeature';
 import { City, Category } from '../../types/api';
 import CategorySearchSelect from '../../components/CategorySearchSelect';
 
@@ -131,6 +132,7 @@ const OPERATIONAL_STRUCTURE_SECTIONS = {
 export default function BusinessSetupWizard() {
     const { user, syncProfile } = useAuth();
     const router = useRouter();
+    const { isFree } = usePlanFeature();
 
     const [categories, setCategories] = useState<Category[]>([]);
     const [allCities, setAllCities] = useState<City[]>([]);
@@ -1645,7 +1647,7 @@ export default function BusinessSetupWizard() {
                             </div>
 
                             <div className="pt-2 border-t border-slate-100">
-                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Additional Named Phone Numbers (Premium Only)</label>
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Additional Named Phone Numbers{isFree ? ' (Premium Only)' : ''}</label>
                                 <div className="space-y-2">
                                     {stepData.namedPhoneNumbers.map((p, idx) => (
                                         <div key={idx} className="grid grid-cols-1 md:grid-cols-4 gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100">
@@ -1912,7 +1914,7 @@ export default function BusinessSetupWizard() {
                         <div className="border-b border-slate-100 pb-4 mb-6">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-xl font-black text-slate-800">Online Profile Links</h3>
-                                <span className="inline-flex items-center gap-1 text-[10px] font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full"><Lock className="w-3 h-3" /> Upgrade Incentive</span>
+                                {isFree && <span className="inline-flex items-center gap-1 text-[10px] font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full"><Lock className="w-3 h-3" /> Upgrade Incentive</span>}
                             </div>
                             <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Step 14 of 21 • Optional</p>
                         </div>
@@ -1971,10 +1973,12 @@ export default function BusinessSetupWizard() {
                                 </div>
                             </div>
 
-                            <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-4 mt-2">
+                            {isFree && (
+                                <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-4 mt-2">
                                 <p className="text-xs font-bold text-amber-800">⭐ Configuration Premium Lock Indicator</p>
                                 <p className="text-[11px] font-semibold text-amber-700 mt-1">You can configure social links during wizard setup. Upgrading to a paid premium tier is required to show links on the live profile.</p>
                             </div>
+                            )}
                         </div>
                     </div>
                 );
@@ -2047,7 +2051,7 @@ export default function BusinessSetupWizard() {
                         <div className="border-b border-slate-100 pb-4 mb-6">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-xl font-black text-slate-800">Search Keywords</h3>
-                                <span className="inline-flex items-center gap-1 text-[10px] font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full"><Lock className="w-3 h-3" /> Premium Only</span>
+                                {isFree && <span className="inline-flex items-center gap-1 text-[10px] font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full"><Lock className="w-3 h-3" /> Premium Only</span>}
                             </div>
                             <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Step 17 of 21 • Optional</p>
                         </div>
@@ -2094,7 +2098,7 @@ export default function BusinessSetupWizard() {
                         <div className="border-b border-slate-100 pb-4 mb-6">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-xl font-black text-slate-800">Frequently Asked Questions</h3>
-                                <span className="inline-flex items-center gap-1 text-[10px] font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full"><Lock className="w-3 h-3" /> Premium Only</span>
+                                {isFree && <span className="inline-flex items-center gap-1 text-[10px] font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full"><Lock className="w-3 h-3" /> Premium Only</span>}
                             </div>
                             <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Step 18 of 21 • Optional</p>
                         </div>
@@ -2358,8 +2362,8 @@ export default function BusinessSetupWizard() {
                             </div>
 
                             <div className="pt-4 border-t border-slate-100">
-                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Gallery Images (Up to 3 on Free Plan)</label>
-                                {stepData.galleryUrls.length >= 3 && <PremiumFeatureBanner />}
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Gallery Images{isFree ? ' (Up to 3 on Free Plan)' : ''}</label>
+                                {isFree && stepData.galleryUrls.length >= 3 && <PremiumFeatureBanner />}
                                 <div className="flex flex-wrap gap-3">
                                     {stepData.galleryUrls.map((url, idx) => (
                                         <div key={idx} className="flex flex-col gap-2 w-32 shrink-0">
@@ -2385,7 +2389,7 @@ export default function BusinessSetupWizard() {
                                             />
                                         </div>
                                     ))}
-                                    {stepData.galleryUrls.length < 3 && (
+                                    {stepData.galleryUrls.length < (isFree ? 3 : 999) && (
                                         <label className="w-20 h-20 rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer bg-slate-50 hover:bg-white transition-colors">
                                             <Plus className="w-6 h-6 text-slate-400" />
                                             <span className="text-[9px] font-bold text-slate-400 mt-1 uppercase">Upload</span>
