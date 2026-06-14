@@ -187,14 +187,73 @@ export default function AddListingPage() {
         fetchInitialData();
     }, []);
 
+    const validateStep = (step: number): boolean => {
+        setError(null);
+        
+        switch (step) {
+            case 1:
+                if (!formData.title || formData.title.trim().length < 2) {
+                    setError('Business Name is required and must be at least 2 characters.');
+                    return false;
+                }
+                break;
+            case 5:
+                if (!formData.categoryId) {
+                    setError('Please select a primary Business Category.');
+                    return false;
+                }
+                break;
+            case 7:
+                if (!formData.address || formData.address.trim().length < 5) {
+                    setError('Business Address is required and must be at least 5 characters.');
+                    return false;
+                }
+                if (!formData.city || formData.city.trim().length < 2) {
+                    setError('City is required and must be at least 2 characters.');
+                    return false;
+                }
+                if (!formData.state || formData.state.trim().length < 2) {
+                    setError('State / Province is required and must be at least 2 characters.');
+                    return false;
+                }
+                break;
+            case 9:
+                const phone = toE164(formData.phoneCode, formData.phoneNumber);
+                if (!phone || !/^\+[1-9]\d{7,14}$/.test(phone)) {
+                    setError('A valid Phone Number with country code is required (e.g., +923001234567).');
+                    return false;
+                }
+                break;
+            case 11:
+                if (!formData.description || formData.description.trim().length < 10) {
+                    setError('Description is required and must be at least 10 characters.');
+                    return false;
+                }
+                break;
+            default:
+                break;
+        }
+        return true;
+    };
+
     const handleNext = () => {
-        // Here we can add per-step validation logic before allowing next
+        if (!validateStep(activeStep)) {
+            if (typeof window !== 'undefined') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            return;
+        }
         setActiveStep(prev => Math.min(prev + 1, STEPS.length));
     };
 
     const handlePrev = () => {
+        setError(null);
         setActiveStep(prev => Math.max(prev - 1, 1));
     };
+
+    useEffect(() => {
+        setError(null);
+    }, [activeStep]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
