@@ -832,16 +832,29 @@ export class AffiliateService implements OnModuleInit {
                     }
                 } else {
                     // Assign a new reward plan
-                    const newActivePlan = this.activePlanRepository.create({
-                        vendorId: referredVendor.id,
-                        planId: rewardPlan.id,
-                        status: ActivePlanStatus.ACTIVE,
-                        startDate: now,
-                        endDate: endDate,
-                        amountPaid: 0,
-                        transactionId: 'REFERRAL_SIGNUP_REWARD'
-                    });
-                    await this.activePlanRepository.save(newActivePlan);
+                    if (isPricingPlan(rewardPlan)) {
+                        const newActivePlan = this.activePlanRepository.create({
+                            vendorId: referredVendor.id,
+                            planId: rewardPlan.id,
+                            status: ActivePlanStatus.ACTIVE,
+                            startDate: now,
+                            endDate: endDate,
+                            amountPaid: 0,
+                            transactionId: 'REFERRAL_SIGNUP_REWARD'
+                        });
+                        await this.activePlanRepository.save(newActivePlan);
+                    } else {
+                        const newSub = this.subscriptionRepository.create({
+                            vendorId: referredVendor.id,
+                            planId: rewardPlan.id,
+                            status: SubscriptionStatus.ACTIVE,
+                            startDate: now,
+                            endDate: endDate,
+                            amount: 0,
+                            currency: 'INR'
+                        });
+                        await this.subscriptionRepository.save(newSub);
+                    }
                     this.logger.log(`Assigned ${rewardPlan.name} plan to referred vendor ${referredUserId}`);
                 }
             }

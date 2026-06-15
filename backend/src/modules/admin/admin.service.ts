@@ -15,6 +15,7 @@ import { SavedListing } from '../../entities/favorite.entity';
 import { Comment as BusinessComment } from '../../entities/comment.entity';
 import { Notification } from '../../entities/notification.entity';
 import { Subscription, SubscriptionStatus } from '../../entities/subscription.entity';
+import { ActivePlan, ActivePlanStatus } from '../../entities/active-plan.entity';
 import { CommentReply } from '../../entities/comment-reply.entity';
 import { createPaginatedResponse, calculateSkip } from '../../common/utils/pagination.util';
 import { SearchLog } from '../../entities/search-log.entity';
@@ -24,6 +25,7 @@ import { VendorAttribute } from '../../entities/vendor-attribute.entity';
 import { BusinessQuestion } from '../../entities/business-question.entity';
 import { SearchLocationService } from '../location/search-location.service';
 import { ChatConversation } from '../../entities/chat-conversation.entity';
+import { PricingPlanType } from '../../entities/pricing-plan.entity';
 
 @Injectable()
 export class AdminService {
@@ -54,6 +56,8 @@ export class AdminService {
         private notificationRepository: Repository<Notification>,
         @InjectRepository(Subscription)
         private subscriptionRepository: Repository<Subscription>,
+        @InjectRepository(ActivePlan)
+        private activePlanRepository: Repository<ActivePlan>,
         @InjectRepository(CommentReply)
         private commentReplyRepository: Repository<CommentReply>,
         @InjectRepository(SearchLog)
@@ -118,9 +122,16 @@ export class AdminService {
         });
         const reviewCount = await this.reviewRepository.count();
 
-        const activeSubscriptionCount = await this.subscriptionRepository.count({
+        const activeLegacySubscriptionCount = await this.subscriptionRepository.count({
             where: { status: SubscriptionStatus.ACTIVE },
         });
+        const activeModernSubscriptionCount = await this.activePlanRepository
+            .createQueryBuilder('activePlan')
+            .innerJoin('activePlan.plan', 'plan')
+            .where('activePlan.status = :status', { status: ActivePlanStatus.ACTIVE })
+            .andWhere('plan.type = :subscriptionType', { subscriptionType: PricingPlanType.SUBSCRIPTION })
+            .getCount();
+        const activeSubscriptionCount = activeLegacySubscriptionCount + activeModernSubscriptionCount;
 
         const revenue = await this.transactionRepository
             .createQueryBuilder('transaction')
@@ -186,9 +197,28 @@ export class AdminService {
             .orderBy("EXTRACT(MONTH FROM subscription.created_at)", "ASC")
             .getRawMany();
 
-        const subscriptionsGraphData = subscriptionsGraphDataRaw.map(item => ({
-            month: item.month ? item.month.trim() : '',
-            count: parseInt(item.count || '0')
+        const modernSubscriptionsGraphDataRaw = await this.activePlanRepository
+            .createQueryBuilder('activePlan')
+            .innerJoin('activePlan.plan', 'plan')
+            .select("TO_CHAR(activePlan.created_at, 'Mon')", 'month')
+            .addSelect("COUNT(activePlan.id)", 'count')
+            .where('activePlan.created_at >= :sixMonthsAgo', { sixMonthsAgo })
+            .andWhere('plan.type = :subscriptionType', { subscriptionType: PricingPlanType.SUBSCRIPTION })
+            .groupBy("TO_CHAR(activePlan.created_at, 'Mon')")
+            .addGroupBy("EXTRACT(MONTH FROM activePlan.created_at)")
+            .orderBy("EXTRACT(MONTH FROM activePlan.created_at)", "ASC")
+            .getRawMany();
+
+        const subscriptionsByMonth = new Map<string, number>();
+        for (const item of [...subscriptionsGraphDataRaw, ...modernSubscriptionsGraphDataRaw]) {
+            const month = item.month ? item.month.trim() : '';
+            const count = parseInt(item.count || '0', 10) || 0;
+            subscriptionsByMonth.set(month, (subscriptionsByMonth.get(month) || 0) + count);
+        }
+
+        const subscriptionsGraphData = Array.from(subscriptionsByMonth.entries()).map(([month, count]) => ({
+            month,
+            count,
         }));
 
         return {

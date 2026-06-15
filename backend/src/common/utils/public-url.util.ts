@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 
-export const DEFAULT_FRONTEND_URL = 'https://endearing-taffy-91a2c6.netlify.app';
+export const DEFAULT_FRONTEND_URL = 'https://naampata.com';
 export const DEFAULT_API_URL = 'https://local-business-listing-directory-production.up.railway.app/api/v1';
 export const LOCAL_FRONTEND_ORIGINS = [
     'http://localhost:3000',

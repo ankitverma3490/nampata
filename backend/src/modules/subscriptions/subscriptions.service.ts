@@ -182,19 +182,29 @@ export class SubscriptionsService implements OnModuleInit {
      * ADMIN: Get all subscriptions (paginated)
      */
     async getAllSubscriptionsForAdmin(page = 1, limit = 20): Promise<{ data: any[]; total: number }> {
+        const safePage = Math.max(1, Number(page) || 1);
+        const safeLimit = Math.max(1, Number(limit) || 20);
+        const fetchCount = safePage * safeLimit;
+        const startIndex = (safePage - 1) * safeLimit;
+
         const [oldData, oldTotal] = await this.subscriptionRepository.findAndCount({
             relations: ['plan', 'vendor', 'vendor.user'],
             order: { createdAt: 'DESC' },
-            skip: (page - 1) * limit,
-            take: limit,
+            take: fetchCount,
         });
 
-        const [newData, newTotal] = await this.activePlanRepository.findAndCount({
-            relations: ['plan', 'vendor', 'vendor.user'],
-            order: { createdAt: 'DESC' },
-            skip: (page - 1) * limit,
-            take: limit,
-        });
+        const newPlansQuery = this.activePlanRepository
+            .createQueryBuilder('activePlan')
+            .leftJoinAndSelect('activePlan.plan', 'plan')
+            .leftJoinAndSelect('activePlan.vendor', 'vendor')
+            .leftJoinAndSelect('vendor.user', 'vendorUser')
+            .where('plan.type = :subscriptionType', {
+                subscriptionType: PricingPlanType.SUBSCRIPTION,
+            })
+            .orderBy('activePlan.createdAt', 'DESC');
+
+        const newTotal = await newPlansQuery.clone().getCount();
+        const newData = await newPlansQuery.take(fetchCount).getMany();
 
         const mappedNewData = newData.map(np => ({
             id: np.id,
@@ -204,13 +214,17 @@ export class SubscriptionsService implements OnModuleInit {
             amount: np.amountPaid,
             createdAt: np.createdAt,
             vendor: np.vendor,
-            plan: { name: np.plan?.name || String(np.plan?.type || 'Plan'), planType: np.plan?.type },
+            plan: {
+                name: np.plan?.name || String(np.plan?.type || 'Plan'),
+                planType: np.plan?.type,
+                billingCycle: np.plan?.duration && np.plan?.unit ? `${np.plan.duration} ${np.plan.unit}` : 'custom',
+            },
             isNewSystem: true
         }));
 
         const combined = [...oldData, ...mappedNewData]
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            .slice(0, limit);
+            .slice(startIndex, startIndex + safeLimit);
 
         return { data: combined, total: oldTotal + newTotal };
     }
@@ -305,24 +319,39 @@ export class SubscriptionsService implements OnModuleInit {
     /**
      * ADMIN: Cancel a subscription
      */
-    async cancelSubscriptionAdmin(subscriptionId: string): Promise<Subscription> {
+    async cancelSubscriptionAdmin(subscriptionId: string): Promise<any> {
         const sub = await this.subscriptionRepository.findOne({ where: { id: subscriptionId } });
-        if (!sub) throw new NotFoundException('Subscription not found');
+        if (sub) {
+            await this.subscriptionRepository.update(subscriptionId, {
+                status: SubscriptionStatus.CANCELLED,
+                cancelledAt: new Date(),
+                cancellationReason: 'Cancelled by admin',
+                autoRenew: false,
+            });
 
-        await this.subscriptionRepository.update(subscriptionId, {
-            status: SubscriptionStatus.CANCELLED,
-            cancelledAt: new Date(),
-            cancellationReason: 'Cancelled by admin',
-            autoRenew: false,
-        });
+            return this.subscriptionRepository.findOne({
+                where: { id: subscriptionId },
+                relations: ['plan', 'vendor']
+            });
+        }
 
-        // Fetch back updated subscription with relations if needed
-        const updatedSub = await this.subscriptionRepository.findOne({
-            where: { id: subscriptionId },
-            relations: ['plan', 'vendor']
-        });
+        const activePlan = await this.activePlanRepository
+            .createQueryBuilder('activePlan')
+            .leftJoinAndSelect('activePlan.plan', 'plan')
+            .leftJoinAndSelect('activePlan.vendor', 'vendor')
+            .where('activePlan.id = :subscriptionId', { subscriptionId })
+            .andWhere('plan.type = :subscriptionType', {
+                subscriptionType: PricingPlanType.SUBSCRIPTION,
+            })
+            .getOne();
 
-        return updatedSub;
+        if (!activePlan) {
+            throw new NotFoundException('Subscription not found');
+        }
+
+        activePlan.status = ActivePlanStatus.CANCELLED;
+        activePlan.endDate = new Date();
+        return this.activePlanRepository.save(activePlan);
     }
 
     private getCleanBaseUrl(origin?: string): string {
@@ -935,28 +964,16 @@ export class SubscriptionsService implements OnModuleInit {
     public normalizeModernPlanFeatures(features: Record<string, any> = {}, planName?: string) {
         const maxCategories = Number(features.maxCategories ?? 0);
         const derivedMaxSubCategories = maxCategories > 0 ? Math.max(0, maxCategories - 1) : 0;
-        const isPaidMembership = (planName || '').toLowerCase() !== 'free';
         const normalizedMaxSubCategories = Number(features.maxSubCategories ?? derivedMaxSubCategories ?? 0);
-        const paidFallbackSubCategories =
-            isPaidMembership && normalizedMaxSubCategories <= 0 && maxCategories <= 0 ? 3 : normalizedMaxSubCategories;
-        const normalizedMaxListings =
-            isPaidMembership && Number(features.maxListings || 0) <= 1
-                ? 999
-                : Number(features.maxListings || 0);
-        const normalizedMaxKeywords =
-            isPaidMembership && Number(features.maxKeywords || 0) <= 0
-                ? 10
-                : Number(features.maxKeywords || 0);
-        const normalizedMaxFaqs =
-            isPaidMembership && Number(features.maxFaqs || 0) <= 0
-                ? 10
-                : Number(features.maxFaqs || 0);
+        const normalizedMaxListings = Number(features.maxListings ?? 0);
+        const normalizedMaxKeywords = Number(features.maxKeywords ?? 0);
+        const normalizedMaxFaqs = Number(features.maxFaqs ?? 0);
         const normalizedNamedPhones = Number(features.maxNamedPhoneNumbers ?? features.maxAdditionalPhones ?? 0);
 
         return {
             ...features,
             showAnalytics: !!features.showAnalytics,
-            showLeads: features.showLeads !== undefined ? !!features.showLeads : true,
+            showLeads: !!features.showLeads,
             showOffers: !!features.showOffers || Number(features.maxOffers || 0) > 0 || Number(features.maxEvents || 0) > 0,
             showDemand: !!features.showDemand,
             showQueries: !!features.showQueries,
@@ -966,11 +983,11 @@ export class SubscriptionsService implements OnModuleInit {
             canRespondBroadcast:
                 features.canRespondBroadcast !== undefined
                     ? !!features.canRespondBroadcast
-                    : !!features.respondToBroadcastLeads || isPaidMembership,
+                    : !!features.respondToBroadcastLeads,
             canReplyReviews:
                 features.canReplyReviews !== undefined
                     ? !!features.canReplyReviews
-                    : !!features.replyToReviews || isPaidMembership,
+                    : !!features.replyToReviews,
             showSaved: true,
             showFollowing: true,
             showListings: true,
@@ -978,7 +995,7 @@ export class SubscriptionsService implements OnModuleInit {
             maxListings: normalizedMaxListings,
             maxKeywords: normalizedMaxKeywords,
             maxFaqs: normalizedMaxFaqs,
-            maxSubCategories: paidFallbackSubCategories,
+            maxSubCategories: normalizedMaxSubCategories,
             maxNamedPhoneNumbers: normalizedNamedPhones,
             showCustomerNotes:
                 features.showCustomerNotes !== undefined
@@ -1027,37 +1044,25 @@ export class SubscriptionsService implements OnModuleInit {
                     canRespondBroadcast:
                         result.plan.dashboardFeatures?.canRespondBroadcast !== undefined
                             ? !!result.plan.dashboardFeatures.canRespondBroadcast
-                            : result.plan.planType !== 'free' && Number(result.plan.price) > 0,
+                            : !!legacyFeatures.respondToBroadcastLeads,
                     canReplyReviews:
                         result.plan.dashboardFeatures?.canReplyReviews !== undefined
                             ? !!result.plan.dashboardFeatures.canReplyReviews
-                            : result.plan.planType !== 'free' && Number(result.plan.price) > 0,
+                            : !!legacyFeatures.replyToReviews,
                     showCustomerNotes:
                         legacyFeatures.showCustomerNotes !== undefined
                             ? !!legacyFeatures.showCustomerNotes
                             : legacyFeatures.customerNotes !== undefined
                                 ? !!legacyFeatures.customerNotes
-                                : legacyIsPaid,
+                                : false,
                     showSaved: true,
                     showFollowing: true,
                     showListings: true,
-                    canAddListing: true,
-                    maxListings:
-                        legacyIsPaid && Number(legacyFeatures.maxListings ?? 0) <= 1
-                            ? 999
-                            : Number(legacyFeatures.maxListings ?? 0),
-                    maxKeywords:
-                        legacyIsPaid && Number(legacyFeatures.maxKeywords ?? 0) <= 0
-                            ? 10
-                            : Number(legacyFeatures.maxKeywords ?? 0),
-                    maxFaqs:
-                        legacyIsPaid && Number(legacyFeatures.maxFaqs ?? 0) <= 0
-                            ? 10
-                            : Number(legacyFeatures.maxFaqs ?? 0),
-                    maxSubCategories:
-                        legacyIsPaid && legacyResolvedMaxSubCategories <= 0 && legacyMaxCategories <= 0
-                            ? 3
-                            : legacyResolvedMaxSubCategories,
+                    canAddListing: Number(legacyFeatures.maxListings ?? 0) > 0,
+                    maxListings: Number(legacyFeatures.maxListings ?? 0),
+                    maxKeywords: Number(legacyFeatures.maxKeywords ?? 0),
+                    maxFaqs: Number(legacyFeatures.maxFaqs ?? 0),
+                    maxSubCategories: legacyResolvedMaxSubCategories,
                     maxNamedPhoneNumbers: Number(legacyFeatures.maxNamedPhoneNumbers ?? legacyFeatures.maxAdditionalPhones ?? 0),
                 }
         } : null;

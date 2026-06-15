@@ -27,6 +27,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     const { unreadChatCount, unreadCount: unreadNotificationCount, newEnquiryCount } = useSocket();
     const [newBroadcastCount, setNewBroadcastCount] = useState(0);
     const { hasFeature, planName } = usePlanFeature();
+    const displayPlan = planName.toLowerCase().includes('plan')
+        ? planName.replace(/plan/gi, '').replace(/\s+/g, ' ').trim()
+        : planName;
 
     // Close mobile sidebar on route change
     useEffect(() => {
@@ -65,7 +68,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         { name: 'Following', icon: UserPlus, href: '/following', badge: null, feature: 'showFollowing', description: 'Businesses you follow for updates' },
         { name: 'Queries', icon: Send, href: '/messages', badge: newEnquiryCount > 0 ? String(newEnquiryCount) : null, feature: 'showQueries', description: 'Direct customer messages & contact requests' },
         { name: 'Live Chat', icon: MessageSquare, iconColor: 'text-emerald-500', href: '/chat', badge: unreadChatCount > 0 ? String(unreadChatCount) : null, feature: 'showChat', description: 'Real-time chat with customers' },
-        { name: 'Customer Notes', icon: FileText, href: '/notes', badge: null, feature: 'showChat', description: 'Private notes for customer follow-ups & CRM' },
+        { name: 'Customer Notes', icon: FileText, href: '/notes', badge: null, feature: 'showCustomerNotes', description: 'Private notes for customer follow-ups & CRM' },
         { name: 'Hot Demand Insights', icon: TrendingUp, href: '/demand', badge: null, feature: 'showDemand', description: 'Trending searches in your categories' },
         { name: 'Subscription & Billing', icon: CreditCard, href: '/subscription', badge: null, description: 'Your plan, invoices and renewals' },
         { name: 'Broadcast Feed', icon: Megaphone, href: '/broadcasts', badge: newBroadcastCount > 0 ? String(newBroadcastCount) : null, feature: 'showBroadcast', description: 'My Broadcasts — service requests from customers' },
@@ -81,11 +84,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         }
 
         if (user?.role === 'vendor') {
-            return item.name !== 'List My Business';
+            if (item.name === 'List My Business') return false;
+            return item.feature ? hasFeature(item.feature) : true;
         }
 
         // For regular users/customers, show a limited subset
-        return ['Dashboard', 'List My Business', 'Live Chat', 'Saved Businesses', 'Following', 'Notifications', 'Settings'].includes(item.name);
+        const allowedForUsers = ['Dashboard', 'List My Business', 'Live Chat', 'Saved Businesses', 'Following', 'Notifications', 'Settings'].includes(item.name);
+        if (!allowedForUsers) return false;
+        return item.feature ? hasFeature(item.feature) : true;
     });
 
     const SidebarInner = () => (
@@ -120,7 +126,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         {user?.role === 'vendor' && (
                             <div className="flex items-center gap-1.5 px-2.5 py-0.5 bg-indigo-50 rounded-lg border border-indigo-100/50">
                                 <TrendingUp className="w-3 h-3 text-indigo-600" />
-                                <span className="text-[9px] text-indigo-700 font-bold uppercase tracking-wider">{planName} Business Plan</span>
+                                <span className="text-[9px] text-indigo-700 font-bold uppercase tracking-wider">{displayPlan} Business Plan</span>
                             </div>
                         )}
                     </div>

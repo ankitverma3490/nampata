@@ -17,6 +17,7 @@ import { Comment } from '../../entities/comment.entity';
 import { Notification } from '../../entities/notification.entity';
 import { Subscription } from '../../entities/subscription.entity';
 import { CommentReply } from '../../entities/comment-reply.entity';
+import { ActivePlan } from '../../entities/active-plan.entity';
 import { SearchModule } from '../search/search.module';
 import { SearchLog } from '../../entities/search-log.entity';
 import { AdminSearchController } from './admin-search.controller';
@@ -50,6 +51,7 @@ import { ChatConversation } from '../../entities/chat-conversation.entity';
             VendorAttribute,
             BusinessQuestion,
             ChatConversation,
+            ActivePlan,
         ]),
         SearchModule,
         LocationModule,

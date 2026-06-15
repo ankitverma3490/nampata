@@ -5,8 +5,9 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
+        "build:hostinger": "next build && node prepare_hostinger.js",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
     },
     "dependencies": {
         "@react-oauth/google": "^0.13.4",

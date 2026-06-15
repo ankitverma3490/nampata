@@ -61,6 +61,7 @@ function RegisterForm() {
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const { register, googleLogin } = useAuth();
     const searchParams = useSearchParams();
+    const redirect = searchParams.get('redirect');
 
     // Real-time validation
     const passwordValidation = {

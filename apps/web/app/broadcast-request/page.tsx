@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 // import React from 'react';
 // import Navbar from '../../components/Navbar';
@@ -7,6 +7,7 @@
 // import { Megaphone, Sparkles, CheckCircle2, Zap, Target, ChevronRight } from 'lucide-react';
 // import { motion } from 'framer-motion';
 // import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // export default function BroadcastsPage() {
 //     return (
@@ -71,8 +72,6 @@
 
 
 
-"use client";
-
 import React from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
@@ -90,9 +89,27 @@ import Link from 'next/link';
 import { useAuth } from '../../context/AuthContext';
 
 export default function BroadcastsPage() {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
+    const router = useRouter();
+
+    React.useEffect(() => {
+        if (!loading && !user) {
+            router.push('/login?redirect=/broadcast-request');
+        }
+    }, [user, loading, router]);
 
     const isBlockedBusinessAccount = user?.role === 'vendor';
+
+    if (loading || !user) {
+        return (
+            <main className="min-h-screen bg-[#fcfcfd] flex items-center justify-center">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 border-4 border-[#ff7a29] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm text-slate-400 font-bold">Verifying session...</p>
+                </div>
+            </main>
+        );
+    }
 
     return (
         <main className="min-h-screen bg-[#fcfcfd] overflow-hidden">

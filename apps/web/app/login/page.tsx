@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import Navbar from '../../components/Navbar';
@@ -52,7 +53,9 @@ function GoogleSignInButton({ loading, onError, onSuccess }: { loading: boolean;
     );
 }
 
-export default function LoginPage() {
+function LoginForm() {
+    const searchParams = useSearchParams();
+    const redirect = searchParams.get('redirect');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -185,12 +188,25 @@ export default function LoginPage() {
                     </div>
 
                     <p className="mt-8 text-center text-sm text-slate-500 font-bold">
-                        Don't have an account? <Link href="/register" className="text-blue-600 hover:text-blue-700 transition-colors">Create one for free</Link>
+                        Don't have an account? <Link href={redirect ? `/register?redirect=${encodeURIComponent(redirect)}` : '/register'} className="text-blue-600 hover:text-blue-700 transition-colors">Create one for free</Link>
                     </p>
                 </div>
             </main>
 
             <Footer />
         </div>
+    );
+}
+
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+                <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+            </div>
+        }>
+            <LoginForm />
+        </Suspense>
     );
 }

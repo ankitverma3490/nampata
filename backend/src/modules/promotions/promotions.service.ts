@@ -403,7 +403,25 @@ export class PromotionsService implements OnModuleInit {
                 const paymentIntentId = session.payment_intent as string;
                 
                 const result = await this.activateBooking(bookingId, paymentIntentId);
-                return { success: true, ...result };
+                
+                let planName = 'Offer Highlight';
+                if (result.booking?.placements) {
+                    const plc = result.booking.placements;
+                    if (plc.includes('homepage') && plc.includes('category')) {
+                        planName = 'Omni-Channel Boost';
+                    } else if (plc.includes('homepage')) {
+                        planName = 'Homepage Boost';
+                    } else if (plc.includes('category')) {
+                        planName = 'Category Boost';
+                    }
+                }
+                
+                return {
+                    success: true,
+                    endDate: result.booking?.endTime,
+                    planName,
+                    ...result
+                };
             }
             return { success: false, status: session.payment_status };
         } catch (error) {

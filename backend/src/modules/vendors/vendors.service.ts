@@ -9,7 +9,8 @@ import { Repository, In, Brackets, EntityManager } from 'typeorm';
 import { Vendor } from '../../entities/vendor.entity';
 import { User, UserRole } from '../../entities/user.entity';
 import { Listing } from '../../entities/business.entity';
-import { Subscription } from '../../entities/subscription.entity';
+import { Subscription, SubscriptionStatus } from '../../entities/subscription.entity';
+import { ActivePlan, ActivePlanStatus } from '../../entities/active-plan.entity';
 import { CreateVendorDto, UpdateVendorDto } from './dto/vendor.dto';
 import { OfferEvent, OfferType, OfferStatus } from '../../entities/offer-event.entity';
 import { Deal } from '../../entities/deal.entity';
@@ -19,6 +20,7 @@ import { SearchLog } from '../../entities/search-log.entity';
 import { Category } from '../../entities/category.entity';
 import { generateSlug, generateUniqueSlug } from '../../common/utils/slug.util';
 import { AffiliateService } from '../affiliate/affiliate.service';
+import { PricingPlanType } from '../../entities/pricing-plan.entity';
 
 @Injectable()
 export class VendorsService {
@@ -53,6 +55,37 @@ export class VendorsService {
             slug = `${baseSlug}-${counter}`;
             counter++;
         }
+    }
+
+    private resolveActiveMembership(
+        subscriptions: Subscription[] = [],
+        activePlans: ActivePlan[] = [],
+    ): Subscription | ActivePlan | null {
+        const now = new Date();
+        const currentSubscriptions = subscriptions.filter(
+            (sub) => sub.status === SubscriptionStatus.ACTIVE && new Date(sub.endDate) > now,
+        );
+        const currentActivePlans = activePlans.filter(
+            (plan) =>
+                plan.status === ActivePlanStatus.ACTIVE &&
+                new Date(plan.startDate) <= now &&
+                new Date(plan.endDate) > now &&
+                plan.plan?.type === PricingPlanType.SUBSCRIPTION,
+        );
+
+        const legacyLatest = currentSubscriptions.sort(
+            (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
+        )[0];
+        const modernLatest = currentActivePlans.sort(
+            (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
+        )[0];
+
+        if (!legacyLatest) return modernLatest || null;
+        if (!modernLatest) return legacyLatest || null;
+
+        return new Date(modernLatest.startDate) >= new Date(legacyLatest.startDate)
+            ? modernLatest
+            : legacyLatest;
     }
 
     /**
@@ -102,7 +135,7 @@ export class VendorsService {
     async getProfile(userId: string): Promise<Vendor> {
         let vendor = await this.vendorRepository.findOne({
             where: { userId },
-            relations: ['businesses', 'subscriptions'],
+            relations: ['businesses', 'subscriptions', 'subscriptions.plan', 'activePlans', 'activePlans.plan'],
         });
 
         if (!vendor) {
@@ -126,7 +159,7 @@ export class VendorsService {
 
                 return this.vendorRepository.findOne({
                     where: { userId },
-                    relations: ['businesses', 'subscriptions'],
+                    relations: ['businesses', 'subscriptions', 'subscriptions.plan', 'activePlans', 'activePlans.plan'],
                 });
             } else {
                 throw new NotFoundException('Vendor profile not found and user is not a vendor');
@@ -144,7 +177,7 @@ export class VendorsService {
 
         let vendor = await this.vendorRepository.findOne({
             where: { userId },
-            relations: ['businesses', 'subscriptions'],
+            relations: ['businesses', 'subscriptions', 'subscriptions.plan', 'activePlans', 'activePlans.plan'],
         });
 
         if (!vendor) {
@@ -170,7 +203,7 @@ export class VendorsService {
 
         return this.vendorRepository.findOne({
             where: { userId },
-            relations: ['businesses', 'subscriptions'],
+            relations: ['businesses', 'subscriptions', 'subscriptions.plan', 'activePlans', 'activePlans.plan'],
         });
     }
 
@@ -183,7 +216,7 @@ export class VendorsService {
         const businessCount = await this.listingRepository.count({
             where: { 
                 vendorId: vendor.id,
-                status: 'approved' as any 
+
             },
         });
 
@@ -306,7 +339,10 @@ export class VendorsService {
 
         const totalReviews = Number(totalReviewsRaw?.total) || 0;
         const profileCompletion = Math.min(completionScore, 100);
-        const activeSubscription = vendor.subscriptions?.find(s => s.status === 'active') || null;
+        const activeSubscription = this.resolveActiveMembership(
+            vendor.subscriptions || [],
+            vendor.activePlans || [],
+        );
 
         // Check if there is any REAL activity to report
         // Gating: If the vendor has no total views and no logged activity, show empty state
@@ -314,6 +350,7 @@ export class VendorsService {
         
         return {
             totalBusinesses: businessCount,
+            businessCount,
             pendingCount,
             activeCount: businessCount - pendingCount,
             activeSubscription,

@@ -1,6 +1,6 @@
 const PRODUCTION_ORIGIN = 'https://local-business-listing-directory-production.up.railway.app';
 export const PRODUCTION_API_URL = `${PRODUCTION_ORIGIN}/api/v1`;
-export const PRODUCTION_SITE_URL = 'https://endearing-taffy-91a2c6.netlify.app';
+export const PRODUCTION_SITE_URL = 'https://naampata.com';
 
 const LOOPBACK_ALIAS = ['local', 'host'].join('');
 const LOOPBACK_IPV4 = [127, 0, 0, 1].join('.');

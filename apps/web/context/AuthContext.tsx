@@ -180,6 +180,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             router.push('/verify-email');
             return;
         }
+        
+        // Check for redirect parameter in URL
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const redirectPath = params.get('redirect');
+            if (redirectPath) {
+                router.push(redirectPath);
+                return;
+            }
+        }
+        
         router.push('/dashboard');
     };
 

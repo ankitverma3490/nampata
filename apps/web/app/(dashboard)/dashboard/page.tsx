@@ -295,7 +295,9 @@ export default function GenericDashboard() {
                             </div>
                             <div className="text-center sm:text-left">
                                 <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-1">Current Subscription</p>
-                                <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight mb-1">{planName} Plan</h2>
+                                <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight mb-1">
+                                    {planName.toLowerCase().endsWith('plan') ? planName : `${planName} Plan`}
+                                </h2>
                                 <p className="text-slate-400 font-bold text-[11px] sm:text-xs flex items-center justify-center sm:justify-start gap-2">
                                     <Clock className="w-3.5 h-3.5 text-slate-500" />
                                     {(() => {

@@ -157,10 +157,6 @@ export class EventsService {
         const numericLimit =
             rawLimit === undefined || rawLimit === null ? null : Number(rawLimit);
 
-        if (mergedFeatures.showOffers === true && (numericLimit === null || Number.isNaN(numericLimit) || numericLimit <= 1)) {
-            return Number.POSITIVE_INFINITY;
-        }
-
         if (numericLimit !== null && !Number.isNaN(numericLimit)) {
             return numericLimit;
         }

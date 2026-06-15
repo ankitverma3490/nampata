@@ -213,7 +213,7 @@ function OfferSuccessContent() {
                                     <span className="text-slate-400 font-bold text-sm">Valid Until</span>
                                     <span className="font-black text-slate-900 dark:text-white flex items-center gap-2">
                                         <Calendar className="w-4 h-4 text-primary" />
-                                        {details?.endDate ? new Date(details.endDate).toLocaleDateString('en-US', {
+                                        {details?.endDate || details?.booking?.endTime ? new Date(details.endDate || details.booking.endTime).toLocaleDateString('en-US', {
                                             month: 'short', day: 'numeric', year: 'numeric'
                                         }) : 'N/A'}
                                     </span>

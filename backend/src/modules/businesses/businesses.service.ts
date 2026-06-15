@@ -82,35 +82,13 @@ export class BusinessesService implements OnModuleInit {
         const maxCategories = Number(raw.maxCategories ?? 0);
         const derivedMaxSubCategories = maxCategories > 0 ? Math.max(0, maxCategories - 1) : 0;
         const normalizedMaxSubCategories = Number(raw.maxSubCategories ?? derivedMaxSubCategories ?? 0);
-        
-        const isPaidMembership = (planName || '').toLowerCase() !== 'free' || Number(raw.maxListings || 0) > 1 || raw.isPaid === true || raw.planType !== 'free';
-
-        const paidFallbackSubCategories =
-            isPaidMembership && normalizedMaxSubCategories <= 0 && maxCategories <= 0
-                ? 3
-                : normalizedMaxSubCategories;
-
-        const normalizedMaxListings =
-            isPaidMembership && Number(raw.maxListings || 0) <= 1
-                ? 999
-                : Number(raw.maxListings || 0);
-
-        const normalizedMaxKeywords =
-            isPaidMembership && Number(raw.maxKeywords || 0) <= 0
-                ? 10
-                : Number(raw.maxKeywords || 0);
-
-        const normalizedMaxFaqs =
-            isPaidMembership && Number(raw.maxFaqs || 0) <= 0
-                ? 10
-                : Number(raw.maxFaqs || 0);
 
         return {
             ...raw,
-            maxListings: normalizedMaxListings,
-            maxKeywords: normalizedMaxKeywords,
-            maxFaqs: normalizedMaxFaqs,
-            maxSubCategories: paidFallbackSubCategories,
+            maxListings: Number(raw.maxListings ?? 0),
+            maxKeywords: Number(raw.maxKeywords ?? 0),
+            maxFaqs: Number(raw.maxFaqs ?? 0),
+            maxSubCategories: normalizedMaxSubCategories,
             maxNamedPhoneNumbers: Number(raw.maxNamedPhoneNumbers ?? raw.maxAdditionalPhones ?? 0),
             showCustomerNotes:
                 raw.showCustomerNotes !== undefined

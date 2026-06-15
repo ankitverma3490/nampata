@@ -1,54 +1,11 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Home, ArrowLeft, Search, MapPin, AlertCircle, Loader2 } from "lucide-react";
+import { Home, Search, MapPin, AlertCircle } from "lucide-react";
 
 export default function NotFound() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [isRedirecting, setIsRedirecting] = React.useState(false);
-
-  useEffect(() => {
-    // SPA Fallback for Static Export:
-    // If we land on a 404 but the path looks like a business or vendor listing,
-    // redirect to the template page which can handle the data fetching on the client.
-    const pathParts = pathname.split("/").filter(Boolean);
-    
-    if (pathParts.length >= 2) {
-      const type = pathParts[0]; // 'business', 'vendors', etc.
-      const slug = pathParts[1];
-      
-      if (
-        (type === "business" || type === "vendors" || type === "cities" || type === "categories") && 
-        slug !== "template"
-      ) {
-        setIsRedirecting(true);
-        console.log(`[NotFound] Dynamic route detected: /${type}/${slug}. Redirecting to template...`);
-        // We use router.replace to avoid adding the 404 page to history
-        router.replace(`/${type}/template?originalSlug=${slug}`);
-      }
-    }
-  }, [pathname, router]);
-
-  if (isRedirecting) {
-    return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center space-y-6"
-        >
-          <Loader2 className="w-12 h-12 text-red-500 animate-spin mx-auto" />
-          <h2 className="text-2xl font-black text-slate-900">Finding Listing...</h2>
-          <p className="text-slate-500 font-bold">Connecting to the neighborhood directory...</p>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background Decorative Elements */}
