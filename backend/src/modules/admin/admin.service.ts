@@ -624,6 +624,10 @@ export class AdminService {
             .leftJoinAndSelect('vendor.subscriptions', 'subscriptions', 'subscriptions.status = :activeStatus', { activeStatus: SubscriptionStatus.ACTIVE })
             .leftJoinAndSelect('subscriptions.plan', 'plan')
             .leftJoinAndSelect('business.category', 'category')
+            .leftJoinAndSelect('business.subcategories', 'subcategories')
+            .leftJoinAndSelect('business.businessHours', 'businessHours')
+            .leftJoinAndSelect('business.businessAmenities', 'businessAmenities')
+            .leftJoinAndSelect('businessAmenities.amenity', 'amenity')
             .orderBy('business.createdAt', 'DESC')
             .skip(skip)
             .take(limit);

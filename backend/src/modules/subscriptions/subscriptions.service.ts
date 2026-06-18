@@ -1060,9 +1060,9 @@ export class SubscriptionsService implements OnModuleInit {
                     showListings: true,
                     canAddListing: Number(legacyFeatures.maxListings ?? 0) > 0,
                     maxListings: Number(legacyFeatures.maxListings ?? 0),
-                    maxKeywords: Number(legacyFeatures.maxKeywords ?? 0),
-                    maxFaqs: Number(legacyFeatures.maxFaqs ?? 0),
-                    maxSubCategories: legacyResolvedMaxSubCategories,
+                    maxKeywords: legacyIsPaid && Number(legacyFeatures.maxKeywords ?? 0) === 0 ? 10 : Number(legacyFeatures.maxKeywords ?? 0),
+                    maxFaqs: legacyIsPaid && Number(legacyFeatures.maxFaqs ?? 0) === 0 ? 10 : Number(legacyFeatures.maxFaqs ?? 0),
+                    maxSubCategories: legacyResolvedMaxSubCategories > 0 ? legacyResolvedMaxSubCategories : (legacyIsPaid ? 3 : 0),
                     maxNamedPhoneNumbers: Number(legacyFeatures.maxNamedPhoneNumbers ?? legacyFeatures.maxAdditionalPhones ?? 0),
                 }
         } : null;

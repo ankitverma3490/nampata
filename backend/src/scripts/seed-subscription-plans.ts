@@ -33,6 +33,7 @@ const FREE_FEATURES = {
     showChat: false,
     showBroadcast: false,
     showDemand: false,
+    showCustomerNotes: true,
     maxKeywords: 0,
     maxListings: 999,
 };
