@@ -266,7 +266,7 @@ export default function SubscriptionsPage() {
                                     >
                                         <option value="" disabled>Select a Plan</option>
                                         {plans.map(p => (
-                                            <option key={p.id} value={p.id}>{p.name} - ${p.price}/{p.billingCycle}</option>
+                                            <option key={p.id} value={p.id}>{p.name} - PKR {Number(p.price).toLocaleString()}/{p.billingCycle}</option>
                                         ))}
                                     </select>
                                 </div>

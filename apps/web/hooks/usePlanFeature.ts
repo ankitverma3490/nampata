@@ -46,7 +46,7 @@ export const usePlanFeature = () => {
         showOffers: false,
         showReviews: false,
         showAnalytics: false,
-        showCustomerNotes: false,
+        showCustomerNotes: true,
         showChat: false,
         showBroadcast: false,
         canRespondBroadcast: false,
@@ -64,23 +64,37 @@ export const usePlanFeature = () => {
         isFeatured: false,
     };
 
-    const features: DashboardFeatures = activeSub?.plan?.dashboardFeatures || defaultFeatures;
+    const features: DashboardFeatures = {
+        ...defaultFeatures,
+        ...(activeSub?.plan?.dashboardFeatures || {}),
+    };
     const getFeatureValue = (featureName: string): any => {
         if (user?.role === 'admin' || user?.role === 'superadmin') {
             if (featureName.startsWith('max')) return 999999;
             return true;
         }
         const value = features[featureName];
+        const hasActiveSub = !!activeSub && activeSub.status === 'active';
         if (featureName.startsWith('max')) {
             if (featureName === 'maxSubCategories') {
                 const numeric = Number(value ?? 0);
                 const fallbackFromCategories = Number((features as any).maxCategories ?? 0);
                 if (numeric > 0) return numeric;
                 if (fallbackFromCategories > 0) return Math.max(0, fallbackFromCategories - 1);
+                if (hasActiveSub) return 3;
                 return 0;
             }
             if (featureName === 'maxNamedPhoneNumbers') {
                 return Number(value ?? (features as any).maxAdditionalPhones ?? 0);
+            }
+            if (Number(value ?? 0) === 0 && hasActiveSub) {
+                const paidDefaults: Record<string, number> = {
+                    maxPhotos: 10, maxListings: 3, maxHighlights: 6,
+                    maxSpecials: 3, maxTeamMembers: 10, maxSocialLinks: 4,
+                    maxOperatingHours: 3, maxDealsPerMonth: 3, maxEventsPerMonth: 3,
+                    maxKeywords: 10, maxFaqs: 10, maxEmailAddresses: 5,
+                };
+                if (paidDefaults[featureName]) return paidDefaults[featureName];
             }
             return Number(value ?? 0);
         }
@@ -111,6 +125,7 @@ export const usePlanFeature = () => {
         features,
         planName: activeSub?.plan?.name || 'Free',
         isFree: (user?.role !== 'admin' && user?.role !== 'superadmin') && (!activeSub || activeSub.plan?.planType?.toLowerCase() === 'free' || activeSub.plan?.name?.toLowerCase().includes('free')),
+        hasPaidPlan: !!activeSub && activeSub.status === 'active' && activeSub.plan?.planType?.toLowerCase() !== 'free',
         loading: !user,
     };
 };

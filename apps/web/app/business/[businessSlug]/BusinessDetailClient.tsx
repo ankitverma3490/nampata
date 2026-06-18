@@ -2097,7 +2097,7 @@ export default function BusinessDetailClient({
 
                 <div className="flex flex-col items-center text-center">
                   <Link
-                    href={business.vendor?.slug ? `/businesses/${business.vendor.slug}` : (business.vendorId || business.vendor?.id) ? `/businesses/${business.vendorId || business.vendor?.id}` : "#"}
+                    href={business.vendor?.slug ? `/businesses/${business.vendor.slug}` : "#"}
                     className={`flex flex-col items-center text-center group/vendor ${!(business.vendor?.slug || business.vendorId || business.vendor?.id) ? "pointer-events-none" : "cursor-pointer"}`}
                   >
                     <div className="w-32 h-32 bg-slate-50 rounded-[40px] flex items-center justify-center text-slate-400 font-bold overflow-hidden shadow-inner mb-6 relative group border-4 border-white ring-1 ring-slate-100">
@@ -2215,7 +2215,7 @@ export default function BusinessDetailClient({
                       <button
                         type="button"
                         onClick={() => {
-                          window.location.href = `/businesses/${business.vendor?.slug || business.vendorId || business.vendor?.id}`;
+                          window.location.href = `/business/${business.slug || business.vendor?.slug || ''}`;
                         }}
                         className="group/btn relative w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2 overflow-hidden hover:bg-blue-600 transition-all duration-300 shadow-lg shadow-slate-900/10 active:scale-[0.98] mt-6 cursor-pointer z-20"
                       >

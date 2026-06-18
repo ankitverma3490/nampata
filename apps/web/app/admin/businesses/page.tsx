@@ -6,7 +6,8 @@ import {
     Briefcase, Search, RefreshCw, Loader2, CheckCircle2, XCircle,
     AlertCircle, Clock, MoreVertical, Trash2, MapPin, Tag,
     ExternalLink, ChevronLeft, ChevronRight, Store, Filter, Star,
-    Phone
+    Phone, Globe, MessageCircle, Calendar, Users, Eye, Heart, Image,
+    DollarSign, Building2, Hash, Info
 } from 'lucide-react';
 import { api, getImageUrl } from '../../../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -346,126 +347,286 @@ export default function AdminBusinessesPage() {
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="relative w-full max-w-2xl bg-white rounded-[20px] shadow-2xl overflow-hidden border border-slate-100"
+                            className="relative w-full max-w-3xl max-h-[90vh] bg-white rounded-[20px] shadow-2xl border border-slate-100 flex flex-col overflow-hidden"
                         >
-                            <div className="p-10">
-                                <div className="flex items-start justify-between mb-10">
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-20 h-20 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden shadow-sm shrink-0">
-                                            {(selectedBusiness.logoUrl || selectedBusiness.coverImageUrl || (selectedBusiness.images && selectedBusiness.images.length > 0)) ? (
-                                                <img 
-                                                    src={getImageUrl(selectedBusiness.logoUrl || selectedBusiness.coverImageUrl || selectedBusiness.images[0]) || ''} 
-                                                    className="w-full h-full object-cover" 
-                                                />
-                                            ) : (
-                                                <Store className="w-10 h-10 text-slate-200" />
+                            {/* Sticky Header */}
+                            <div className="p-6 pb-0 flex items-start justify-between shrink-0">
+                                <div className="flex items-center gap-5">
+                                    <div className="w-20 h-20 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden shadow-sm shrink-0">
+                                        {(selectedBusiness.logoUrl || selectedBusiness.coverImageUrl || (selectedBusiness.images && selectedBusiness.images.length > 0)) ? (
+                                            <img 
+                                                src={getImageUrl(selectedBusiness.logoUrl || selectedBusiness.coverImageUrl || selectedBusiness.images[0]) || ''} 
+                                                className="w-full h-full object-cover" 
+                                            />
+                                        ) : (
+                                            <Store className="w-10 h-10 text-slate-200" />
+                                        )}
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-3 mb-1.5">
+                                            <h2 className="text-2xl font-black text-slate-900 tracking-tight">{selectedBusiness.title}</h2>
+                                            {selectedBusiness.isVerified && (
+                                                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shadow-sm">
+                                                    <CheckCircle2 className="w-3 h-3 text-white" />
+                                                </div>
                                             )}
                                         </div>
-                                        <div>
-                                            <div className="flex items-center gap-3 mb-1.5">
-                                                <h2 className="text-2xl font-black text-slate-900 tracking-tight">{selectedBusiness.title}</h2>
-                                                {selectedBusiness.isVerified && (
-                                                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shadow-sm">
-                                                        <CheckCircle2 className="w-3 h-3 text-white" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{selectedBusiness.category?.name}</span>
-                                                <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
-                                                <StatusBadge status={selectedBusiness.status} />
-                                            </div>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{selectedBusiness.category?.name}</span>
+                                            {selectedBusiness.subcategories && selectedBusiness.subcategories.length > 0 && selectedBusiness.subcategories.map((sc: any) => (
+                                                <span key={sc.id} className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-[9px] font-bold uppercase">{sc.name}</span>
+                                            ))}
+                                            <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                                            <StatusBadge status={selectedBusiness.status} />
+                                            {selectedBusiness.isFeatured && (
+                                                <span className="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-full text-[9px] font-black uppercase">Featured</span>
+                                            )}
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => setSelectedBusiness(null)}
-                                        className="p-2 hover:bg-slate-50 text-slate-400 hover:text-slate-900 rounded-xl transition-all border border-transparent hover:border-slate-100 active:scale-95"
-                                    >
-                                        <XCircle className="w-6 h-6" />
-                                    </button>
+                                </div>
+                                <button
+                                    onClick={() => setSelectedBusiness(null)}
+                                    className="p-2 hover:bg-slate-50 text-slate-400 hover:text-slate-900 rounded-xl transition-all border border-transparent hover:border-slate-100 active:scale-95 shrink-0"
+                                >
+                                    <XCircle className="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            {/* Scrollable Content */}
+                            <div className="p-6 pt-4 overflow-y-auto flex-1 min-h-0 space-y-6">
+
+                                {/* Stats Row */}
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <div className="bg-blue-50 rounded-2xl p-3 text-center">
+                                        <Star className="w-4 h-4 text-blue-500 mx-auto mb-1" />
+                                        <p className="text-lg font-black text-blue-700">{selectedBusiness.averageRating || '0.0'}</p>
+                                        <p className="text-[9px] font-bold text-blue-400 uppercase">Rating ({selectedBusiness.totalReviews || 0} reviews)</p>
+                                    </div>
+                                    <div className="bg-emerald-50 rounded-2xl p-3 text-center">
+                                        <Eye className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
+                                        <p className="text-lg font-black text-emerald-700">{(selectedBusiness.totalViews || 0).toLocaleString()}</p>
+                                        <p className="text-[9px] font-bold text-emerald-400 uppercase">Views</p>
+                                    </div>
+                                    <div className="bg-orange-50 rounded-2xl p-3 text-center">
+                                        <Users className="w-4 h-4 text-orange-500 mx-auto mb-1" />
+                                        <p className="text-lg font-black text-orange-700">{(selectedBusiness.totalLeads || 0).toLocaleString()}</p>
+                                        <p className="text-[9px] font-bold text-orange-400 uppercase">Leads</p>
+                                    </div>
+                                    <div className="bg-purple-50 rounded-2xl p-3 text-center">
+                                        <Heart className="w-4 h-4 text-purple-500 mx-auto mb-1" />
+                                        <p className="text-lg font-black text-purple-700">{(selectedBusiness.followersCount || 0).toLocaleString()}</p>
+                                        <p className="text-[9px] font-bold text-purple-400 uppercase">Followers</p>
+                                    </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
-                                    <div className="space-y-8">
-                                        <div>
-                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">Contact Information</p>
-                                            <div className="space-y-4">
-                                                <div className="flex items-center gap-3 text-sm text-slate-600 group">
-                                                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500">
-                                                        <Phone className="w-4 h-4" />
-                                                    </div>
-                                                    <span className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{selectedBusiness.phone}</span>
+                                {/* Contact + Owner */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Contact Information</p>
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-3 text-sm">
+                                                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
+                                                    <Phone className="w-4 h-4" />
                                                 </div>
-                                                {selectedBusiness.whatsapp && (
-                                                    <div className="flex items-center gap-3 text-sm text-slate-600">
-                                                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500 font-black">W</div>
-                                                        <span className="font-bold text-slate-900">{selectedBusiness.whatsapp}</span>
+                                                <span className="font-bold text-slate-900">{selectedBusiness.phone || 'Not provided'}</span>
+                                            </div>
+                                            {selectedBusiness.whatsapp && (
+                                                <div className="flex items-center gap-3 text-sm">
+                                                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
+                                                        <MessageCircle className="w-4 h-4" />
                                                     </div>
-                                                )}
-                                                {selectedBusiness.website && (
-                                                    <div className="flex items-center gap-3 text-sm text-slate-600">
-                                                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
-                                                            <Tag className="w-4 h-4" />
+                                                    <span className="font-bold text-slate-900">{selectedBusiness.whatsapp}</span>
+                                                </div>
+                                            )}
+                                            {selectedBusiness.namedPhoneNumbers && selectedBusiness.namedPhoneNumbers.length > 0 && (
+                                                selectedBusiness.namedPhoneNumbers.map((np: any, idx: number) => (
+                                                    <div key={idx} className="flex items-center gap-3 text-sm">
+                                                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
+                                                            <Phone className="w-4 h-4" />
                                                         </div>
-                                                        <span className="font-medium text-slate-500 truncate">{selectedBusiness.website.replace(/^https?:\/\//, '')}</span>
+                                                        <div>
+                                                            <span className="text-[10px] font-bold text-slate-400 uppercase block">{np.label || 'Phone ' + (idx + 1)}</span>
+                                                            <span className="font-bold text-slate-900">{np.number}</span>
+                                                        </div>
                                                     </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">Physical Address</p>
-                                            <div className="flex gap-4 text-sm text-slate-600">
-                                                <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
-                                                    <MapPin className="w-4 h-4" />
+                                                ))
+                                            )}
+                                            {selectedBusiness.website && (
+                                                <div className="flex items-center gap-3 text-sm">
+                                                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0">
+                                                        <Globe className="w-4 h-4" />
+                                                    </div>
+                                                    <span className="font-medium text-slate-700 truncate">{selectedBusiness.website}</span>
                                                 </div>
-                                                <p className="font-bold leading-relaxed text-slate-900">
-                                                    {selectedBusiness.address}<br />
-                                                    <span className="text-slate-400 font-medium">{selectedBusiness.city}, {selectedBusiness.state} {selectedBusiness.pincode}</span>
-                                                </p>
-                                            </div>
+                                            )}
                                         </div>
                                     </div>
-                                    <div className="space-y-8">
-                                        <div className="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
-                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">Business Details</p>
-                                            <div className="space-y-3">
-                                                <p className="font-black text-slate-900 text-lg">{selectedBusiness.vendor?.businessName || 'Business Owner'}</p>
-                                                <div className="space-y-1">
-                                                    <p className="text-xs font-bold text-slate-500">{selectedBusiness.vendor?.businessPhone}</p>
-                                                    <p className="text-xs font-medium text-slate-400">{selectedBusiness.vendor?.businessEmail}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">Operational Status</p>
-                                            <div className="flex flex-wrap gap-2">
-                                                <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border ${selectedBusiness.isVerified ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>
-                                                    {selectedBusiness.isVerified ? 'Recommended' : 'Standard'}
-                                                </span>
-                                                {selectedBusiness.isFeatured && (
-                                                    <span className="px-4 py-2 bg-amber-50 text-amber-600 border border-amber-100 rounded-xl text-[10px] font-black uppercase tracking-wider">Featured Asset</span>
-                                                )}
-                                            </div>
+                                    <div className="space-y-4">
+                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Business Owner</p>
+                                        <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 space-y-2">
+                                            <p className="font-black text-slate-900 text-sm">{selectedBusiness.vendor?.businessName || 'N/A'}</p>
+                                            <p className="text-xs font-bold text-slate-500">{selectedBusiness.vendor?.businessPhone || 'No phone'}</p>
+                                            <p className="text-xs font-medium text-slate-400">{selectedBusiness.vendor?.businessEmail || 'No email'}</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                {selectedBusiness.searchKeywords && selectedBusiness.searchKeywords.length > 0 && (
-                                    <div className="border-t border-slate-50 pt-8 mt-6">
-                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">Search Keywords</p>
+                                {/* Address */}
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3">Physical Address</p>
+                                    <div className="flex gap-4">
+                                        <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
+                                            <MapPin className="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-slate-900 leading-relaxed">{selectedBusiness.address || 'No address'}</p>
+                                            {selectedBusiness.addressLine2 && <p className="text-sm text-slate-500 mt-1">{selectedBusiness.addressLine2}</p>}
+                                            <p className="text-sm text-slate-400 mt-1">
+                                                {[selectedBusiness.city, selectedBusiness.state, selectedBusiness.pincode].filter(Boolean).join(', ')}
+                                                {selectedBusiness.country ? ` (${selectedBusiness.country})` : ''}
+                                            </p>
+                                            {selectedBusiness.latitude && selectedBusiness.longitude && (
+                                                <p className="text-[10px] text-slate-300 mt-1 font-mono">Lat: {selectedBusiness.latitude}, Lng: {selectedBusiness.longitude}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Business Meta */}
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3">Business Info</p>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                        {selectedBusiness.priceRange && (
+                                            <div className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2">
+                                                <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+                                                <div>
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase">Price Range</p>
+                                                    <p className="text-xs font-black text-slate-700">{selectedBusiness.priceRange}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {selectedBusiness.yearEstablished && (
+                                            <div className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2">
+                                                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                                                <div>
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase">Established</p>
+                                                    <p className="text-xs font-black text-slate-700">{selectedBusiness.yearEstablished}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {selectedBusiness.employeeCount && (
+                                            <div className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2">
+                                                <Users className="w-3.5 h-3.5 text-slate-400" />
+                                                <div>
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase">Employees</p>
+                                                    <p className="text-xs font-black text-slate-700">{selectedBusiness.employeeCount}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Images Gallery */}
+                                {selectedBusiness.images && selectedBusiness.images.length > 0 && (
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                                            <Image className="w-3 h-3" /> Images ({selectedBusiness.images.length})
+                                        </p>
+                                        <div className="flex gap-2 overflow-x-auto pb-2">
+                                            {selectedBusiness.images.map((img: string, i: number) => (
+                                                <div key={i} className="w-24 h-24 rounded-xl overflow-hidden shrink-0 border border-slate-100">
+                                                    <img src={getImageUrl(img) || ''} className="w-full h-full object-cover" alt={`Image ${i + 1}`} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Amenities */}
+                                {selectedBusiness.businessAmenities && selectedBusiness.businessAmenities.length > 0 && (
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                                            <Info className="w-3 h-3" /> Amenities ({selectedBusiness.businessAmenities.length})
+                                        </p>
                                         <div className="flex flex-wrap gap-2">
-                                            {selectedBusiness.searchKeywords.map((kw: string, i: number) => (
-                                                <span key={i} className="px-3 py-1.5 bg-slate-50 text-slate-600 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-slate-100 flex items-center gap-2">
-                                                    <Search className="w-3 h-3 text-slate-400" />
-                                                    {kw}
+                                            {selectedBusiness.businessAmenities.map((ba: any) => (
+                                                <span key={ba.id} className="px-3 py-1.5 bg-slate-50 text-slate-600 rounded-xl text-[10px] font-bold border border-slate-100">
+                                                    {ba.amenity?.name || 'Amenity'}
                                                 </span>
                                             ))}
                                         </div>
                                     </div>
                                 )}
 
-                                <div className="border-t border-slate-50 pt-8 mt-10">
-                                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">Business Narrative</p>
+                                {/* Search Keywords */}
+                                {selectedBusiness.searchKeywords && selectedBusiness.searchKeywords.length > 0 && (
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                                            <Hash className="w-3 h-3" /> Search Keywords
+                                        </p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {selectedBusiness.searchKeywords.map((kw: string, i: number) => (
+                                                <span key={i} className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-xl text-[10px] font-bold border border-blue-100 flex items-center gap-1.5">
+                                                    <Search className="w-3 h-3" /> {kw}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Business Hours */}
+                                {selectedBusiness.businessHours && selectedBusiness.businessHours.length > 0 && (
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                                            <Clock className="w-3 h-3" /> Operating Hours
+                                        </p>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            {selectedBusiness.businessHours.map((bh: any) => (
+                                                <div key={bh.id} className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs ${bh.isOpen ? 'bg-emerald-50' : 'bg-slate-50'}`}>
+                                                    <span className="font-black text-slate-700 uppercase">{bh.day}</span>
+                                                    <span className={`font-bold ${bh.isOpen ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                                        {bh.isOpen ? `${bh.openTime} – ${bh.closeTime}` : 'Closed'}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Social Links */}
+                                {selectedBusiness.socialLinks && selectedBusiness.socialLinks.length > 0 && (
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                                            <Globe className="w-3 h-3" /> Social Links
+                                        </p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {selectedBusiness.socialLinks.map((link: any, i: number) => (
+                                                <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-bold border border-indigo-100 flex items-center gap-1.5 hover:bg-indigo-100 transition-colors">
+                                                    <ExternalLink className="w-3 h-3" /> {link.platform || 'Link'}
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* FAQs */}
+                                {selectedBusiness.faqs && selectedBusiness.faqs.length > 0 && (
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3">FAQs ({selectedBusiness.faqs.length})</p>
+                                        <div className="space-y-3">
+                                            {selectedBusiness.faqs.map((faq: any, i: number) => (
+                                                <div key={i} className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                                                    <p className="text-xs font-black text-slate-800">Q: {faq.question}</p>
+                                                    <p className="text-xs font-medium text-slate-500 mt-1">A: {faq.answer}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Description */}
+                                <div className="border-t border-slate-100 pt-6">
+                                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3">Business Narrative</p>
                                     <p className="text-slate-500 text-sm leading-relaxed whitespace-pre-line font-medium italic">
                                         "{selectedBusiness.description || 'No detailed description remains for this listing.'}"
                                     </p>

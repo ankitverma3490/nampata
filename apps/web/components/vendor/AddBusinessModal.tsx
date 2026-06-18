@@ -633,7 +633,7 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, business 
 
                                                     {/* Subcategories */}
                                                     {(() => {
-                                                        const maxSubCategories = getFeatureValue('maxSubCategories') || 0;
+                                                        const maxSubCategories = Number(getFeatureValue('maxSubCategories') || 0);
                                                         const allowedMax = Math.min(3, maxSubCategories);
                                                         
                                                         if (allowedMax > 0 && formData.categoryId && formData.categoryId !== 'other') {

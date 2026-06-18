@@ -3,6 +3,25 @@ import { Metadata } from 'next';
 import BusinessDetailClient from './BusinessDetailClient';
 import { api } from '../../../lib/api';
 
+export async function generateStaticParams() {
+  try {
+    const res = await fetch('https://local-business-listing-directory-production.up.railway.app/api/v1/listings/public?limit=100');
+    const data = await res.json();
+    const listings = data.listings || data.data || [];
+    const paths = [
+      { businessSlug: 'template' },
+      ...listings.map((l: any) => ({ businessSlug: l.slug || l.id }))
+    ];
+    return paths;
+  } catch (error) {
+    console.error("Error generating static params for business details:", error);
+    return [
+      { businessSlug: 'template' }
+    ];
+  }
+}
+
+
 export async function generateMetadata({ 
   params 
 }: { 

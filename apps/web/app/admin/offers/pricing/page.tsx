@@ -179,7 +179,7 @@ export default function AdminOfferPricingPage() {
                                 <div className="flex items-end justify-between pt-6 border-t border-slate-50">
                                     <div>
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Price</p>
-                                        <p className="text-3xl font-black text-slate-900">${price.price}</p>
+                                        <p className="text-3xl font-black text-slate-900">PKR {Number(price.price).toLocaleString()}</p>
                                     </div>
                                     {!price.isActive && (
                                         <span className="px-3 py-1 bg-red-50 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-lg">Inactive</span>
@@ -235,7 +235,7 @@ export default function AdminOfferPricingPage() {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Price (USD)</label>
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Price (PKR)</label>
                                             <div className="relative">
                                                 <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                                 <input 

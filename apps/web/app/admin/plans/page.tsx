@@ -180,7 +180,7 @@ export default function PlansPage() {
                             </div>
                             <div className="mb-6 pb-6 border-b border-slate-100">
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-4xl font-black text-slate-900">${plan.price}</span>
+                                    <span className="text-4xl font-black text-slate-900">PKR {Number(plan.price).toLocaleString()}</span>
                                     <span className="text-slate-400 font-bold">/{plan.billingCycle}</span>
                                 </div>
                                 <div className="mt-2 flex items-center gap-2">
