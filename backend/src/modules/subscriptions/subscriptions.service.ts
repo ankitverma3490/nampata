@@ -1054,7 +1054,7 @@ export class SubscriptionsService implements OnModuleInit {
                             ? !!legacyFeatures.showCustomerNotes
                             : legacyFeatures.customerNotes !== undefined
                                 ? !!legacyFeatures.customerNotes
-                                : false,
+                                : legacyIsPaid,
                     showSaved: true,
                     showFollowing: true,
                     showListings: true,
