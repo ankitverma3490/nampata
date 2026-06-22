@@ -30,6 +30,7 @@ import {
   Megaphone,
   Tag,
   Loader2,
+  Globe,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
