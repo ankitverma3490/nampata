@@ -8,6 +8,7 @@ import { SavedListing } from '../../entities/favorite.entity';
 import { SavedOfferEvent } from '../../entities/saved-offer-event.entity';
 import { Notification } from '../../entities/notification.entity';
 import { Listing } from '../../entities/business.entity';
+import { OfferEvent } from '../../entities/offer-event.entity';
 
 import { AdminModule } from '../admin/admin.module';
 import { Review } from '../../entities/review.entity';
@@ -15,7 +16,7 @@ import { TrustService } from './trust.service';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User, SavedListing, SavedOfferEvent, Notification, Listing, Review]),
+        TypeOrmModule.forFeature([User, SavedListing, SavedOfferEvent, Notification, Listing, Review, OfferEvent]),
         SubscriptionsModule,
         AdminModule,
     ],
@@ -24,3 +25,4 @@ import { TrustService } from './trust.service';
     exports: [UsersService, TrustService],
 })
 export class UsersModule { }
+
