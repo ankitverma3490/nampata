@@ -329,11 +329,9 @@ export class VendorsService {
             { val: vendor.country, weight: 5 },
             { val: vendor.bio, weight: 10 },
             { val: vendor.businessEmail, weight: 5 },
-            { val: vendor.socialLinks?.length > 0, weight: 5 },
+            { val: vendor.socialLinks?.length > 0, weight: 10 },
             { val: vendor.businessHours && Object.keys(vendor.businessHours).length > 0, weight: 10 },
-            { val: businessCount > 0, weight: 15 },
-            { val: vendor.logoUrl, weight: 5 },
-            { val: vendor.coverImageUrl, weight: 5 },
+            { val: businessCount > 0, weight: 20 },
         ];
 
         fields.forEach(f => {
