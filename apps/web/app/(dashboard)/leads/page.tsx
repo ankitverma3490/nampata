@@ -310,7 +310,7 @@ function LeadDetailModal({ lead, onClose, onStatusChange }: {
                                     {noteError ? (
                                         <p className="text-sm font-bold text-red-500">{noteError}</p>
                                     ) : (
-                                        <p className="text-xs font-medium text-slate-400">Notes are only visible inside your business dashboard.</p>
+                                        <p className="text-xs font-medium text-slate-400">Notes are for your internal use.</p>
                                     )}
                                 </div>
                                 <button

@@ -431,7 +431,7 @@ function SuccessContent() {
 
                             <div>
                                 <h3 className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4">Onboarding</h3>
-                                <h2 className="text-2xl font-black tracking-tight mb-4 leading-tight">Ready to boost your presence?</h2>
+                                <h2 className="text-2xl font-black tracking-tight mb-4 leading-tight">Ready to get started?</h2>
                                 <p className="text-slate-400 dark:text-slate-500 font-bold text-sm leading-relaxed mb-8">
                                     Start using your premium analytics and AI content tools to attract more customers.
                                 </p>

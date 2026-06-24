@@ -40,7 +40,6 @@ export default function BroadcastRequestForm({ onSuccess }: BroadcastRequestForm
         latitude: null as number | null,
         longitude: null as number | null,
     });
-    const [vendorCategories, setVendorCategories] = useState<string[]>([]);
     const { user } = useAuth();
 
     useEffect(() => {
@@ -52,20 +51,6 @@ export default function BroadcastRequestForm({ onSuccess }: BroadcastRequestForm
                 ]);
                 setCategories(catsData || []);
                 setCities(sortAndDedupeCities(citiesData || []));
-                
-                if (user?.role === 'vendor' || user?.role === 'admin' || user?.role === 'superadmin') {
-                    const vendorListings = await api.listings.getMyListings({ limit: 100 });
-                    if (vendorListings?.data) {
-                        const vendorCatIds = vendorListings.data.flatMap((b: any) => {
-                            const ids = [b.categoryId];
-                            if (b.subcategories) {
-                                ids.push(...b.subcategories.map((sc: any) => sc.id));
-                            }
-                            return ids;
-                        });
-                        setVendorCategories([...new Set(vendorCatIds)]);
-                    }
-                }
             } catch (err) {
                 console.error('Failed to load form data', err);
             }
@@ -124,10 +109,6 @@ export default function BroadcastRequestForm({ onSuccess }: BroadcastRequestForm
     const nextStep = () => {
         if (step === 0 && !formData.categoryId) {
             setError('Please select a category');
-            return;
-        }
-        if (step === 0 && vendorCategories.includes(formData.categoryId)) {
-            setError('You cannot broadcast a requirement in a category you are already listed in.');
             return;
         }
         if (step === 1 && !formData.title) {

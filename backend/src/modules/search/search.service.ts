@@ -319,6 +319,12 @@ export class SearchService implements OnModuleInit {
             case SearchSortBy.RATING:
                 qb.orderBy('b.averageRating', 'DESC');
                 break;
+            case SearchSortBy.MOST_REVIEWED:
+                qb.orderBy('b.totalReviews', 'DESC');
+                break;
+            case SearchSortBy.MOST_CONTACTED:
+                qb.orderBy('b.totalLeads', 'DESC');
+                break;
             case SearchSortBy.NEWEST:
                 qb.orderBy('b.createdAt', 'DESC');
                 break;

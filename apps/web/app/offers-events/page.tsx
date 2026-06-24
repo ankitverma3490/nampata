@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { 
     Search, 
@@ -119,16 +119,7 @@ const OffersEventsContent = () => {
         }
     };
 
-    useEffect(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        fetchOffers();
-    }, [page, type, city, lat, lng]);
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        setPage(1);
-        fetchOffers();
-        
+    const syncUrl = useCallback(() => {
         const params = new URLSearchParams();
         if (query) params.set('query', query);
         if (city) params.set('city', city);
@@ -136,8 +127,18 @@ const OffersEventsContent = () => {
         if (lat) params.set('latitude', lat);
         if (lng) params.set('longitude', lng);
         if (radius) params.set('radius', radius);
-        
-        router.push(`/offers-events?${params.toString()}`, { scroll: false });
+        router.replace(`/offers-events?${params.toString()}`, { scroll: false });
+    }, [query, city, type, lat, lng, radius, router]);
+
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        fetchOffers();
+        syncUrl();
+    }, [page, type, city, lat, lng, query, radius]);
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        setPage(1);
     };
 
     const handleGetLocation = async () => {

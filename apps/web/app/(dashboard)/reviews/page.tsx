@@ -285,7 +285,6 @@ export default function BusinessReviews() {
                         <p>Share a real customer requirement with a clear scope, category, city, and expected timeline.</p>
                         <p>Do not request fake reviews, paid positive reviews, competitor reviews, or duplicate/spam broadcasts.</p>
                         <p>Include enough details for businesses to decide whether they can help before responding.</p>
-                        <p>A business cannot broadcast in a category where it already has an active listing.</p>
                     </div>
                     <p className="mt-3 text-[10px] font-bold text-violet-700">
                         Post review-request broadcasts from{' '}

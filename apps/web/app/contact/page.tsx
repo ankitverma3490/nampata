@@ -43,8 +43,8 @@ const contactInfo = [
 
 const faqs = [
     {
-        q: "How do I list my business on naampata?",
-        a: "Simply click 'Add Business' in the top navigation, create a business account, and fill in your business details. The basic listing is completely free.",
+        q: "How do I sign up my business on naampata?",
+        a: "Simply click 'Sign Up' in the top navigation, create a business account, and fill in your business details. The basic listing is completely free.",
     },
     {
         q: "How long does it take to review a listing?",

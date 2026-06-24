@@ -1,4 +1,4 @@
-﻿import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 /**
  * E2E Test: Location and Map Specification
@@ -11,7 +11,7 @@
  * - Map loads only on user click ("View on Map"), not auto-load
  */
 
-const BASE_URL = 'https://endearing-taffy-91a2c6.netlify.app';
+const BASE_URL = process.env.BASE_URL || 'https://naampata.com';
 
 test.describe('Location and Map Specification', () => {
 

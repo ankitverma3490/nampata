@@ -401,7 +401,15 @@ export class LeadsService {
         userId: string,
     ): Promise<BusinessCustomerNote> {
         const lead = await this.findOne(leadId, userId);
-        
+
+        const user = await this.entityManager.findOne(User, {
+            where: { id: userId },
+            select: ['id', 'role'],
+        });
+        if (user?.role === UserRole.SUPERADMIN || user?.role === UserRole.ADMIN) {
+            throw new ForbiddenException('Admins cannot access business notes');
+        }
+
         const note = this.notesRepository.create({
             leadId: lead.id,
             businessId: lead.businessId,
@@ -417,7 +425,15 @@ export class LeadsService {
      */
     async getNotes(leadId: string, userId: string): Promise<BusinessCustomerNote[]> {
         await this.findOne(leadId, userId); // verify permission
-        
+
+        const user = await this.entityManager.findOne(User, {
+            where: { id: userId },
+            select: ['id', 'role'],
+        });
+        if (user?.role === UserRole.SUPERADMIN || user?.role === UserRole.ADMIN) {
+            throw new ForbiddenException('Admins cannot access business notes');
+        }
+
         return this.notesRepository.find({
             where: { leadId },
             order: { createdAt: 'DESC' },

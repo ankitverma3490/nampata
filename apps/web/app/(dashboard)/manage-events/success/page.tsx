@@ -6,16 +6,11 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     CheckCircle2, 
-    ArrowRight, 
     Calendar, 
     Tag, 
-    ChevronRight,
     Loader2,
     AlertCircle,
-    PartyPopper,
-    Zap,
     Rocket,
-    ShieldCheck
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { api } from '@/lib/api';
@@ -168,7 +163,7 @@ function OfferSuccessContent() {
                     </div>
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-4">Verification Pending</h1>
                     <p className="text-slate-500 max-w-sm font-bold mb-8">
-                        We're still processing your boost. If your status doesn't update in 5 minutes, please contact support.
+                        We're still processing your payment. If your status doesn't update in 5 minutes, please contact support.
                     </p>
                     <Link href="/dashboard" className="px-10 py-4 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-2xl font-black tracking-tight hover:scale-[1.02] transition-all">
                         Back to Dashboard
@@ -185,24 +180,24 @@ function OfferSuccessContent() {
                 >
                     <div className="text-center mb-16">
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/10 text-orange-500 rounded-full text-[10px] font-black uppercase tracking-widest mb-6">
-                            <Zap className="w-3 h-3" /> Promotion Confirmed
+                            <CheckCircle2 className="w-3 h-3" /> Payment Confirmed
                         </div>
                         <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">
-                            Taking Your Business <span className="text-primary">Higher</span>
+                            Your Listing is <span className="text-primary">Live</span>
                         </h1>
                         <p className="text-xl text-slate-400 font-bold tracking-tight max-w-2xl mx-auto">
-                            Your feature boost is now active and will be visible to all users searching for services in your area.
+                            Your listing is now active and visible to all users searching for services in your area.
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-                        {/* Boost Details */}
+                        {/* Payment Details */}
                         <div className="bg-white dark:bg-slate-900 border-2 border-slate-50 dark:border-slate-800 rounded-[35px] p-10 text-left relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-10 transition-opacity">
-                                <Rocket className="w-32 h-32 -rotate-45" />
+                                <CheckCircle2 className="w-32 h-32" />
                             </div>
                             <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-10 flex items-center gap-2">
-                                <Tag className="w-4 h-4" /> Boost Information
+                                <Tag className="w-4 h-4" /> Listing Details
                             </h3>
                             <div className="space-y-6 relative z-10">
                                 <div className="flex justify-between items-baseline border-b border-slate-50 dark:border-slate-800 pb-4">
@@ -250,7 +245,7 @@ function OfferSuccessContent() {
                     </div>
 
                     <p className="text-center text-slate-400 font-bold text-sm">
-                        Success! Your boost takes immediate effect. <Link href="/help" className="text-primary hover:underline">Learn more about ranking</Link>.
+                        Your listing is now live. <Link href="/help" className="text-primary hover:underline">Learn more about visibility</Link>.
                     </p>
                 </motion.div>
             )}

@@ -6,7 +6,7 @@ import {
     OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan, LessThan, In } from 'typeorm';
+import { Repository, MoreThan, LessThan } from 'typeorm';
 import { PromotionPricingRule, PromotionPlacement } from '../../entities/promotion-pricing-rule.entity';
 import { PromotionBooking, BookingStatus } from '../../entities/promotion-booking.entity';
 import { OfferEvent, OfferType } from '../../entities/offer-event.entity';
@@ -109,12 +109,8 @@ export class PromotionsService implements OnModuleInit {
 
     private async seedDefaultRules() {
         const defaults = [
-            { placement: PromotionPlacement.HOMEPAGE, pricePerHour: 100, pricePerDay: 2400 },
-            { placement: PromotionPlacement.CATEGORY, pricePerHour: 70, pricePerDay: 1680 },
-            { placement: PromotionPlacement.LISTING, pricePerHour: 50, pricePerDay: 1200 },
             { placement: PromotionPlacement.OFFER, pricePerHour: 40, pricePerDay: 960 },
             { placement: PromotionPlacement.EVENT, pricePerHour: 60, pricePerDay: 1440 },
-            { placement: PromotionPlacement.PAGE, pricePerHour: 80, pricePerDay: 1920 },
         ];
 
         for (const ruleData of defaults) {
@@ -138,107 +134,23 @@ export class PromotionsService implements OnModuleInit {
         this.assertPromotionEnabled();
         let totalPrice = 0;
         const breakup = [];
-        // const MIN_STRIPE_AMOUNT_PKR = 150;
-
-        // 1. Check if a fixed-price booster plan is selected
-        let activePricingId = dto.pricingId;
-        
-        // If pricingId is missing but dealId/eventId/offerEventId is present, try to fetch it from the entity
-        if (!activePricingId) {
-            if (dto.dealId) {
-                const deal = await this.dealRepository.findOne({ where: { id: dto.dealId } });
-                if (deal?.pricingId) {
-                    activePricingId = deal.pricingId;
-                }
-            } else if (dto.eventId) {
-                const event = await this.eventRepository.findOne({ where: { id: dto.eventId } });
-                if (event?.pricingId) {
-                    activePricingId = event.pricingId;
-                }
-            } else if (dto.offerEventId) {
-                const offer = await this.offerRepository.findOne({ where: { id: dto.offerEventId } });
-                if (offer?.pricingId) {
-                    activePricingId = offer.pricingId;
-                }
-            }
-        }
-
-        if (activePricingId) {
-            const plan = await this.pricingPlanRepo.findOne({ where: { id: activePricingId, isActive: true } });
-            if (plan) {
-                const planPrice = Number(plan.price);
-                totalPrice += planPrice;
-                breakup.push({
-                    placement: plan.type,
-                    label: plan.name,
-                    subtotal: planPrice,
-                    price: planPrice,
-                    isBaseFee: true,
-                    isFixedPlan: true
-                });
-            }
-        }
-
-        // 2. Per-day visibility (deals/events) or legacy placement boosts
         let durationHours = 0;
+
         if (dto.placements?.length > 0 && dto.startTime && dto.endTime) {
-            const isVisibilityOnly = dto.placements.every(
-                (p) => p === PromotionPlacement.OFFER || p === PromotionPlacement.EVENT,
-            );
-
-            if (isVisibilityOnly) {
-                const kind: 'deal' | 'event' = dto.placements.includes(PromotionPlacement.EVENT) &&
-                    !dto.placements.includes(PromotionPlacement.OFFER)
-                    ? 'event'
-                    : 'deal';
-                const vis = await this.calculateVisibilityPrice(dto.startTime, dto.endTime, kind);
-                durationHours = vis.days * 24;
-                totalPrice += vis.totalPrice;
-                breakup.push({
-                    placement: vis.placement,
-                    label: 'Per-day visibility',
-                    subtotal: vis.totalPrice,
-                    price: vis.totalPrice,
-                    dayRate: vis.dayRate,
-                    days: vis.days,
-                    isBaseFee: false,
-                });
-            } else {
-                const start = new Date(dto.startTime);
-                const end = new Date(dto.endTime);
-                if (start >= end) throw new BadRequestException('Start time must be before end time for boosts');
-
-                const diffMs = end.getTime() - start.getTime();
-                durationHours = Math.ceil(diffMs / (1000 * 60 * 60));
-                const durationDays = Math.floor(durationHours / 24);
-                const remainingHours = durationHours % 24;
-
-                const rules = await this.pricingRuleRepo.find({ where: { placement: In(dto.placements) } });
-                for (const rule of rules) {
-                    const hourRate = Number(rule.pricePerHour);
-                    const dayRate = Number(rule.pricePerDay);
-                    const placementTotal = (durationDays * dayRate) + (remainingHours * hourRate);
-
-                    totalPrice += placementTotal;
-                    breakup.push({
-                        placement: rule.placement,
-                        subtotal: placementTotal,
-                        price: placementTotal,
-                        rate: hourRate,
-                        days: durationDays,
-                        hours: remainingHours,
-                        isBaseFee: false,
-                    });
-                }
-            }
+            const kind: 'deal' | 'event' = 'deal';
+            const vis = await this.calculateVisibilityPrice(dto.startTime, dto.endTime, kind);
+            durationHours = vis.days * 24;
+            totalPrice += vis.totalPrice;
+            breakup.push({
+                placement: vis.placement,
+                label: 'Per-day visibility',
+                subtotal: vis.totalPrice,
+                price: vis.totalPrice,
+                dayRate: vis.dayRate,
+                days: vis.days,
+                isBaseFee: false,
+            });
         }
-
-        // let isMinimumApplied = false;
-        // If there's a cost but it's below the Stripe minimum of roughly ₨ 140, we round up to ₨ 150
-        // if (totalPrice > 0 && totalPrice < MIN_STRIPE_AMOUNT_PKR) {
-        //     totalPrice = MIN_STRIPE_AMOUNT_PKR;
-        //     isMinimumApplied = true;
-        // }
 
         return { totalPrice, durationHours, breakup, isMinimumApplied: false };
     }
@@ -404,22 +316,10 @@ export class PromotionsService implements OnModuleInit {
                 
                 const result = await this.activateBooking(bookingId, paymentIntentId);
                 
-                let planName = 'Offer Highlight';
-                if (result.booking?.placements) {
-                    const plc = result.booking.placements;
-                    if (plc.includes('homepage') && plc.includes('category')) {
-                        planName = 'Omni-Channel Boost';
-                    } else if (plc.includes('homepage')) {
-                        planName = 'Homepage Boost';
-                    } else if (plc.includes('category')) {
-                        planName = 'Category Boost';
-                    }
-                }
-                
                 return {
                     success: true,
                     endDate: result.booking?.endTime,
-                    planName,
+                    planName: 'Visibility Payment',
                     ...result
                 };
             }
@@ -466,16 +366,15 @@ export class PromotionsService implements OnModuleInit {
                     invoiceNumber: `INV-BST-${Date.now()}`,
                     metadata: {
                         bookingId: booking.id,
-                        type: 'promotion_boost',
+                        type: 'visibility_payment',
                         offerEventId: booking.offerEventId,
                         dealId: booking.dealId,
                         eventId: booking.eventId,
                         offerType: booking.type,
-                        placements: booking.placements
                     }
                 });
                 await this.transactionRepository.save(transaction);
-                this.logger.log(`Invoice recorded for boost booking ${booking.id}`);
+                this.logger.log(`Invoice recorded for visibility booking ${booking.id}`);
             }
         } catch (error) {
             this.logger.error(`Failed to record transaction for booking ${booking.id}: ${error.message}`);
@@ -493,19 +392,7 @@ export class PromotionsService implements OnModuleInit {
         }
 
         if (item) {
-            // All boosts make the item active and featured
             item.isActive = true;
-            item.isFeatured = true;
-            
-            // Sync placements
-            const currentPlacements = item.placements || [];
-            const newPlacements = [...new Set([...currentPlacements, ...booking.placements])];
-            item.placements = newPlacements;
-            
-            // Set featuredUntil to the end of the booking duration
-            if (!item.featuredUntil || item.featuredUntil < booking.endTime) {
-                item.featuredUntil = booking.endTime;
-            }
             
             if (booking.dealId) {
                 await this.dealRepository.save(item);
@@ -514,7 +401,7 @@ export class PromotionsService implements OnModuleInit {
             } else {
                 await this.offerRepository.save(item);
             }
-            this.logger.log(`🚀 Boost activated for ${booking.dealId ? 'Deal' : booking.eventId ? 'Event' : 'Offer'}: ${item.title} until ${item.featuredUntil} with placements: ${newPlacements.join(', ')}`);
+            this.logger.log(`Activated visibility for ${booking.dealId ? 'Deal' : booking.eventId ? 'Event' : 'Offer'}: ${item.title}`);
         }
 
         return { success: true, booking, item };
@@ -553,92 +440,9 @@ export class PromotionsService implements OnModuleInit {
 
         if (expiredBookings.length === 0) return 0;
 
-        this.logger.log(`Cleaning up ${expiredBookings.length} expired promotions...`);
+        this.logger.log(`Cleaning up ${expiredBookings.length} expired visibility bookings...`);
 
-        // 2. Identify unique offers/deals/events affected
-        const offerIds = [...new Set(expiredBookings.filter(b => b.offerEventId).map(b => b.offerEventId))];
-        const dealIds = [...new Set(expiredBookings.filter(b => b.dealId).map(b => b.dealId))];
-        const eventIds = [...new Set(expiredBookings.filter(b => b.eventId).map(b => b.eventId))];
-
-        for (const offerId of offerIds) {
-            const offer = await this.offerRepository.findOne({ where: { id: offerId } });
-            if (!offer) continue;
-
-            // Find remaining active bookings for this offer
-            const activeBookings = await this.bookingRepo.find({
-                where: {
-                    offerEventId: offerId,
-                    status: BookingStatus.ACTIVE,
-                    endTime: MoreThan(now),
-                }
-            });
-
-            // Recalculate placements
-            const remainingPlacements = [];
-            activeBookings.forEach(b => {
-                remainingPlacements.push(...b.placements);
-            });
-            offer.placements = [...new Set(remainingPlacements)];
-
-            // If no active bookings left, we might want to toggle featured? 
-            if (offer.placements.length === 0 && offer.featuredUntil && now > offer.featuredUntil) {
-                offer.isFeatured = false;
-            }
-
-            await this.offerRepository.save(offer);
-        }
-
-        for (const dealId of dealIds) {
-            const deal = await this.dealRepository.findOne({ where: { id: dealId } });
-            if (!deal) continue;
-
-            const activeBookings = await this.bookingRepo.find({
-                where: {
-                    dealId,
-                    status: BookingStatus.ACTIVE,
-                    endTime: MoreThan(now),
-                }
-            });
-
-            const remainingPlacements = [];
-            activeBookings.forEach(b => {
-                remainingPlacements.push(...b.placements);
-            });
-            deal.placements = [...new Set(remainingPlacements)];
-
-            if (deal.placements.length === 0 && deal.featuredUntil && now > deal.featuredUntil) {
-                deal.isFeatured = false;
-            }
-
-            await this.dealRepository.save(deal);
-        }
-
-        for (const eventId of eventIds) {
-            const event = await this.eventRepository.findOne({ where: { id: eventId } });
-            if (!event) continue;
-
-            const activeBookings = await this.bookingRepo.find({
-                where: {
-                    eventId,
-                    status: BookingStatus.ACTIVE,
-                    endTime: MoreThan(now),
-                }
-            });
-
-            const remainingPlacements = [];
-            activeBookings.forEach(b => {
-                remainingPlacements.push(...b.placements);
-            });
-            event.placements = [...new Set(remainingPlacements)];
-
-            if (event.placements.length === 0 && event.featuredUntil && now > event.featuredUntil) {
-                event.isFeatured = false;
-            }
-
-            await this.eventRepository.save(event);
-        }
-
-        // 3. Mark bookings as expired
+        // Mark bookings as expired
         const result = await this.bookingRepo
             .createQueryBuilder()
             .update(PromotionBooking)

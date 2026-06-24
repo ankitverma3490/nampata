@@ -4,15 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { 
     FileText, 
-    Sparkles, 
     ArrowLeft, 
     Download, 
-    Calendar, 
     CheckCircle2, 
     Clock, 
-    ExternalLink,
     AlertCircle,
-    TrendingUp,
     ShieldCheck
 } from 'lucide-react';
 import Link from 'next/link';
@@ -27,7 +23,6 @@ const safeFormat = (date: any, formatStr: string, fallback = '—') => {
 
 export default function BusinessInvoicesPage() {
     const [invoices, setInvoices] = useState<any[]>([]);
-    const [promotions, setPromotions] = useState<any>({ plans: [], boosts: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -35,12 +30,10 @@ export default function BusinessInvoicesPage() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const [invoicesData, promosData] = await Promise.all([
+                const [invoicesData] = await Promise.all([
                     api.subscriptions.getMyInvoices({ silent: true }),
-                    api.subscriptions.getActivePromotions({ silent: true })
                 ]);
                 setInvoices(invoicesData);
-                setPromotions(promosData);
             } catch (err: any) {
                 console.error('Failed to fetch billing data:', err);
                 setError('Unable to load your billing history. Please try again later.');
@@ -69,8 +62,6 @@ export default function BusinessInvoicesPage() {
         );
     }
 
-    const hasActivePromos = promotions.plans?.length > 0 || promotions.boosts?.length > 0;
-
     return (
         <div className="min-h-screen bg-gray-50/50 pb-20">
             {/* Header */}
@@ -84,8 +75,8 @@ export default function BusinessInvoicesPage() {
                             <ArrowLeft className="w-5 h-5" />
                         </Link>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-900">Billing & Promotions</h1>
-                            <p className="text-sm text-gray-500">Manage your active boosts and view purchase history</p>
+                            <h1 className="text-xl font-bold text-gray-900">Billing & Payments</h1>
+                            <p className="text-sm text-gray-500">View your payment history</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-50 text-orange-700 rounded-full border border-orange-100">
@@ -102,105 +93,6 @@ export default function BusinessInvoicesPage() {
                         <p className="text-sm">{error}</p>
                     </div>
                 )}
-
-                {/* Active Promotions Section */}
-                <section>
-                    <div className="flex items-center gap-2 mb-6">
-                        <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-                            <TrendingUp className="w-5 h-5" />
-                        </div>
-                        <h2 className="text-lg font-bold text-gray-900">Active Boosts</h2>
-                    </div>
-
-                    {!hasActivePromos ? (
-                        <div className="bg-white border border-dashed border-gray-300 rounded-3xl p-12 text-center shadow-sm">
-                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Sparkles className="w-8 h-8 text-gray-300" />
-                            </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-1">No active boosts</h3>
-                            <p className="text-gray-500 mb-6 max-w-sm mx-auto text-sm">
-                                Boost your visibility by featuring your offers or events on the platform.
-                            </p>
-                            <Link 
-                                href="/offer-plans"
-                                className="inline-flex items-center gap-2 px-6 py-2.5 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-orange-200"
-                            >
-                                <Sparkles className="w-4 h-4" />
-                                Upgrade Now
-                            </Link>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {/* Listing Feature Plans */}
-                            {promotions.plans?.map((plan: any) => (
-                                <div key={plan.id} className="bg-white border border-gray-100 rounded-3xl p-6 relative overflow-hidden group hover:border-blue-400 transition-all shadow-sm hover:shadow-xl hover:shadow-blue-50/50">
-                                    <div className="absolute top-0 right-0 p-4">
-                                        <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-bold uppercase tracking-tight border border-blue-100">
-                                            {plan.type?.replace('_', ' ')}
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100">
-                                            <TrendingUp className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-bold text-gray-900 line-clamp-1">{plan.name}</h3>
-                                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{plan.target}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        <div className="flex items-center justify-between text-sm py-2 border-b border-gray-50">
-                                            <span className="text-gray-500 flex items-center gap-2"><Clock className="w-4 h-4" /> Expires in</span>
-                                            <span className="font-bold text-blue-600">
-                                                {plan.endDate ? Math.max(0, Math.ceil((new Date(plan.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : '—'} days
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-gray-500 flex items-center gap-2"><Calendar className="w-4 h-4" /> Valid until</span>
-                                            <span className="text-gray-900 font-medium">{safeFormat(plan.endDate, 'MMM d, yyyy')}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-
-                            {/* Offer Boosts */}
-                            {promotions.boosts?.map((boost: any) => (
-                                <div key={boost.id} className="bg-white border border-gray-100 rounded-3xl p-6 relative overflow-hidden group hover:border-orange-300 transition-all shadow-sm hover:shadow-xl hover:shadow-orange-50/50">
-                                    <div className="absolute top-0 right-0 p-4">
-                                        <div className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-[10px] font-bold uppercase tracking-tight border border-orange-100">
-                                            FEATURED {boost.type}
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="w-10 h-10 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 border border-orange-100">
-                                            <Sparkles className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-bold text-gray-900 line-clamp-1">{boost.target}</h3>
-                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{boost.business}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        <div className="flex items-center justify-between text-sm py-2 border-b border-gray-50">
-                                            <span className="text-gray-500 flex items-center gap-2"><Clock className="w-4 h-4" /> Expires in</span>
-                                            <span className="font-bold text-orange-600">
-                                                {boost.endDate ? Math.max(0, Math.ceil((new Date(boost.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : '—'} days
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-gray-500 flex items-center gap-2"><Calendar className="w-4 h-4" /> Active until</span>
-                                            <span className="text-gray-900 font-medium">{safeFormat(boost.endDate, 'MMM d, yyyy')}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </section>
 
                 {/* Invoices Table */}
                 <section>

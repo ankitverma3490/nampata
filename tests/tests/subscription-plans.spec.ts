@@ -1,4 +1,4 @@
-﻿import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 /**
  * E2E Test: Subscription Plans Specification
@@ -21,7 +21,7 @@
  * - After payment, features are unlocked
  */
 
-const BASE_URL = 'https://endearing-taffy-91a2c6.netlify.app';
+const BASE_URL = process.env.BASE_URL || 'https://naampata.com';
 
 // Helper to log into a free-tier vendor account
 async function loginAsVendor(page: any, email = 'testvendor@naampata.com', password = 'Test1234!') {
@@ -49,13 +49,17 @@ test.describe('Subscription Plans â€” Free vs Paid Feature Gates', () => {
         expect(hasPaid).toBe(true);
     });
 
-    test('TC-SUB-02: Subscription plan prices are admin-configured â€” not hardcoded', async ({ page }) => {
+    test('TC-SUB-02: Subscription plan prices are admin-configured — not hardcoded', async ({ page }) => {
         await loginAsVendor(page);
 
         // Check that pricing comes from API (monitor network)
         let pricingApiCalled = false;
         page.on('response', async (res) => {
-            if (res.url().includes('/subscriptions/pricing') || res.url().includes('/pricing/plans')) {
+            if (
+                res.url().includes('/subscriptions/pricing') ||
+                res.url().includes('/pricing/plans') ||
+                res.url().includes('/subscriptions/plans')
+            ) {
                 pricingApiCalled = true;
             }
         });
@@ -90,6 +94,17 @@ test.describe('Subscription Plans â€” Free vs Paid Feature Gates', () => {
             }
         });
 
+        // Accept the confirmation dialog automatically
+        page.on('dialog', async (dialog) => {
+            await dialog.accept();
+        });
+
+        // Check the terms & conditions checkbox first
+        const agreeCheckbox = page.locator('input[type="checkbox"]').first();
+        if (await agreeCheckbox.isVisible()) {
+            await agreeCheckbox.check();
+        }
+
         // Click the Activate/Upgrade button for the paid plan
         const activateBtn = page.locator(
             'button:has-text("Activate"), button:has-text("Upgrade"), button:has-text("Get Started"), button:has-text("Subscribe")'
@@ -109,11 +124,11 @@ test.describe('Subscription Plans â€” Free vs Paid Feature Gates', () => {
             
             expect(checkoutApiCalled || redirectedToStripe || checkoutUrl.includes('stripe')).toBe(true);
         } else {
-            console.warn('âš ï¸ Activate button not found on subscription page');
+            console.warn('⚠️ Activate button not found on subscription page');
         }
     });
 
-    test('TC-SUB-04: Free plan â€” gallery upload locks after 3 photos', async ({ page }) => {
+    test('TC-SUB-04: Free plan — gallery upload locks after 3 photos', async ({ page }) => {
         await loginAsVendor(page);
         await page.goto(`${BASE_URL}/add-listing`);
         await page.waitForSelector('body', { timeout: 8000 });

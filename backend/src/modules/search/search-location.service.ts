@@ -1,7 +1,7 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Brackets } from 'typeorm';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { Listing, BusinessStatus } from '../../entities/business.entity';
@@ -58,6 +58,7 @@ export class SearchLocationService {
             : { match_all: {} };
 
         let esIds: string[] = [];
+        let esFailed = false;
         try {
             const esResult = await this.elasticsearchService.search({
                 index: this.INDEX_NAME,
@@ -75,36 +76,113 @@ export class SearchLocationService {
 
             esIds = esResult.hits.hits.map(hit => hit._id);
         } catch (err) {
-            this.logger.error('Elasticsearch query failed, falling back to empty ID set', err);
+            esFailed = true;
+            this.logger.error('Elasticsearch query failed, falling back to database query in hybrid search', err);
         }
 
-        if (esIds.length === 0) {
-            return []; // No matches from ES
-        }
+        let businesses: Listing[] = [];
 
-        // 3. Query PostGIS with ST_DWithin and array filter
-        const qb = this.businessRepository.createQueryBuilder('b')
-            .leftJoinAndSelect('b.category', 'category')
-            .where('b.id IN (:...ids)', { ids: esIds });
+        // 3. Query Database (with PostGIS/earthdistance for radius lookup)
+        if (esFailed) {
+            this.logger.log('[Hybrid Search] Executing pure database fallback search.');
+            const qb = this.businessRepository.createQueryBuilder('b')
+                .leftJoinAndSelect('b.category', 'category')
+                .where('b.status = :status', { status: BusinessStatus.APPROVED });
 
-        if (latitude && longitude) {
-            const formula = `earth_distance(ll_to_earth(b.latitude, b.longitude), ll_to_earth(:lat, :lng))`;
-            qb.addSelect(`${formula} / 1000`, 'distance');
-            qb.setParameters({ lat: latitude, lng: longitude });
-
-            if (radius) {
-                const radiusInMeters = radius * 1000;
-                qb.andWhere(`${formula} <= :radiusInMeters`, { radiusInMeters });
+            if (city) {
+                qb.andWhere('LOWER(b.city) = :city', { city: city.toLowerCase() });
             }
-            qb.orderBy('distance', 'ASC');
+            if (categorySlug) {
+                qb.andWhere('category.slug = :categorySlug', { categorySlug });
+            }
+            if (minRating) {
+                qb.andWhere('b.averageRating >= :minRating', { minRating });
+            }
+            if (verifiedOnly) {
+                qb.andWhere('b.isVerified = :verifiedOnly', { verifiedOnly: true });
+            }
+
+            if (query) {
+                const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+                for (const term of searchTerms) {
+                    qb.andWhere(
+                        new Brackets((innerQb) => {
+                            innerQb.where('LOWER(b.title) LIKE :term', { term: `%${term}%` })
+                                .orWhere('LOWER(b.description) LIKE :term', { term: `%${term}%` })
+                                .orWhere('LOWER(b.city) LIKE :term', { term: `%${term}%` })
+                                .orWhere('LOWER(category.name) LIKE :term', { term: `%${term}%` })
+                                .orWhere('b.meta_keywords LIKE :term', { term: `%${term}%` })
+                                .orWhere('"b"."search_keywords"::text ILIKE :term', { term: `%${term}%` });
+                        }),
+                        { term: `%${term}%` }
+                    );
+                }
+            }
+
+            if (latitude && longitude) {
+                const formula = `earth_distance(ll_to_earth(b.latitude, b.longitude), ll_to_earth(:lat, :lng))`;
+                qb.addSelect(`${formula} / 1000`, 'distance');
+                qb.setParameters({ lat: latitude, lng: longitude });
+
+                if (radius) {
+                    const radiusInMeters = radius * 1000;
+                    qb.andWhere(`${formula} <= :radiusInMeters`, { radiusInMeters });
+                }
+                qb.orderBy('distance', 'ASC');
+            } else {
+                qb.orderBy('b.createdAt', 'DESC');
+            }
+
+            qb.take(dto.limit || 50).skip(((dto.page || 1) - 1) * (dto.limit || 50));
+            const { entities, raw } = await qb.getRawAndEntities();
+            businesses = entities.map((entity, index) => {
+                const rawItem = raw[index];
+                if (rawItem) {
+                    const distanceKey = Object.keys(rawItem).find(k => k.toLowerCase().includes('distance'));
+                    if (distanceKey && rawItem[distanceKey] !== undefined && rawItem[distanceKey] !== null) {
+                        (entity as any).distance = parseFloat(rawItem[distanceKey]);
+                    }
+                }
+                return entity;
+            });
         } else {
-            // Sort by creation date if no distance is provided
-            qb.orderBy('b.createdAt', 'DESC');
+            if (esIds.length === 0) {
+                return []; // No matches from ES
+            }
+
+            const qb = this.businessRepository.createQueryBuilder('b')
+                .leftJoinAndSelect('b.category', 'category')
+                .where('b.id IN (:...ids)', { ids: esIds });
+
+            if (latitude && longitude) {
+                const formula = `earth_distance(ll_to_earth(b.latitude, b.longitude), ll_to_earth(:lat, :lng))`;
+                qb.addSelect(`${formula} / 1000`, 'distance');
+                qb.setParameters({ lat: latitude, lng: longitude });
+
+                if (radius) {
+                    const radiusInMeters = radius * 1000;
+                    qb.andWhere(`${formula} <= :radiusInMeters`, { radiusInMeters });
+                }
+                qb.orderBy('distance', 'ASC');
+            } else {
+                // Keep the ordering from ES by sorting by the order of esIds if possible,
+                // or fall back to standard sorting.
+                qb.orderBy('b.createdAt', 'DESC');
+            }
+
+            qb.take(dto.limit || 50).skip(((dto.page || 1) - 1) * (dto.limit || 50));
+            const { entities, raw } = await qb.getRawAndEntities();
+            businesses = entities.map((entity, index) => {
+                const rawItem = raw[index];
+                if (rawItem) {
+                    const distanceKey = Object.keys(rawItem).find(k => k.toLowerCase().includes('distance'));
+                    if (distanceKey && rawItem[distanceKey] !== undefined && rawItem[distanceKey] !== null) {
+                        (entity as any).distance = parseFloat(rawItem[distanceKey]);
+                    }
+                }
+                return entity;
+            });
         }
-
-        qb.take(dto.limit || 50).skip(((dto.page || 1) - 1) * (dto.limit || 50));
-
-        const businesses = await qb.getMany();
 
         const formattedResults = businesses.map(b => ({
             id: b.id,
@@ -124,7 +202,7 @@ export class SearchLocationService {
             address: b.address,
             followersCount: b.followersCount,
             createdAt: b.createdAt,
-            distance: (b as any).distance || null,
+            distance: (b as any).distance ?? null,
         }));
 
         // 4. Cache the results for 15 minutes (900000 ms)

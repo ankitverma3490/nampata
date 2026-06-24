@@ -1,4 +1,4 @@
-﻿import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 /**
  * E2E Test: Listing Questions (Business Sign-Up Flow)
@@ -15,7 +15,7 @@
  * - Save & Continue and Back buttons are present
  */
 
-const BASE_URL = 'https://endearing-taffy-91a2c6.netlify.app';
+const BASE_URL = process.env.BASE_URL || 'https://naampata.com';
 
 test.describe('Listing Questions â€” Business Sign-Up Flow', () => {
 

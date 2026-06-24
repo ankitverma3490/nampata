@@ -64,13 +64,13 @@ export class ChatController {
     }
 
     @Get('conversations/:id/notes')
-    @ApiOperation({ summary: 'Get private business/admin notes for a customer conversation' })
+    @ApiOperation({ summary: 'Get private business notes for a customer conversation' })
     async getNotes(@Request() req: any, @Param('id') id: string) {
         return this.chatService.getNotes(id, req.user);
     }
 
     @Post('conversations/:id/notes')
-    @ApiOperation({ summary: 'Create a private business/admin note for a customer conversation' })
+    @ApiOperation({ summary: 'Create a private business note for a customer conversation' })
     async createNote(
         @Request() req: any,
         @Param('id') id: string,

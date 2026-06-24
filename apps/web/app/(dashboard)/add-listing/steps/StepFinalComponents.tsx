@@ -178,32 +178,35 @@ export const Step10Hours = ({ formData, setFormData }: StepProps) => {
     );
 };
 
-const INDUSTRY_SUB_TYPES = [
-    'Halal Certified', 'Organic', 'Vegan', 'Eco-Friendly', 'ISO Certified', 'Handmade / Artisan'
-];
+import { INDUSTRY_SUB_TYPES_SECTIONS } from '../../../../lib/constants/listing-options';
 
 export const Step15Industry = ({ formData, setFormData }: StepProps) => {
     const safeIndustrySubType = Array.isArray(formData.industrySubType) ? formData.industrySubType : [];
 
     return (
-        <div className="space-y-4">
-            <label className={labelClass}>Industry Specific Tags</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {INDUSTRY_SUB_TYPES.map(type => {
-                    const selected = safeIndustrySubType.includes(type);
-                    return (
-                        <label key={type} className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${selected ? 'border-orange-400 bg-orange-50' : 'border-slate-200 bg-white hover:border-orange-200'}`}>
-                            <input 
-                                type="checkbox" 
-                                className="w-5 h-5 text-orange-500 rounded border-slate-300 focus:ring-orange-500"
-                                checked={selected}
-                                onChange={() => setFormData(p => ({ ...p, industrySubType: toggleArrayItem(Array.isArray(p.industrySubType) ? p.industrySubType : [], type) }))}
-                            />
-                            <span className="ml-3 text-sm font-semibold text-slate-800">{type}</span>
-                        </label>
-                    );
-                })}
-            </div>
+        <div className="space-y-8">
+            <label className={labelClass}>Industry Sub-Type</label>
+            {Object.entries(INDUSTRY_SUB_TYPES_SECTIONS).map(([key, section]) => (
+                <div key={key}>
+                    <h3 className="text-sm font-black text-slate-900 mb-3">{section.label}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {section.options.map(type => {
+                            const selected = safeIndustrySubType.includes(type);
+                            return (
+                                <label key={type} className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${selected ? 'border-orange-400 bg-orange-50' : 'border-slate-200 bg-white hover:border-orange-200'}`}>
+                                    <input 
+                                        type="checkbox" 
+                                        className="w-5 h-5 text-orange-500 rounded border-slate-300 focus:ring-orange-500"
+                                        checked={selected}
+                                        onChange={() => setFormData(p => ({ ...p, industrySubType: toggleArrayItem(Array.isArray(p.industrySubType) ? p.industrySubType : [], type) }))}
+                                    />
+                                    <span className="ml-3 text-sm font-semibold text-slate-800">{type}</span>
+                                </label>
+                            );
+                        })}
+                    </div>
+                </div>
+            ))}
         </div>
     );
 };
