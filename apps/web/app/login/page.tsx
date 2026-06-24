@@ -13,6 +13,8 @@ const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
 
 function GoogleSignInButton({ loading, onError, onSuccess }: { loading: boolean; onError: (message: string) => void; onSuccess: (accessToken: string) => Promise<void> }) {
     const handleGoogleLogin = useGoogleLogin({
+        flow: 'implicit',
+        scope: 'openid profile email',
         onSuccess: async (tokenResponse) => {
             try {
                 await onSuccess(tokenResponse.access_token);

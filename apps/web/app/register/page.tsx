@@ -18,6 +18,8 @@ const inputClass =
 
 function GoogleSignupButton({ loading, onError, onSuccess }: { loading: boolean; onError: (message: string) => void; onSuccess: (accessToken: string) => Promise<void> }) {
     const handleGoogleSignup = useGoogleLogin({
+        flow: 'implicit',
+        scope: 'openid profile email',
         onSuccess: async (tokenResponse) => {
             try {
                 await onSuccess(tokenResponse.access_token);
