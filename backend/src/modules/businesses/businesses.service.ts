@@ -978,37 +978,37 @@ export class BusinessesService implements OnModuleInit {
 
             // Verified (4pts)
             scoreParts.push(
-                `CASE WHEN "listing"."isVerified" = true THEN ${verifiedWeight} ELSE 0 END`
+                `CASE WHEN "listing"."is_verified" = true THEN ${verifiedWeight} ELSE 0 END`
             );
 
             // Featured (4pts)
             scoreParts.push(
-                `CASE WHEN "listing"."isFeatured" = true THEN ${featuredWeight} ELSE 0 END`
+                `CASE WHEN "listing"."is_featured" = true THEN ${featuredWeight} ELSE 0 END`
             );
 
             // Freshness (10pts) — newer = higher score, decay over 30 days
             scoreParts.push(
-                `CASE WHEN "listing"."recentUntil" > NOW() THEN ${freshnessWeight}`
-                + ` WHEN "listing"."createdAt" > NOW() - INTERVAL '7 days' THEN ${Math.round(freshnessWeight * 0.8)}`
-                + ` WHEN "listing"."createdAt" > NOW() - INTERVAL '30 days' THEN ${Math.round(freshnessWeight * 0.4)}`
+                `CASE WHEN "listing"."recent_until" > NOW() THEN ${freshnessWeight}`
+                + ` WHEN "listing"."created_at" > NOW() - INTERVAL '7 days' THEN ${Math.round(freshnessWeight * 0.8)}`
+                + ` WHEN "listing"."created_at" > NOW() - INTERVAL '30 days' THEN ${Math.round(freshnessWeight * 0.4)}`
                 + ' ELSE 0 END'
             );
 
             // Rating (10pts) — scaled 0-5 to 0-10
             scoreParts.push(
-                `COALESCE("listing"."averageRating", 0) * 2`
+                `COALESCE("listing"."average_rating", 0) * 2`
             );
 
             // Reviews (8pts) — log-scale, max at 50 reviews
             scoreParts.push(
-                `LEAST(COALESCE("listing"."totalReviews", 0) * 0.16, ${reviewsWeight})`
+                `LEAST(COALESCE("listing"."total_reviews", 0) * 0.16, ${reviewsWeight})`
             );
 
             // Profile completeness (6pts)
             scoreParts.push(
                 `(CASE WHEN "listing"."description" IS NOT NULL AND LENGTH("listing"."description") > 50 THEN 2 ELSE 0 END`
-                + ` + CASE WHEN "listing"."logoUrl" IS NOT NULL THEN 1.5 ELSE 0 END`
-                + ` + CASE WHEN "listing"."coverImageUrl" IS NOT NULL THEN 1.5 ELSE 0 END`
+                + ` + CASE WHEN "listing"."logo_url" IS NOT NULL THEN 1.5 ELSE 0 END`
+                + ` + CASE WHEN "listing"."cover_image_url" IS NOT NULL THEN 1.5 ELSE 0 END`
                 + ` + CASE WHEN "listing"."address" IS NOT NULL THEN 1 ELSE 0 END)`
             );
 
