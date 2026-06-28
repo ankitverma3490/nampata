@@ -229,9 +229,9 @@ export class PromotionsService implements OnModuleInit {
         const successPath = dto.dealId
             ? '/deals/success'
             : dto.eventId
-                ? '/events/success'
+                ? '/manage-events/success'
                 : '/offer-plans/success';
-        const cancelPath = dto.dealId ? '/deals' : dto.eventId ? '/events' : '/offer-plans';
+        const cancelPath = dto.dealId ? '/deals' : dto.eventId ? '/manage-events' : '/offer-plans';
 
         const info = pricing.breakup.map(b => b.label || b.placement).join(', ');
         const session = await this.stripe.checkout.sessions.create({
